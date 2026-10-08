@@ -1,6 +1,8 @@
 # yys_dimsum
 
-Source use: Claude, original copyright: Onmyoji / YYS, Netease
+Source use: Claude
+
+Copyright: Onmyoji/NetEase Games
 
 Tool site: https://revolcs.github.io/yys_dsp_pub/
 
