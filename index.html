@@ -1,0 +1,1208 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>羊的式神點心紙</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Mono:wght@700&display=swap">
+<style>
+/* Layout: one narrow column, sticky pill tabs; 圖鑑 = sticker-sheet icon grid (owned = neon frame + hard shadow), 黑蛋 = skill ledger per server */
+:root{
+  --paper:#f3f3ee; --sheet:#ffffff; --ink:#111214; --ink-soft:#6a6c72; --line:#dcdcd4;
+  --neon:#a3ffc9; --neon-ink:#111214; --acc:var(--neon); --acc-ink:var(--neon-ink); --guest:#2fb8ff; --seal:#ff3d6e; --seal-ink:#ffffff; --indigo:#6d4dff; --gold:#d9ad55; --egg:#111214; --ok:#14a364;
+  --tile-off:#e4e4dc; --shadow:#111214; --tshadow:#111214; --cnink:#0b6fa8; --dim:.45; --eggbg:transparent; --eggglow:rgba(0,0,0,0); --rar-out:#3a1830; --rar-in:#ffffff; --rimgf:none;
+  --f-display:"Huninn","Noto Sans TC",system-ui,sans-serif;
+  --f-body:"Huninn","Noto Sans TC",system-ui,-apple-system,"PingFang TC","Microsoft JhengHei",sans-serif;
+  --f-num:"Space Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#130a11; --sheet:#1e1119; --ink:#f7eef3; --ink-soft:#b39aa8; --line:#3a2533;
+  --neon:#ff4fb8; --neon-ink:#1a0712; --acc:var(--neon); --acc-ink:var(--neon-ink); --guest:var(--neon); --seal:#ff5c85; --seal-ink:#fff; --indigo:#b3a1ff; --gold:#d9ad55; --egg:#0d0e10; --ok:#4fe39a; --tile-off:#2c1b26; --shadow:rgba(255,79,184,.6); --tshadow:rgba(255,79,184,.35); --cnink:#8fdcff; --dim:.62; --eggbg:radial-gradient(circle,rgba(255,236,200,.22) 0%,rgba(255,236,200,.08) 55%,transparent 72%); --eggglow:rgba(255,230,180,.45); --rar-out:#fff4dc; --rar-in:#2b1020; --rimgf:drop-shadow(2px 0 0 #fff4dc) drop-shadow(-2px 0 0 #fff4dc) drop-shadow(0 2px 0 #fff4dc) drop-shadow(0 -2px 0 #fff4dc) drop-shadow(0 0 2px rgba(255,244,220,.6)); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#130a11; --sheet:#1e1119; --ink:#f7eef3; --ink-soft:#b39aa8; --line:#3a2533;
+  --neon:#ff4fb8; --neon-ink:#1a0712; --acc:var(--neon); --acc-ink:var(--neon-ink); --guest:var(--neon); --seal:#ff5c85; --seal-ink:#fff; --indigo:#b3a1ff; --gold:#d9ad55; --egg:#0d0e10; --ok:#4fe39a; --tile-off:#2c1b26; --shadow:rgba(255,79,184,.6); --tshadow:rgba(255,79,184,.35); --cnink:#8fdcff; --dim:.62; --eggbg:radial-gradient(circle,rgba(255,236,200,.22) 0%,rgba(255,236,200,.08) 55%,transparent 72%); --eggglow:rgba(255,230,180,.45); --rar-out:#fff4dc; --rar-in:#2b1020; --rimgf:drop-shadow(2px 0 0 #fff4dc) drop-shadow(-2px 0 0 #fff4dc) drop-shadow(0 2px 0 #fff4dc) drop-shadow(0 -2px 0 #fff4dc) drop-shadow(0 0 2px rgba(255,244,220,.6)); color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5}
+.wrap{max-width:720px;margin:0 auto;padding-inline:16px;padding-block:16px 96px}
+h1{font-family:var(--f-display);font-weight:900;font-size:1.9rem;margin:0;letter-spacing:-.01em;text-wrap:balance}
+h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:6px;box-decoration-break:clone}
+.sub{color:var(--ink-soft);font-size:.85rem;margin:2px 0 0}
+
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:6;background:var(--paper);margin-inline:-16px;padding:8px 16px 8px;border-bottom:2px solid var(--ink);display:flex;flex-direction:column;gap:8px}
+.toprow{display:flex;align-items:center;gap:10px;min-width:0}
+.toprow h1{font-size:1.45rem;flex:none}
+.now{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--ink-soft);white-space:nowrap}
+.now .rimg{filter:var(--rimgf);height:1.9rem}.now .rar{font-size:1.15rem}
+.tabs{display:flex;gap:6px}
+.tab{padding:7px!important}
+.jump{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px;margin-inline:-2px}
+.jump::-webkit-scrollbar{display:none}
+.jb{flex:none;display:flex;align-items:center;justify-content:center;min-width:52px;height:38px;padding:0 8px;border-radius:12px;border:2px solid var(--line);background:var(--sheet);cursor:pointer}
+.jb .rimg{height:26px}.jb .rar{font-size:.95rem}
+.jb[aria-current="true"]{border-color:var(--ink);background:var(--acc);box-shadow:2px 2px 0 var(--ink)}
+.group-h{scroll-margin-top:calc(var(--hdr,150px) + 10px)}
+.io{margin-top:10px;display:flex;flex-direction:column;gap:8px;background:var(--sheet);border:2px solid var(--ink);border-radius:14px;padding:10px 12px;box-shadow:3px 3px 0 var(--shadow)}
+.io.guest{border-color:var(--guest);box-shadow:3px 3px 0 var(--guest)}
+.io-msg{font-size:.85rem;color:var(--ink)}
+.io-msg b{font-weight:900}
+.io-msg .dirty{display:inline-block;margin-left:6px;font-size:.75rem;font-weight:900;color:var(--seal-ink);background:var(--seal);border-radius:99px;padding:0 8px}
+.pvtag{display:inline-block;margin-bottom:4px;font-size:.72rem;font-weight:900;color:#fff;background:var(--indigo);border-radius:99px;padding:1px 9px}
+.io.preview{border-style:dashed}
+.io-btns{display:flex;gap:6px;flex-wrap:wrap}
+.acctwrap{display:flex;gap:6px;align-items:center;min-width:0;max-width:100%}
+.topacct .seg button{padding:5px 12px;font-size:.85rem}
+.topacct .acctbtn{padding:5px 10px;font-size:.78rem}
+.acctlbl{flex:none;font-size:.72rem;font-weight:900;color:var(--ink-soft)}
+.acctseg{overflow-x:auto;scrollbar-width:none;flex-wrap:nowrap;min-width:0}
+.acctseg::-webkit-scrollbar{display:none}
+.acctseg button{white-space:nowrap}
+.acctbtn{flex:none;padding:6px 10px;font-size:.8rem}
+.fed{font-size:.82rem;color:var(--ink-soft);margin-top:2px}
+.fed b{font-family:var(--f-num);color:var(--ink)}
+.acctsum{margin:0 0 12px;background:var(--sheet);border:2px solid var(--ink);border-radius:14px;overflow:hidden}
+.acctsum table{width:100%;border-collapse:collapse;font-size:.85rem}
+.acctsum th,.acctsum td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+.acctsum th:first-child,.acctsum td:first-child{text-align:left}
+.acctsum th{font-weight:900;font-size:.75rem;color:var(--ink-soft)}
+.acctsum tr.cur td{background:color-mix(in srgb,var(--acc) 35%,transparent)}
+.acctsum tr.tot td{font-weight:900;border-bottom:0}
+.arow{display:flex;gap:6px;align-items:center}
+.arow input{flex:1}
+.foot{margin-top:40px;padding-top:14px;border-top:2px dashed var(--line);text-align:center;font-size:.75rem;color:var(--ink-soft);display:flex;flex-direction:column;gap:2px}
+.help{margin-top:12px}
+.help li b{color:var(--ink)}
+.wk{grid-column:1/-1;font-size:.75rem;font-weight:900;color:var(--ink-soft);border-bottom:1px dashed var(--line);padding:6px 2px 2px;margin-top:2px}
+.wkli{list-style:none;font-size:.75rem;font-weight:900;color:var(--ink-soft);background:var(--paper);padding:5px 12px;border-bottom:1px solid var(--line)}
+.cnmini{align-self:center;font:inherit;font-size:.72rem;font-weight:900;border:2px solid #2fb8ff;color:var(--cnink);background:var(--sheet);border-radius:99px;padding:2px 9px;cursor:pointer;white-space:nowrap}
+.cnmini[aria-pressed="true"]{background:#2fb8ff;color:#fff}
+.themefab{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:26;width:46px;height:46px;border-radius:50%;font-size:1.3rem;line-height:1;border:2px solid var(--ink);background:var(--sheet);box-shadow:3px 3px 0 var(--tshadow);cursor:pointer;display:grid;place-items:center}
+.cnfab{position:fixed;right:16px;bottom:calc(78px + env(safe-area-inset-bottom,0px));z-index:25;font:inherit;font-size:.8rem;font-weight:900;border:2px solid #0b2e5c;color:#fff;background:#2fb8ff;border-radius:99px;padding:8px 14px;box-shadow:3px 3px 0 #0b2e5c;cursor:pointer}
+.cnfab[aria-pressed="true"]{background:var(--sheet);color:var(--cnink)}
+.disc{margin-top:10px;background:var(--sheet);border:2px dashed var(--line);border-radius:12px;padding:8px 12px;font-size:.82rem;color:var(--ink-soft)}
+.disc summary{cursor:pointer;font-weight:900;color:var(--ink);list-style:none}
+.disc summary::-webkit-details-marker{display:none}
+.disc summary::after{content:" ▾";color:var(--ink-soft)}
+.disc[open] summary::after{content:" ▴"}
+.disc ul{margin:6px 0 2px;padding-left:1.2em;display:flex;flex-direction:column;gap:3px}
+.tab{flex:1;font:inherit;font-weight:900;font-size:1rem;padding:10px;border-radius:99px;border:2px solid var(--ink);background:var(--sheet);color:var(--ink);cursor:pointer}
+.tab[aria-selected="true"]{background:var(--acc);color:var(--acc-ink);border-color:var(--ink);box-shadow:3px 3px 0 var(--shadow)}
+button:focus-visible,input:focus-visible,select:focus-visible,label:focus-visible{outline:2px solid var(--seal);outline-offset:2px}
+
+.notice{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--sheet);border:1px dashed var(--line);color:var(--ink-soft);font-size:.85rem}
+
+.progress{display:flex;align-items:center;gap:14px;margin:16px 0 10px}
+.count{font-family:var(--f-num);font-size:2rem;font-variant-numeric:tabular-nums;line-height:1}
+.count small{font-size:1rem;color:var(--ink-soft)}
+.bar{flex:1;height:14px;border-radius:99px;background:var(--tile-off);overflow:hidden;border:2px solid var(--ink)}
+.bar i{display:block;height:100%;background:var(--acc);width:0;transition:width .3s}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.chip{font:inherit;font-size:.85rem;font-weight:700;padding:5px 12px;border-radius:99px;border:2px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
+.chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper);font-weight:700}
+.spacer{flex:1}
+.btn{font:inherit;font-weight:700;font-size:.9rem;padding:7px 14px;border-radius:99px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;text-align:center}
+.btn.ghost{background:var(--sheet);color:var(--ink);border-color:var(--ink)}
+.btn.danger{background:var(--seal);border-color:var(--seal);color:var(--seal-ink)}
+.btn[aria-pressed="true"]{background:var(--acc);border-color:var(--ink);color:var(--acc-ink)}
+.seg{display:inline-flex;border:2px solid var(--ink);border-radius:99px;overflow:hidden;background:var(--sheet)}
+.seg button{font:inherit;font-size:.9rem;border:0;background:none;color:var(--ink-soft);padding:7px 14px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink);font-weight:900}
+
+.group-h{font-family:var(--f-display);font-weight:900;font-size:1.15rem;margin:20px 0 8px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.group-h span:not(.rar){font-family:var(--f-body);font-size:.8rem;color:var(--ink-soft);font-variant-numeric:tabular-nums}
+
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px}
+.tile.placeholder{opacity:.25}
+.tile.ghost{position:fixed;left:0;top:0;z-index:50;pointer-events:none;margin:0;filter:drop-shadow(0 10px 16px rgba(0,0,0,.35));will-change:transform}
+body.dragging{user-select:none;-webkit-user-select:none;overscroll-behavior:none}
+.tile{-webkit-touch-callout:none;user-select:none;-webkit-user-select:none;position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer;min-width:0}
+.face{position:relative;width:100%;aspect-ratio:1;max-width:100%;border-radius:16px;overflow:hidden;background:var(--tile-off);border:2px solid transparent;display:grid;place-items:center;transition:transform .12s}
+.tile:active .face{transform:scale(.94)}
+.face img{width:100%;height:100%;object-fit:cover;filter:grayscale(1) opacity(var(--dim));transition:filter .2s}
+.face .ini{font-family:var(--f-display);font-size:1.6rem;color:var(--ink-soft);opacity:.6}
+.tile.on .face{border:3px solid var(--neon);background:var(--sheet);box-shadow:3px 3px 0 var(--tshadow);transform:rotate(-1.5deg)}
+.tile.on:nth-child(even) .face{transform:rotate(1.5deg)}
+.tile.on .face img{filter:none}
+.tile.on .face .ini{opacity:1;color:var(--ink)}
+.nm{font-size:.78rem;font-weight:400;text-align:center;line-height:1.25;color:var(--ink-soft);overflow-wrap:anywhere;max-width:100%}
+.tile.on .nm{color:var(--ink)}
+.tile.cn:not(.on) .face{border:3px solid #6fe3ff;box-shadow:0 0 0 2px rgba(111,227,255,.35),0 0 14px rgba(111,227,255,.75)}
+.cnb{position:absolute;left:50%;bottom:6%;transform:translateX(-50%) rotate(-7deg);white-space:nowrap;font-family:var(--f-display);font-weight:900;font-size:.66rem;letter-spacing:.04em;line-height:1.2;
+  color:#fff;background:#2fb8ff;border:2px solid #0b2e5c;border-radius:7px;padding:1px 5px;box-shadow:2px 2px 0 #0b2e5c;
+  text-shadow:1px 1px 0 #0b2e5c,-1px 1px 0 #0b2e5c,1px -1px 0 #0b2e5c,-1px -1px 0 #0b2e5c}
+.tile.on .cnb{display:none}
+.editing .face{border-style:dashed;border-color:var(--indigo)}
+.pen{position:absolute;inset:auto 4px 4px auto;font-size:.7rem;background:var(--indigo);color:var(--paper);border-radius:6px;padding:0 5px;display:none}
+.editing .pen{display:block}
+.addtile .face{border:2px dashed var(--line);background:transparent}
+.addtile .ini{font-family:var(--f-body);font-size:1.8rem}
+
+/* eggs */
+.eggsum{display:flex;gap:16px;align-items:center;margin:16px 0 12px;background:var(--sheet);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--shadow);border-radius:18px;padding:16px}
+.egg{width:64px;height:68px;flex:none;border-radius:50%;background:var(--eggbg);filter:drop-shadow(0 0 3px var(--eggglow))}
+.egg img,.dm img{display:block;width:100%;height:100%;object-fit:contain}
+.rimg{height:1.35em;width:auto;vertical-align:middle;display:inline-block}
+.rimg.lg{height:2.2rem}
+.chip .rimg{height:1.5em;margin:-.2em 0}
+img.rimg[alt="UR"]{vertical-align:middle;position:relative;top:-.115em}
+img.rimg[alt="SSR"]{position:relative;top:.05em}
+img.rimg[alt="SR"],img.rimg[alt="呱太"]{position:relative;top:.03em}
+.pickh .rimg{height:1.6em}
+.pill .rimg{height:1.4em}
+.dm{display:inline-block;width:1.15em;height:1.2em;vertical-align:-.25em;margin-right:2px}
+.std{display:inline-flex;gap:2px;vertical-align:middle}
+.std i{font-style:normal;font-size:.72rem;min-width:1.3em;text-align:center;border:1px solid var(--line);border-radius:4px;padding:0 2px;font-variant-numeric:tabular-nums;color:var(--ink)}
+.std i.lack{border-color:var(--seal);color:var(--seal);font-weight:700}
+.std i{font-family:var(--f-num)}
+.full{font:inherit;font-size:.78rem;font-weight:900;border:2px solid var(--ink);color:var(--acc-ink);background:var(--acc);border-radius:8px;padding:5px 8px;cursor:pointer;white-space:nowrap}
+.allfull{padding:14px;text-align:center;color:var(--ok);font-weight:700;font-size:.88rem}
+.nown{font:inherit;font-size:.78rem;font-weight:900;border:2px solid var(--line);color:var(--ink-soft);background:var(--sheet);border-radius:8px;padding:5px 7px;cursor:pointer}
+.nown.on{border-color:var(--ink-soft);background:var(--tile-off);color:var(--ink)}
+.nown:disabled{opacity:.35;cursor:default}
+.segf button{padding:6px 10px}
+.full:disabled{opacity:.35;cursor:default}
+.full.is-full{background:var(--sheet);color:var(--ok);border-color:var(--ok)}
+.gfull{align-self:center;font:inherit;font-size:.75rem;font-weight:900;border:2px solid var(--ink);background:var(--acc);color:var(--acc-ink);border-radius:99px;padding:3px 10px;cursor:pointer;white-space:nowrap;margin-left:auto}
+.gfull:disabled{background:var(--sheet);border-color:var(--line);color:var(--ok);cursor:default}
+.gfull.armed{background:var(--seal);border-color:var(--seal);color:var(--seal-ink)}
+.bar2{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--sheet);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin-bottom:8px;font-size:.85rem}
+.bar2[hidden]{display:none}
+.eggsum .big{font-family:var(--f-num);font-size:2.4rem;line-height:1;font-variant-numeric:tabular-nums}
+.eggsum .lbl{color:var(--ink-soft);font-size:.85rem}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.pill{font-size:.75rem;padding:2px 8px;border-radius:99px;background:var(--tile-off);font-variant-numeric:tabular-nums}
+.pill b{font-weight:700}
+
+.rows{list-style:none;margin:0;padding:0;background:var(--sheet);border:2px solid var(--ink);border-radius:16px;overflow:hidden}
+.srow{display:grid;grid-template-columns:40px minmax(0,1fr) auto auto auto auto;gap:8px;align-items:center;padding:8px 10px;border-bottom:1px solid var(--line)}
+.srow:last-child{border-bottom:0}
+.mini{width:40px;height:40px;border-radius:10px;overflow:hidden;background:var(--tile-off);display:grid;place-items:center;font-family:var(--f-display);color:var(--ink-soft)}
+.mini img{width:100%;height:100%;object-fit:cover}
+.srow .who{min-width:0;cursor:pointer}
+.srow .who b{display:block;font-weight:500;font-size:.92rem;overflow-wrap:anywhere}
+.srow .who small{color:var(--ink-soft);font-size:.75rem;font-variant-numeric:tabular-nums}
+.cntag{display:inline-block;margin-left:6px;vertical-align:2px;transform:rotate(-5deg);white-space:nowrap;font-family:var(--f-display);font-weight:900;font-size:.62rem;letter-spacing:.04em;line-height:1.2;
+  color:#fff;background:#2fb8ff;border:2px solid #0b2e5c;border-radius:6px;padding:0 4px;box-shadow:2px 2px 0 #0b2e5c;
+  text-shadow:1px 1px 0 #0b2e5c,-1px 1px 0 #0b2e5c,1px -1px 0 #0b2e5c,-1px -1px 0 #0b2e5c}
+.srow.cn .mini{border:3px solid #6fe3ff;box-shadow:0 0 8px rgba(111,227,255,.7)}
+.cnchip[aria-pressed="true"]{border-color:#2fb8ff;background:#2fb8ff;color:#fff}
+.tag{font-size:.65rem;border:1px solid var(--gold);color:var(--gold);border-radius:5px;padding:0 4px;margin-left:4px;vertical-align:1px}
+.cur{width:4.6em;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:.12em;padding:6px 4px}
+.owe{min-width:3.2em;text-align:right;font-family:var(--f-num);font-size:1.15rem;font-variant-numeric:tabular-nums}
+.owe.zero{color:var(--ok);font-size:.85rem;font-family:var(--f-body)}
+.owe.none{color:var(--ink-soft);font-size:.85rem;font-family:var(--f-body)}
+.cur.bad{border-color:var(--seal)}
+.empty{color:var(--ink-soft);text-align:center;padding:28px 8px;font-size:.9rem}
+
+input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:8px 10px;width:100%;min-width:0}
+.fld{display:flex;flex-direction:column;gap:4px;font-size:.8rem;color:var(--ink-soft)}
+.check{display:flex;gap:8px;align-items:center;font-size:.9rem;color:var(--ink)}
+.check input{width:auto}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:rgba(10,12,18,.45);z-index:20;display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--sheet);width:100%;max-width:520px;border-radius:18px 18px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:12px;max-height:92%;overflow:auto}
+.sheet h2{font-family:var(--f-display);margin:0;font-size:1.25rem}
+.preview{display:flex;gap:12px;align-items:center}
+.preview .face{width:84px;flex:none}
+.preview .face img{filter:none}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.row>*{flex:1}
+.two{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.confirm{background:var(--paper);border-radius:10px;padding:10px;font-size:.85rem}
+.picklist{display:flex;flex-direction:column;max-height:40vh;overflow:auto;border:1px solid var(--line);border-radius:10px}
+.picklist button{font:inherit;text-align:left;border:0;border-bottom:1px solid var(--line);background:none;color:var(--ink);padding:9px 12px;cursor:pointer;display:flex;justify-content:space-between;gap:8px}
+.picklist button small{color:var(--ink-soft)}
+.rar{position:relative;display:inline-block;font-family:var(--f-display);font-weight:900;font-style:italic;letter-spacing:.06em;line-height:1.2;padding:.08em .22em;transform:skewX(-8deg);isolation:isolate;filter:drop-shadow(1px 2px 0 rgba(0,0,0,.28))}
+.rar>b{position:relative;z-index:2;font-weight:inherit;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent}
+.rar::before,.rar::after{content:attr(data-t);position:absolute;inset:0;padding:inherit;pointer-events:none}
+.rar::before{z-index:0;color:var(--rar-out);-webkit-text-stroke:.3em var(--rar-out)}
+.rar::after{z-index:1;color:var(--rar-in);-webkit-text-stroke:.13em var(--rar-in)}
+.rar.lg{font-size:1.45rem}
+.rar-all,.rar-col{--rar-out:#fff4dc;--rar-in:#2b1020}
+.rar-all>b{background-image:linear-gradient(180deg,#fff8d6 0%,#ffd860 50%,#e59a1c 100%)}
+.rar-ur>b{background-image:linear-gradient(100deg,#ffd6f2 0%,#d9c4ff 35%,#b9ecff 70%,#fff4c4 100%)}
+.rar-sp>b{background-image:linear-gradient(180deg,#ffb3c4 0%,#ff4d6d 55%,#d61f3c 100%)}
+.rar-ssr>b{background-image:linear-gradient(180deg,#fff27a 0%,#ffbe2e 50%,#ff6a1a 100%)}
+.rar-sr>b{background-image:linear-gradient(180deg,#f0c2ff 0%,#b05cff 55%,#7a2fd6 100%)}
+.rar-r>b{background-image:linear-gradient(180deg,#b8eaff 0%,#4fb6ff 55%,#1d6fe0 100%)}
+.rar-n>b{background-image:linear-gradient(180deg,#ffffff 0%,#d4d6dc 55%,#8e9199 100%)}
+.rar-gt>b{background-image:linear-gradient(180deg,#d6fff6 0%,#6fe0cf 55%,#1fa39a 100%)}
+.rar-col>b{background-image:linear-gradient(180deg,#d9fbff 0%,#5fd6ff 45%,#ff7ac6 100%)}
+.rar-x>b{background-image:linear-gradient(180deg,var(--ink),var(--ink))}
+.chip .rar{font-size:1rem}
+
+.pickh{position:sticky;top:0;background:var(--sheet);border-bottom:2px solid var(--acc);font-size:1rem;padding:3px 12px;z-index:1}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:99px;font-size:.85rem;z-index:30;max-width:calc(100% - 32px);text-align:center}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="top" id="top">
+    <div class="toprow"><h1>式神<mark>點心紙</mark></h1><div class="now" id="nowRar"></div></div>
+    <nav class="tabs" role="tablist">
+      <button class="tab" id="tab-shiki" role="tab" aria-selected="true">式神圖鑑</button>
+      <button class="tab" id="tab-egg" role="tab" aria-selected="false">黑蛋地獄</button>
+    </nav>
+    <div class="acctwrap topacct"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button></div>
+    <div class="jump" id="jump" aria-label="跳到稀有度"></div>
+  </div>
+  <details class="disc" id="disc">
+    <summary>⚠️ 免責聲明（請先看我）⚠️</summary>
+    <ul>
+      <li>本頁為玩家自製的非官方工具，與網易及《陰陽師》官方沒有任何關係。</li>
+      <li>遊戲角色頭像、稀有度圖示等美術版權屬網易所有，此處僅作個人收藏紀錄用途，不作任何商業用途。</li>
+      <li>式神名單、技能數值為玩家手動整理，可能與遊戲實際內容有出入，一切以遊戲內為準。</li>
+      <li>朋友打開時是<b>訪客模式</b>：紀錄只存在自己打開的頁面，不會改到任何人的資料；關掉頁面就會清空，離開前記得匯出、下次匯入接續。想離線用或不想登入，可以按<b>📦 匯出免登入版</b>下載一個單獨的檔案，直接用瀏覽器打開。</li>
+    </ul>
+  </details>
+
+  <div id="nojs" style="margin:12px 0;padding:14px 16px;border:2.5px solid #111;border-radius:16px;background:#fff6a8;color:#111;font-weight:700;line-height:1.6;box-shadow:4px 4px 0 #111">⚠️ 這個畫面不能執行點心紙的程式（手機的「檔案預覽」會把程式關掉）。<br>請改用<b>網址</b>打開，或用電腦的瀏覽器（Chrome／Safari／Edge）打開這個檔案 (´;ω;`)</div>
+  <div class="io" id="io" hidden>
+    <div class="io-msg" id="ioMsg"></div>
+    <div class="io-btns">
+      <button class="btn ghost" id="exMd" type="button">匯出 MD</button>
+      <button class="btn ghost" id="exPng" type="button">匯出圖片</button>
+      <label class="btn" for="imFile" id="imLbl">匯入紀錄</label>
+      <button class="btn ghost" id="pvGuest" type="button" hidden>👀 預覽訪客模式</button>
+      <button class="btn ghost" id="exStatic" type="button" hidden>📦 匯出免登入版</button>
+      <button class="btn ghost" id="exMine" type="button" hidden>📦 匯出我的免登入版</button>
+      <input id="imFile" type="file" accept=".md,.txt,.png,text/markdown,text/plain,image/png" hidden>
+    </div>
+    <div class="bar2" id="imConfirm" hidden><span id="imCMsg" style="flex:1;min-width:0"></span><button class="btn" id="imCYes" type="button">寫入雲端</button><button class="btn ghost" id="imCNo" type="button">取消</button></div>
+  </div>
+  <div id="notice" class="notice" hidden></div>
+
+  <section id="pane-shiki">
+    <details class="disc help">
+      <summary>📖 點心紙使用說明</summary>
+      <ul>
+        <li><b>點一下頭像</b>＝入手（螢光框），再點一次取消。</li>
+        <li>上面的帳號列可以切換<b>不同帳號</b>（主帳號、小號…），每個帳號分開點。</li>
+        <li><b>±小號記錄</b>：新增、改名或刪除帳號（刪除要按兩次確認）。</li>
+        <li>淺藍框＋「陸服限定」貼紙＝亞服沒有的式神。合作區依<b>作品</b>分組，陸服限定排在最後。</li>
+        <li>想藏起陸服限定避免誤按，有三個地方可以按，<b>按哪個都一樣、兩頁同步</b>：上面工具列的<b>隱藏陸服限定</b>、合作標題旁的<b>🙈／🙉</b>小按鈕，以及捲到合作區時右下角浮出的<b>±陸限</b>（🙈＝已隱藏，🙉＝顯示中）。</li>
+        <li>最大的數字和進度條只算<b>本家</b>（不含合作）。進度條下面：<b>本家</b>、<b>合作</b>各自的數量；<b>合計</b>固定不含陸服限定，<b>含陸服限定</b>是全部式神。</li>
+        <li>最上面的稀有度按鈕可以快速跳轉，右上角會顯示「正在看」哪一組。</li>
+        <li>訪客記得在離開前按<b>匯出 MD／匯出圖片</b>，下次用<b>匯入紀錄</b>接續。</li>
+        <li>右下角的 <b>🌓／☀️／🌙</b> 浮動按鈕可以切換<b>跟隨系統／日間／夜間</b>模式，只記在你自己的裝置上。</li>
+      </ul>
+    </details>
+    <div class="progress">
+      <div class="count" id="cnt">0<small> / 0</small></div>
+      <div class="bar"><i id="barfill"></i></div>
+    </div>
+    <div class="pills" id="cntSplit" style="margin:-4px 0 10px"></div>
+    <div class="toolbar">
+      <button class="chip" data-f="all" aria-pressed="true">全部</button>
+      <button class="chip" data-f="no" aria-pressed="false">未入手</button>
+      <button class="chip" data-f="yes" aria-pressed="false">已入手</button>
+      <button class="chip cnchip" type="button" aria-pressed="false">隱藏陸服限定</button>
+      <span class="spacer"></span>
+      <label class="btn ghost" for="bulkFile" id="bulkLbl" hidden>上傳截圖配頭像</label>
+      <input id="bulkFile" type="file" accept="image/*" multiple hidden>
+      <button class="btn ghost" id="addShiki" type="button" hidden>＋新增式神</button>
+      <button class="btn ghost" id="editBtn" aria-pressed="false" hidden>編輯</button>
+    </div>
+    <div class="bar2" id="pendBar" hidden style="margin-top:12px"><span id="pendMsg" style="flex:1;min-width:0"></span><button class="btn" id="pendGo" type="button">開始配對</button></div>
+    <p class="sub" id="ownerHint" style="margin:10px 0 0" hidden>長按後放開＝編輯（編輯視窗最下面可以刪除這隻式神）；長按後拖曳＝換位置（在「全部」底下才能拖）。「＋新增式神」只有你看得到。</p>
+    <div id="groups"></div>
+  </section>
+
+  <section id="pane-egg" hidden>
+    <p class="sub" style="margin-top:12px">黑蛋頁輸入現有技能，我會自動算你還欠幾顆～</p>
+    <details class="disc help">
+      <summary>📖 黑蛋地獄使用說明</summary>
+      <ul>
+        <li><b>輸入技能</b>：三個技能 5、4、3 就打 <b>543</b>，右邊自動算還欠幾顆。標準技能的格子變紅＝那格還沒滿。</li>
+        <li><b>滿</b>：一鍵變滿技能；已經滿（綠框）再按一次會變回 111／11。</li>
+        <li><b>未</b>：設成還沒擁有（不計算）；再按一次變回擁有，技能從 1 開始。</li>
+        <li><b>一鍵全滿</b>、各組的<b>這組全滿</b>：只會補滿已經填過的式神。</li>
+        <li>篩選<b>全部／未滿／已滿／未擁有</b>；<b>隱藏陸服限定</b>跟點心紙連動。</li>
+        <li>總數預設<b>不含合作</b>，勾「總數包含合作」才會算進去。</li>
+        <li><b>±N號機記錄用</b>：多號機各自記錄。下方表格列出每個帳號的<b>尚欠</b>和<b>已餵</b>（技能從 1 升到現在吃掉的黑蛋），最後一行是所有帳號合計。</li>
+      </ul>
+    </details>
+    <div class="toolbar" style="margin-top:16px">
+      <button class="chip cnchip" type="button" aria-pressed="false">隱藏陸服限定</button>
+      <div class="seg segf" role="group" aria-label="篩選" id="eggF">
+        <button data-ef="all">全部</button><button data-ef="owe">未滿</button><button data-ef="full">已滿</button><button data-ef="none">未擁有</button>
+      </div>
+      <button class="btn ghost" id="allFull">一鍵全滿</button>
+    </div>
+    <div class="bar2" id="fullConfirm" hidden>
+      <span id="fullMsg" style="flex:1;min-width:0"></span>
+      <button class="btn ghost" id="fullNo" type="button">取消</button>
+      <button class="btn" id="fullYes" type="button">全部設成滿</button>
+    </div>
+    <div class="eggsum">
+      <div class="egg" aria-hidden="true" id="eggArt"></div>
+      <div style="min-width:0">
+        <div class="lbl" id="eggLbl">亞服尚欠黑蛋</div>
+        <div class="big" id="eggTotal">0</div>
+        <div class="fed" id="eggFed"></div>
+        <div class="pills" id="eggPills"></div>
+        <label class="check" style="margin-top:8px;font-size:.8rem"><input id="eggCol" type="checkbox"> 總數包含合作</label>
+      </div>
+    </div>
+    <div class="acctsum" id="acctSum"></div>
+    <div id="eggGroups"></div>
+  </section>
+  <footer class="foot">
+    <div id="copyLine">遊戲角色、圖示等美術版權歸網易《陰陽師》所有</div>
+    <div>點心紙＆黑蛋地獄企劃 ver 1.0<span id="staticTag"></span></div>
+  </footer>
+</div>
+
+<!-- edit sheet -->
+<div id="scrim" class="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+    <h2 id="sheetTitle">編輯式神</h2>
+    <div class="preview">
+      <div class="face" id="pvFace"><span class="ini"></span></div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0">
+        <label class="btn ghost" for="pvFile" id="pvUpLbl">上傳 icon 截圖</label>
+        <input id="pvFile" type="file" accept="image/*" hidden>
+        <button class="btn ghost" id="pvClearImg" type="button">移除圖片</button>
+      </div>
+    </div>
+    <label class="fld">名字<input id="pvName" type="text"></label>
+    <div class="two">
+      <label class="fld">稀有度<select id="pvRar"></select></label>
+      <label class="fld">標準技能<input id="pvMax" type="text" inputmode="numeric" placeholder="555"></label>
+      <label class="fld">排序<input id="pvOrder" type="number" inputmode="numeric"></label>
+    </div>
+    <label class="fld">作品（合作用，同作品會排在一起）<input id="pvWork" type="text" maxlength="20" placeholder="例如 鬼滅之刃"></label>
+    <label class="check"><input id="pvShrine" type="checkbox"> 神龕限定（黑蛋分開算）</label>
+    <label class="check"><input id="pvCn" type="checkbox"> 陸服限定（亞服沒有，未點亮時顯示藍框）</label>
+    <div id="pvConfirm" class="confirm" hidden>
+      確定刪除這隻？圖片和技能紀錄會一起刪掉喔。
+      <div class="row" style="margin-top:8px"><button class="btn ghost" id="pvNo" type="button">不要</button><button class="btn danger" id="pvYes" type="button">刪除</button></div>
+    </div>
+    <div class="row">
+      <button class="btn ghost" id="pvDel" type="button">刪除</button>
+      <button class="btn ghost" id="pvCancel" type="button">取消</button>
+      <button class="btn" id="pvSave" type="button">儲存</button>
+    </div>
+  </div>
+</div>
+
+<!-- account manager -->
+<div id="aScrim" class="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="aTitle">
+    <h2 id="aTitle">管理帳號</h2>
+    <p class="sub" style="margin:0" id="aHint"></p>
+    <div id="aList" style="display:flex;flex-direction:column;gap:8px"></div>
+    <div class="row"><input id="aNew" type="text" maxlength="12" placeholder="新帳號名稱，例如 小號"><button class="btn" id="aAdd" type="button" style="flex:none">新增</button></div>
+    <button class="btn ghost" id="aClose" type="button">完成</button>
+  </div>
+</div>
+
+<!-- export fallback -->
+<div id="xScrim" class="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="xTitle">
+    <h2 id="xTitle">匯出</h2>
+    <p class="sub" id="xHint" style="margin:0"></p>
+    <textarea id="xText" readonly hidden style="width:100%;min-height:40vh;font:12px/1.4 ui-monospace,monospace;border-radius:10px;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:8px"></textarea>
+    <img id="xImg" alt="匯出的點心紙圖片" hidden style="width:100%;border-radius:10px;border:1px solid var(--line)">
+    <div class="row"><button class="btn ghost" id="xCopy" type="button">複製文字</button><button class="btn" id="xClose" type="button">關閉</button></div>
+  </div>
+</div>
+
+<!-- grid split sheet -->
+<div id="gScrim" class="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="gTitle">
+    <h2 id="gTitle">切格子</h2>
+    <p class="sub" style="margin:0">把圖鑑截圖切成一格一格。對不準的話調整欄數、列數。</p>
+    <div style="overflow:auto;border-radius:12px;border:2px solid var(--ink)"><canvas id="gCanvas" style="display:block;width:100%;height:auto"></canvas></div>
+    <div class="two">
+      <label class="fld">每行幾格<input id="gCols" type="number" inputmode="numeric" min="1" max="10" value="4"></label>
+      <label class="fld">共幾列<input id="gRows" type="number" inputmode="numeric" min="1" max="20" value="4"></label>
+      <label class="fld" style="justify-content:flex-end"><span class="check"><input id="gSingle" type="checkbox"> 單張頭像</span></label>
+    </div>
+    <div class="sub" id="gInfo"></div>
+    <div class="row">
+      <button class="btn ghost" id="gCancel" type="button">取消</button>
+      <button class="btn" id="gGo" type="button">切好了，開始配對</button>
+    </div>
+  </div>
+</div>
+
+<!-- bulk icon sheet -->
+<div id="bScrim" class="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="bTitle">
+    <h2 id="bTitle">這張是誰？</h2>
+    <div class="preview">
+      <div class="face" id="bFace"></div>
+      <div style="min-width:0">
+        <div class="sub" id="bProg">第 1 / 1 張</div>
+        <div class="sub">打幾個字找式神，點名字就配對好了</div>
+      </div>
+    </div>
+    <div class="toolbar" id="bRar"></div>
+    <input id="bSearch" type="text" placeholder="先選稀有度，再打幾個字">
+    <div class="picklist" id="bList"></div>
+    <div class="row">
+      <button class="btn ghost" id="bStop" type="button">結束</button>
+      <button class="btn ghost" id="bSkip" type="button">跳過這張</button>
+      <button class="btn ghost" id="bDrop" type="button" hidden>丟掉這張</button>
+    </div>
+  </div>
+</div>
+<button id="themeFab" class="themefab" type="button" aria-label="切換日夜模式">🌓</button>
+<button id="cnFab" class="cnfab" type="button" hidden aria-pressed="false" aria-label="顯示或隱藏陸服限定">±陸限</button>
+<div id="toast" class="toast" hidden></div>
+
+<script id="static-data">window.STATIC_DB={"shiki":[{"id":"col003","name":"阿香","rarity":"合作","max":"515","order":10,"img":"a35dd50ebda6bc5c7aac6099c44b478b","work":"鬼燈的冷徹"},{"id":"col004","name":"蜜桃&芥子","rarity":"合作","max":"515","order":3,"img":"8560184a96b6270c21f6688a38f4db34","work":"鬼燈的冷徹","shrine":true},{"id":"col010","name":"朽木露琪亞","rarity":"合作","max":"555","order":9,"img":"e035fc8a7bc6cefa4299006325f60f6e","work":"BLEACH 死神","shrine":true},{"id":"col011","name":"炭治郎","rarity":"合作","max":"555","order":12,"img":"68d4fda8f5122eb7966c13c0852f7022","cn":true,"work":"鬼滅之刃"},{"id":"col012","name":"禰豆子","rarity":"合作","max":"555","order":14,"img":"6359d1c46a39efe40285027aa4abe388","cn":true,"work":"鬼滅之刃"},{"id":"col022","name":"夏目&貓咪老師","rarity":"合作","max":"555","order":20,"img":"3580fd387e0026ad8b6e2aef2c56d947","work":"夏目友人帳"},{"id":"col029","name":"雪兔&月","rarity":"合作","order":29,"cn":true,"work":"庫洛魔法使"},{"id":"coln001","name":"洛天依","rarity":"合作","max":"555","order":22,"img":"cdf85a9f6ea19573835fa9333d8104c4","work":"洛天依（Vsinger）"},{"id":"coln002","name":"言和","rarity":"合作","max":"555","order":21,"img":"52500bb8421dd39a98a9d461b0729a6c","work":"洛天依（Vsinger）"},{"id":"coln004","name":"知世&小可","rarity":"合作","order":28,"cn":true,"work":"庫洛魔法使"},{"id":"coln005","name":"李小狼","rarity":"合作","max":"555","order":27,"img":"76af0fe824e1040bb38b2b687c066651","cn":true,"work":"庫洛魔法使"},{"id":"coln006","name":"木之本櫻","rarity":"合作","max":"555","order":23,"img":"8c39731662702a47686371e78a42be93","work":"庫洛魔法使"},{"id":"coln007","name":"巡音流歌","rarity":"合作","max":"555","order":19,"img":"6639e8d133a291cd06171471351a3e2e","work":"初音未來"},{"id":"coln009","name":"鏡音鈴·連","rarity":"合作","max":"555","order":18,"img":"7eb3e5c456dfdc72958f6c07402075ea","work":"初音未來"},{"id":"coln010","name":"初音未來","rarity":"合作","max":"555","order":17,"img":"858b3115d3dbb57c91a50de2d64b88af","work":"初音未來"},{"id":"coln011","name":"坂田銀時","rarity":"合作","max":"515","order":13,"img":"2528316c13ae2defe4f594acbcf620a1","work":"銀魂"},{"id":"coln012","name":"神樂&定春","rarity":"合作","max":"515","order":16,"img":"bada984fa67a60bcc0cf1e14021199d9","work":"銀魂"},{"id":"coln013","name":"嘴平伊之助","rarity":"合作","max":"555","order":25,"img":"1be0c9fe4417d710b430ad6a06ea6e35","cn":true,"work":"鬼滅之刃"},{"id":"coln014","name":"我妻善逸","rarity":"合作","max":"555","order":15,"img":"c5416fa78a66b864d72db9d310eba4b3","cn":true,"work":"鬼滅之刃"},{"id":"coln017","name":"黑崎一護","rarity":"合作","max":"515","order":8,"img":"f62de37aa8817fbd43eb278c3d02c2b5","work":"BLEACH 死神"},{"id":"coln018","name":"桔梗","rarity":"合作","max":"515","order":7,"img":"c083311a8890c31c81d880820bd9c3ec","work":"犬夜叉"},{"id":"coln019","name":"殺生丸","rarity":"合作","max":"515","order":6,"img":"c68929c1edfa2041edfdf58b786b5049","work":"犬夜叉"},{"id":"coln020","name":"犬夜叉","rarity":"合作","max":"515","order":5,"img":"16b108e24871521291a6b013f61dbc99","work":"犬夜叉"},{"id":"coln021","name":"鬼燈","rarity":"合作","max":"515","order":2,"img":"63c321d87a71a3557745ab994bcc4eea","work":"鬼燈的冷徹"},{"id":"coln022","name":"賣藥郎","rarity":"合作","max":"515","order":4,"img":"3e903ec922a14c6036f69c6d5c51d16e","work":"物怪"},{"id":"coln023","name":"奴良陸生","rarity":"合作","max":"515","order":1,"img":"a3cd7cbe821d9f2762e673fc7bf521e2","work":"滑頭鬼之孫"},{"id":"gt001","name":"大天狗呱","rarity":"呱太","max":"55","order":1,"img":"d1657aa9175f0713d1553884251f0678"},{"id":"gt002","name":"酒吞呱","rarity":"呱太","max":"55","order":2,"img":"33152c1e9fa911c7e13f59f953d5cadd"},{"id":"gt003","name":"荒川呱","rarity":"呱太","max":"55","order":3,"img":"a7788c61a39023cf5f1d004eeeeafbdf"},{"id":"gt004","name":"閻魔呱","rarity":"呱太","max":"55","order":4,"img":"465b4318b9ab5357196e34e9d8f04734"},{"id":"gt005","name":"兩面佛呱","rarity":"呱太","max":"55","order":5,"img":"d681cc80d84d7bd21dbb1e2d84cb1184"},{"id":"gt006","name":"小鹿男呱","rarity":"呱太","max":"55","order":6,"img":"337c50ce5567c7b81539ce603c94cdde"},{"id":"gt007","name":"茨木呱","rarity":"呱太","max":"55","order":7,"img":"bd7c78838eee7651017847d4186f64f9"},{"id":"gt008","name":"青行燈呱","rarity":"呱太","max":"55","order":8,"img":"31e8d4961b822344b8095cb244b32ba2"},{"id":"gt009","name":"妖刀姬呱","rarity":"呱太","max":"55","order":9,"img":"e93ded77d725bfcabab06f2373cdbdb3"},{"id":"gt010","name":"一目連呱","rarity":"呱太","max":"55","order":10,"img":"fd0f90076cb95d5177725eadbcc5f954"},{"id":"gt011","name":"花鳥卷呱","rarity":"呱太","max":"55","order":11,"img":"98f4335bf71f9554dc01637ef328b52b"},{"id":"gt012","name":"輝夜姬呱","rarity":"呱太","max":"55","order":12,"img":"937118503f88dc8499f8c981af2b7c14"},{"id":"gt013","name":"荒呱","rarity":"呱太","max":"55","order":13,"img":"7118c546f9b1c42fdfb28b1439e1b49e"},{"id":"gt014","name":"彼岸花呱","rarity":"呱太","max":"55","order":14,"img":"8f7ebb7bf3e0c86f7807ab2e02f9021e"},{"id":"gt015","name":"玉藻前呱","rarity":"呱太","max":"55","order":15,"img":"6245354675c06658762236a753120494"},{"id":"gt016","name":"御饌津呱","rarity":"呱太","max":"55","order":16,"img":"9cb64766676abf32d063fae6d71e0d57"},{"id":"gt017","name":"雪童子呱","rarity":"呱太","max":"55","order":17,"img":"3b3416aca42dceb6672fb9eb3dca766a"},{"id":"n001","name":"燈籠鬼","rarity":"N","max":"534","order":1,"img":"b3ec6a2b1af2a67c9e1f1adc472dbee2"},{"id":"n002","name":"提燈小僧","rarity":"N","max":"55","order":2,"img":"48d95615083c18b6093292ed9df6b66e"},{"id":"n003","name":"赤舌","rarity":"N","max":"555","order":3,"img":"733775a9ee9efce90271ca90484e3791"},{"id":"n004","name":"盜墓小鬼","rarity":"N","max":"5","order":4,"img":"4ec11b57cd3048df976a30e950cf56d0"},{"id":"n005","name":"寄生魂","rarity":"N","max":"5","order":5,"img":"4b13fb5d9c783d63d078bd37538c4265"},{"id":"n006","name":"唐紙傘妖","rarity":"N","max":"55","order":6,"img":"cbdc5676d41c6b461f150afa1484feb1"},{"id":"n007","name":"天邪鬼綠","rarity":"N","max":"55","order":7,"img":"ee59e7fc9dda45de9374c4febc677b25"},{"id":"n008","name":"天邪鬼赤","rarity":"N","max":"51","order":8,"img":"4f236b5b7ef3dcb746997d362526c340"},{"id":"n009","name":"天邪鬼黃","rarity":"N","max":"51","order":9,"img":"6253cadfde328685d6679248648bbff1"},{"id":"n010","name":"天邪鬼青","rarity":"N","max":"51","order":10,"img":"f76ee05f9538a9b6b9f786556f83a0c1"},{"id":"n011","name":"帚神","rarity":"N","max":"55","order":11,"img":"f823b532aa2cf1e81deb168b3b9cb74a"},{"id":"n012","name":"塗壁","rarity":"N","max":"51","order":12,"img":"4146c401cc96bb4e2b46231d1bfeb2ab"},{"id":"n013","name":"生剝鬼","rarity":"N","max":"5","order":13,"img":"54e74b9d24c5df13e947bf03d81e1d98"},{"id":"r001","name":"三尾狐","rarity":"R","max":"656","order":1,"img":"1bcf7a6779697f77d3977661643247ff"},{"id":"r002","name":"座敷童子","rarity":"R","max":"533","order":2,"img":"f87721987170c45adb0b3fb1e00b7618"},{"id":"r003","name":"鯉魚精","rarity":"R","max":"555","order":3,"img":"268df614de001ccf40988437c938d4ae"},{"id":"r004","name":"九命貓","rarity":"R","max":"515","order":4,"img":"133a97e43f1811637fbbccb52b7e1d32"},{"id":"r005","name":"狸貓","rarity":"R","max":"555","order":5,"img":"39dd8cf296f5bcc04d5f4f151704e233"},{"id":"r006","name":"河童","rarity":"R","max":"545","order":6,"img":"c4c036a0b752380fe1161510fe7613ab"},{"id":"r007","name":"童男","rarity":"R","max":"551","order":7,"img":"64848ab886b9e1b1d75b88ec63816321"},{"id":"r008","name":"童女","rarity":"R","max":"554","order":8,"img":"4eeafc496f25830f91e3ccad6361631c"},{"id":"r009","name":"餓鬼","rarity":"R","max":"555","order":9,"img":"5587949eb0478c34c3156ac2fae0382e"},{"id":"r010","name":"巫蠱師","rarity":"R","max":"555","order":10,"img":"825bf73048d21bebba6f2dc4d79949b8"},{"id":"r011","name":"鴉天狗","rarity":"R","max":"555","order":11,"img":"3380627ad6a0a535fbcfb5883a1cb2e9"},{"id":"r012","name":"食髮鬼","rarity":"R","max":"515","order":12,"img":"ad1b64e90034f77b2b3ee94e17f3b039"},{"id":"r013","name":"武士之靈","rarity":"R","max":"555","order":13,"img":"63ebb468935d809e48589b08ce07860a"},{"id":"r014","name":"雨女","rarity":"R","max":"514","order":14,"img":"16f1ee8042bec8e18b84f586a3e211ca"},{"id":"r015","name":"跳跳弟弟","rarity":"R","max":"555","order":15,"img":"ce22b314c4b106ea62347f79537a7335"},{"id":"r016","name":"跳跳妹妹","rarity":"R","max":"515","order":16,"img":"6b501ee55de1e615a9cc4507a8e105ce"},{"id":"r017","name":"兵俑","rarity":"R","max":"555","order":17,"img":"b8884a9759c67ef447ae68c900df686e"},{"id":"r018","name":"丑時之女","rarity":"R","max":"555","order":18,"img":"9b2630c3b65ef0f506b645a67b8c36e5"},{"id":"r019","name":"獨眼小僧","rarity":"R","max":"555","order":19,"img":"dbc37287158294e46b38920b5005406d"},{"id":"r020","name":"鐵鼠","rarity":"R","max":"515","order":20,"img":"2592b9f329a1a4fc1d9ef05d325bada9"},{"id":"r021","name":"椒圖","rarity":"R","max":"543","order":21,"img":"e480e84763f94c213fc6871d017ea5ce"},{"id":"r022","name":"管狐","rarity":"R","max":"545","order":22,"img":"4de54b176ad60b63c7d759d88e71dfc0"},{"id":"r023","name":"山兔","rarity":"R","max":"545","order":23,"img":"a8ee18b4b98b1bf7961d4cb0ad57ae6f"},{"id":"r024","name":"螢草","rarity":"R","max":"555","order":24,"img":"12760e248f528fe6582c8edc8b344cc9"},{"id":"r025","name":"蝴蝶精","rarity":"R","max":"555","order":25,"img":"b1c2ce60c60caa41087cb3219b7ab7cc"},{"id":"r026","name":"山童","rarity":"R","max":"515","order":26,"img":"e9721704aacc62d0a95fe05d5e33167e"},{"id":"r027","name":"首無","rarity":"R","max":"515","order":27,"img":"e8d93e40e30171770d463463a8ea0474"},{"id":"r028","name":"覺","rarity":"R","max":"515","order":28,"img":"ee242b6ec563dd9712bab1bb5cd49056"},{"id":"r029","name":"青蛙瓷器","rarity":"R","max":"515","order":29,"img":"e0a73f3bd4d05db89186e801c3213903"},{"id":"r030","name":"古籠火","rarity":"R","max":"535","order":30,"img":"9399529cbd3425784d46c1a14aac6603"},{"id":"r031","name":"兔丸","rarity":"R","max":"555","order":31,"img":"7c541abbe57083fec972fad63f19c29b","shrine":true},{"id":"r032","name":"數珠","rarity":"R","max":"555","order":32,"img":"fea7116b44f8c73be514389362a5820e","shrine":true},{"id":"r033","name":"小袖之手","rarity":"R","max":"555","order":33,"img":"a9f376e570c38b8cb181b6f6bff0152e","shop":"黑心商店"},{"id":"r034","name":"蟲師","rarity":"R","max":"515","order":34,"img":"9c1da1a0242ffbb6af8f7967fab304c4"},{"id":"r035","name":"天井下","rarity":"R","max":"555","order":35,"img":"2d5c7dbf0535807384aa89671e91d5ed","shrine":true},{"id":"r036","name":"垢嘗","rarity":"R","max":"515","order":36,"img":"358680e8eb94cf116608ea359d7e8229","shop":"黑心商店"},{"id":"r037","name":"影鱷","rarity":"R","max":"555","order":37,"img":"725b77e289d90b0199e0416a96ff150a","shrine":true,"shop":"黑心商店"},{"id":"sp01","name":"少羽大天狗","rarity":"SP","max":"515","order":1,"img":"c3a8d1871ce3147f8bbef036b4fa2230"},{"id":"sp02","name":"煉獄茨木童子","rarity":"SP","max":"555","order":2,"img":"c1549389b7f58fa7f207a7fb5732fd83"},{"id":"sp023","name":"神墜八岐大蛇","rarity":"SP","max":"555","order":23,"img":"957496e0ebaf7108681fbb5383c708e3"},{"id":"sp026","name":"神啓荒","rarity":"SP","max":"555","order":26,"img":"7eb0a0ec837ed6e561c68a1a69118660"},{"id":"sp03","name":"稻荷神御饌津","rarity":"SP","max":"555","order":4,"img":"be53305115ec2d276d5396d206baca8c"},{"id":"sp04","name":"蒼風一目連","rarity":"SP","max":"555","order":3,"img":"7db38079bc12cec5046c7fd9f621ffc6"},{"id":"sp05","name":"赤影妖刀姬","rarity":"SP","max":"555","order":5,"img":"2ae05e73f90bf3e47c8ade5662b95453"},{"id":"sp06","name":"御怨般若","rarity":"SP","max":"555","order":6,"img":"bbeb46207f3de5e2ffcc922458d4b2cf"},{"id":"sp07","name":"鬼王酒吞童子","rarity":"SP","max":"555","order":9,"img":"a1cb9635b78b86ca4e3c265f6a564686"},{"id":"sp08","name":"天劍韌心鬼切","rarity":"SP","max":"555","order":10,"img":"672e0b7d3484a4ffebc25903672acc54"},{"id":"sp09","name":"聆海金魚姬","rarity":"SP","max":"515","order":11,"img":"58993659d509e7a043c64915b01b2896"},{"id":"sp10","name":"浮世青行燈","rarity":"SP","max":"555","order":12,"img":"1c462727446f1da6f97b59d63e43e1a0"},{"id":"spn001","name":"百羽鳳凰火","rarity":"SP","max":"555","order":51,"img":"da577efb9b1be065f33034e902420fd4"},{"id":"spn002","name":"天火命鈴彥姬","rarity":"SP","max":"555","order":50,"img":"a646bc38242d8dee994e62ab3fa881c2"},{"id":"spn003","name":"蝕月吸血姬","rarity":"SP","max":"555","order":49,"img":"bfd6d4886638ec4b28120a7c942d2856"},{"id":"spn004","name":"灼華桃花妖","rarity":"SP","max":"555","order":48,"img":"4f381258f3eae70e5569463f8bf6f7a0"},{"id":"spn005","name":"夢山白藏主","rarity":"SP","max":"555","order":47,"img":"93b27dec37015cae97febc664e94c96d"},{"id":"spn006","name":"夢引蝴蝶精","rarity":"SP","max":"555","order":46,"img":"6143d97c4ab11dc37816c4c713a38101"},{"id":"spn007","name":"妙主九命貓","rarity":"SP","max":"555","order":45,"img":"c40792702e60137fd7b9a672d932bf64"},{"id":"spn008","name":"雲間不見岳","rarity":"SP","max":"555","order":44,"img":"4a3eb2c6c7ba1471397df3ce2522592f"},{"id":"spn009","name":"時曜瀧夜叉姬","rarity":"SP","max":"555","order":43,"img":"68e31124c1f8c2ca3a8f324e0d36865d"},{"id":"spn010","name":"瑤音緊那羅","rarity":"SP","max":"555","order":41,"img":"b7757f032d8575e80fc5d49c01b12737"},{"id":"spn011","name":"晴思日和坊","rarity":"SP","max":"555","order":42,"img":"1fc4288c1d2c6bbcce502c6867de2c35"},{"id":"spn012","name":"神釀星熊童子","rarity":"SP","max":"555","order":40,"img":"77ea5540dc2220b06fd67f44cdfa44b9"},{"id":"spn013","name":"心友犬神","rarity":"SP","max":"555","order":39,"img":"74b4824a25716d7bdae7ae65431ee8df"},{"id":"spn014","name":"遙念煙煙羅","rarity":"SP","max":"555","order":38,"img":"2b2e5790e928b5c4399cfe61ed10447a"},{"id":"spn015","name":"龍吟鈴鹿御前","rarity":"SP","max":"555","order":37,"img":"1624638449662b7bed6451993fe4b9c9"},{"id":"spn016","name":"晨暉惠比壽","rarity":"SP","max":"555","order":36,"img":"861df6507cd75b972f3bac14c766c333"},{"id":"spn017","name":"鯨汐千姬","rarity":"SP","max":"555","order":34,"img":"71e5409d3cb8d27cd84e59946878519d"},{"id":"spn018","name":"福悅座敷童子","rarity":"SP","max":"555","order":35,"img":"06aed412e33860214e9baa0d9ff28e24"},{"id":"spn019","name":"本真三尾狐","rarity":"SP","max":"555","order":33,"img":"6db29245b3296dccfd047b3fb8190161"},{"id":"spn020","name":"渺念螢草","rarity":"SP","max":"555","order":32,"img":"5a031a967c27f5583f4ed8695748e7c2"},{"id":"spn021","name":"紡願緣結神","rarity":"SP","max":"515","order":31,"img":"aa45c8fc9824b5c7673057b75627e276"},{"id":"spn022","name":"尋森小鹿男","rarity":"SP","max":"555","order":30,"img":"e23fc25933c1140ba0b993db64a91ef6"},{"id":"spn023","name":"修羅鬼童丸","rarity":"SP","max":"555","order":29,"img":"c5451861f4c0b6594d722fb9654a4c0d"},{"id":"spn024","name":"流光追月神","rarity":"SP","max":"555","order":28,"img":"0e78cff7246fff4c4cbfa9b6b49c1b30"},{"id":"spn025","name":"禪心雲外鏡","rarity":"SP","max":"555","order":27,"img":"7e32e3040ab4e6c722f40a13e34140a1"},{"id":"spn027","name":"心狩鬼女紅葉","rarity":"SP","max":"555","order":25,"img":"d2b0fa39aca2f5c992c97e5fb4c0cf77"},{"id":"spn028","name":"大夜摩天閻魔","rarity":"SP","max":"555","order":24,"img":"b3fce9f62964966ed49d9596de5d0a89"},{"id":"spn030","name":"夢尋山兔","rarity":"SP","max":"555","order":22,"img":"e3ba7c39960560b56aa107274a2563c6"},{"id":"spn031","name":"因幡輝夜姬","rarity":"SP","max":"555","order":21,"img":"268d44bacfc891f9881914e8fa37a3b6"},{"id":"spn032","name":"繪世花鳥卷","rarity":"SP","max":"555","order":20,"img":"5675dff1f49e0b0a93126d7a5f98a5e8"},{"id":"spn033","name":"空相面靈氣","rarity":"SP","max":"555","order":19,"img":"5b482dabe0746c0932f9a02b645ec088"},{"id":"spn034","name":"蟬冰雪女","rarity":"SP","max":"555","order":18,"img":"c8dc89be3943cde83aad9ef0b369c03c"},{"id":"spn035","name":"夜溟彼岸花","rarity":"SP","max":"555","order":17,"img":"6c39d8802008d802e251badf679878e5"},{"id":"spn036","name":"初翎山風","rarity":"SP","max":"555","order":16,"img":"82cfda265d298d19582fff27f65f0d95"},{"id":"spn037","name":"麓銘大嶽丸","rarity":"SP","max":"555","order":14,"img":"0fbfa14e2731d3fba97bc099f8608ba0"},{"id":"spn038","name":"待宵姑獲鳥","rarity":"SP","max":"515","order":15,"img":"6214b89dfa141da8fc4f2b986bc2f815"},{"id":"spn039","name":"縛骨清姬","rarity":"SP","max":"555","order":13,"img":"f2d99be2dbb3be94abfb05fa1fa7face"},{"id":"spn044","name":"燼天玉藻前","rarity":"SP","max":"555","order":8,"img":"927cba11b32f483026bcf605d4f072cd"},{"id":"spn045","name":"驍浪荒川之主","rarity":"SP","max":"555","order":7,"img":"7fe9fdb494594d3c218bbbc91d9264be"},{"id":"sr001","name":"桃花妖","rarity":"SR","max":"555","order":1,"img":"c8ef34701702f080b1283214457db146"},{"id":"sr002","name":"櫻花妖","rarity":"SR","max":"555","order":2,"img":"97971bed7ddf5be3dca12bc86248d8d6"},{"id":"sr003","name":"雪女","rarity":"SR","max":"555","order":3,"img":"3bbe1d7a2eb7d6729f0061b0c7b46ed4"},{"id":"sr004","name":"鬼使白","rarity":"SR","max":"555","order":4,"img":"7a44d392739bd03c84bca3d6c1b6530e"},{"id":"sr005","name":"鬼使黑","rarity":"SR","max":"515","order":5,"img":"2f1e456aed5b23aaf86a1b5c8ff2d47e"},{"id":"sr006","name":"孟婆","rarity":"SR","max":"555","order":6,"img":"e1b56717af78023098f2772f917b28ce"},{"id":"sr007","name":"犬神","rarity":"SR","max":"555","order":7,"img":"4ba0ae419132c173153db35770c89a13"},{"id":"sr008","name":"骨女","rarity":"SR","max":"515","order":8,"img":"67fa8d0da5eafce0460389537966184d"},{"id":"sr009","name":"鬼女紅葉","rarity":"SR","max":"555","order":9,"img":"8da7c36c793a4a03b6fe71bb53988b10"},{"id":"sr010","name":"跳跳哥哥","rarity":"SR","max":"555","order":10,"img":"bf3869ca2a87b976fa674b24135921be"},{"id":"sr011","name":"傀儡師","rarity":"SR","max":"515","order":11,"img":"9522441c7f01d1272dbaa118271f70d9"},{"id":"sr012","name":"海坊主","rarity":"SR","max":"515","order":12,"img":"da5919d579122f41bd0ed2d29f86605b"},{"id":"sr013","name":"判官","rarity":"SR","max":"555","order":13,"img":"d6791f634b88d5e5ce5255e9e67e86d8"},{"id":"sr014","name":"鳳凰火","rarity":"SR","max":"515","order":14,"img":"c88f74a98b4fa1db1a00c15d4f012863"},{"id":"sr015","name":"吸血姬","rarity":"SR","max":"515","order":15,"img":"8d487700b7f38383e18ae6462eeafd8b"},{"id":"sr016","name":"妖狐","rarity":"SR","max":"555","order":16,"img":"ce5e8b8571bdda0af783ba4b7af6beac"},{"id":"sr017","name":"妖琴師","rarity":"SR","max":"555","order":17,"img":"0d111ad601a60790247f9391df34371d"},{"id":"sr018","name":"食夢貘","rarity":"SR","max":"515","order":18,"img":"38c16fdc91fa3b32f7fdca4d2ae0a930"},{"id":"sr019","name":"清姬","rarity":"SR","max":"615","order":19,"img":"26be03ce0994fe4c963cf5785886b96f"},{"id":"sr020","name":"鐮鼬","rarity":"SR","max":"555","order":20,"img":"ba4c5ef3d81ea00ece0700fb97362bb4"},{"id":"sr021","name":"姑獲鳥","rarity":"SR","max":"515","order":21,"img":"b5d252f3f8963e3e5e939b70c5a73891"},{"id":"sr022","name":"二口女","rarity":"SR","max":"515","order":22,"img":"1f7e3d9ef19865a9dc6e8227f9601437"},{"id":"sr023","name":"白狼","rarity":"SR","max":"515","order":23,"img":"e15e9db5c2d6b38bd38560b8f515d411"},{"id":"sr024","name":"惠比壽","rarity":"SR","max":"535","order":24,"img":"6079cb33c64b496fa8e4bbb0c3924aaf"},{"id":"sr025","name":"絡新婦","rarity":"SR","max":"515","order":25,"img":"06ffaa9ccdb1e7790f9ccaaaa8494a23"},{"id":"sr026","name":"般若","rarity":"SR","max":"515","order":26,"img":"2c125aaca3ee38e0e7db9439e5b2495f"},{"id":"sr027","name":"青坊主","rarity":"SR","max":"515","order":27,"img":"d1c574cb71aa314780ba4230bc7d75c5"},{"id":"sr028","name":"萬年竹","rarity":"SR","max":"515","order":28,"img":"534bfdb50e17699be1be1485c2bd1d64","shrine":true},{"id":"sr029","name":"夜叉","rarity":"SR","max":"555","order":29,"img":"668d861aa7f424547dbb58d1487d52ae"},{"id":"sr030","name":"黑童子","rarity":"SR","max":"555","order":30,"img":"2298a7294d533534589a02ed6e39ebe4"},{"id":"sr031","name":"白童子","rarity":"SR","max":"515","order":31,"img":"55869aee8c224717098e197117361699"},{"id":"sr032","name":"煙煙羅","rarity":"SR","max":"555","order":32,"img":"aebb3c9dba3be06d74d8ba7806996a94"},{"id":"sr033","name":"金魚姬","rarity":"SR","max":"515","order":33,"img":"1b17a8dc96249c9ada0f8beb6ad414cf"},{"id":"sr034","name":"鴆","rarity":"SR","max":"555","order":34,"img":"fe97657e140d96a0849081753f8662a5"},{"id":"sr035","name":"以津真天","rarity":"SR","max":"555","order":35,"img":"5265fa1c4e3d1fb9247c10d3d31ff954"},{"id":"sr036","name":"匣中少女","rarity":"SR","max":"515","order":36,"img":"6707ccaf47fd7706815313e654fc0e5a"},{"id":"sr037","name":"小松丸","rarity":"SR","max":"555","order":37,"img":"09fbf43c67119417f01ee44fb3d268b5"},{"id":"sr038","name":"書翁","rarity":"SR","max":"555","order":38,"img":"9fda20f810824caeab20d05ea405ade9"},{"id":"sr039","name":"百目鬼","rarity":"SR","max":"555","order":39,"img":"7cd7ac3f1038058a210f60c88a8f4085"},{"id":"sr040","name":"追月神","rarity":"SR","max":"555","order":40,"img":"fba52a1c2475fc58a3195c8fba1a8194"},{"id":"sr041","name":"日和坊","rarity":"SR","max":"515","order":41,"img":"e65dc8aed2ae3ed79ba9013159feeded"},{"id":"sr042","name":"薰","rarity":"SR","max":"555","order":42,"img":"e044f0134687c43517070b909405ae9b"},{"id":"sr043","name":"弈","rarity":"SR","max":"515","order":43,"img":"5fd39571c77526c73f61d1cf44ff6aa8"},{"id":"sr044","name":"貓掌櫃","rarity":"SR","max":"515","order":44,"img":"a48a193ea1b1adef7acc804fa1ce97c8"},{"id":"sr045","name":"人面樹","rarity":"SR","max":"555","order":45,"img":"265d8b991d9f22b5b452330587bad3a4","shrine":true},{"id":"sr046","name":"於菊蟲","rarity":"SR","max":"555","order":46,"img":"30de3970f017d9032ce2598944350e02"},{"id":"sr047","name":"入殮師","rarity":"SR","max":"555","order":47,"img":"153d0ba7f7c12333b817395a656f082d"},{"id":"sr048","name":"一反木綿","rarity":"SR","max":"555","order":48,"img":"b8f3bb7f38a7e8610e80f3eaf384becb"},{"id":"sr049","name":"化鯨","rarity":"SR","max":"555","order":49,"img":"01374fb80d1dbb5db8f9134ad3668b9e"},{"id":"sr050","name":"海忍","rarity":"SR","max":"555","order":50,"img":"59d685b2dbbf198d16e5a07510109ea4","shrine":true},{"id":"sr051","name":"久次良","rarity":"SR","max":"515","order":51,"img":"cb7e4d992a69a404f97c0bd07641a392"},{"id":"sr052","name":"蟹姬","rarity":"SR","max":"555","order":52,"img":"ea5281eaed99391c98764a730bc188a4"},{"id":"sr053","name":"紙舞","rarity":"SR","max":"555","order":53,"img":"afe40e0ba4263aae27ed05b481226aa1"},{"id":"sr054","name":"星熊童子","rarity":"SR","max":"555","order":54,"img":"549fbd833c3567d15b64fcc97503b7ee"},{"id":"sr055","name":"風狸","rarity":"SR","max":"555","order":55,"img":"c265f8695f0e0b589d197106a77e77c2"},{"id":"sr056","name":"蝎女","rarity":"SR","max":"555","order":56,"img":"0a9f12873630c0b26e9197a8cd24671f"},{"id":"sr057","name":"入內雀","rarity":"SR","max":"555","order":57,"img":"c309ddb4ebc34a243f21047a7aa3aa17"},{"id":"sr058","name":"飴細工","rarity":"SR","max":"555","order":58,"img":"aa59547bd460cb6e4d5b1c2ab65b052f"},{"id":"sr059","name":"川猿","rarity":"SR","max":"555","order":59,"img":"829aaa087734c9b88c214fbe4a524c20"},{"id":"sr060","name":"迦樓羅","rarity":"SR","max":"555","order":60,"img":"c04ffeb5b8fb2f9372f1e2c3d0079e55"},{"id":"sr061","name":"靈海蝶","rarity":"SR","max":"555","order":61,"img":"523819c2be04fbd1633af167d82df388"},{"id":"sr062","name":"粉婆婆","rarity":"SR","max":"515","order":62,"img":"7a7d80d1df418fe31eef23e34db0ce7f"},{"id":"sr063","name":"天逆每","rarity":"SR","max":"515","order":63,"img":"3955080b43a8607f7f920ac88adcddf4"},{"id":"sr064","name":"慧明燈","rarity":"SR","max":"515","order":64,"img":"bbbbbbe9d5df9d8d9fd08734f493dc2f"},{"id":"sr065","name":"盜人神","rarity":"SR","max":"555","order":65,"img":"005bd2243d4de7737993d99b554b95ea"},{"id":"sr066","name":"湍津姬","rarity":"SR","max":"555","order":66,"img":"6f35ee7ff15ecabfe237865af9cae07d"},{"id":"ssr01","name":"大天狗","rarity":"SSR","max":"555","order":1,"img":"1553cf65b3e6f2b8a171e366fe7283c2"},{"id":"ssr02","name":"酒吞童子","rarity":"SSR","max":"515","order":2,"img":"b0b8be9b480d08e351a8afb504efe30c"},{"id":"ssr03","name":"荒川之主","rarity":"SSR","max":"555","order":3,"img":"df803954325b93ad76b447bf45332aa0"},{"id":"ssr035","name":"飯筍","rarity":"SSR","max":"515","order":35,"img":"992b0cd22bc01800fe2d1dcd1ea5d593"},{"id":"ssr04","name":"閻魔","rarity":"SSR","max":"555","order":4,"img":"e770840fc3b9628bae8554b43cf6047e"},{"id":"ssr049","name":"龍珏","rarity":"SSR","max":"555","order":49,"img":"112b5c913f411f7df852a654e98c6721"},{"id":"ssr05","name":"小鹿男","rarity":"SSR","max":"555","order":6,"img":"c5624938dec939df992434c6a1acc9b7"},{"id":"ssr06","name":"茨木童子","rarity":"SSR","max":"515","order":7,"img":"92083d955b6a8e2e002b78b11e3e12e0"},{"id":"ssr064","name":"咲那","rarity":"SSR","max":"555","order":64},{"id":"ssr07","name":"青行燈","rarity":"SSR","max":"555","order":8,"img":"c703509a0a8affd7b677f3d15d1457ba"},{"id":"ssr08","name":"妖刀姬","rarity":"SSR","max":"555","order":9,"img":"2c6aeba0a72f171e5ed31dc89186be01"},{"id":"ssr09","name":"一目連","rarity":"SSR","max":"555","order":10,"img":"7875eaaa9bb938be2488783bef328667"},{"id":"ssr10","name":"花鳥卷","rarity":"SSR","max":"555","order":11,"img":"604caf2856c6a22673d6512facc36825"},{"id":"ssr11","name":"輝夜姬","rarity":"SSR","max":"535","order":12,"img":"9da1d8c0c37f308372154c1109d0df5f"},{"id":"ssr12","name":"荒","rarity":"SSR","max":"555","order":13,"img":"9e35620a70ab6bb7cbbc1214052803a6"},{"id":"ssr13","name":"彼岸花","rarity":"SSR","max":"555","order":14,"img":"789914cd7ad74b02d986b36aa1c2dffd"},{"id":"ssr14","name":"雪童子","rarity":"SSR","max":"515","order":15,"img":"1a9e3220400211fbd7cc032df26f650a"},{"id":"ssr15","name":"玉藻前","rarity":"SSR","max":"555","order":17,"img":"2fda80fcfdd41e8f4abb115f030b5ac3"},{"id":"ssr16","name":"山風","rarity":"SSR","max":"555","order":16,"img":"0eb2d8edd799c4c39a3cfeedaeaccc2b"},{"id":"ssr17","name":"御饌津","rarity":"SSR","max":"515","order":18,"img":"e35175faa4e4c7a033bc219bc2ce5d0d"},{"id":"ssr18","name":"面靈氣","rarity":"SSR","max":"555","order":19,"img":"f611f8fa08f84f413de98d174a3a0cf6"},{"id":"ssr19","name":"鬼切","rarity":"SSR","max":"515","order":20,"img":"593a28d78f7ba30e5f2f81cd563772d2"},{"id":"ssr20","name":"白藏主","rarity":"SSR","max":"555","order":21,"img":"1729bf292140d11f75547262d83c5d5b"},{"id":"ssr21","name":"八岐大蛇","rarity":"SSR","max":"555","order":22,"img":"83f7b900e1fee7fc7f0b65096dd3b9c3"},{"id":"ssr22","name":"不知火","rarity":"SSR","max":"555","order":23,"img":"d76752e917576285294cc5173b600ba1"},{"id":"ssr23","name":"大嶽丸","rarity":"SSR","max":"555","order":24,"img":"be777bbd82ae1c71c7d6ebd708bb1c37"},{"id":"ssr24","name":"瀧夜叉姬","rarity":"SSR","max":"555","order":25,"img":"d194c12c89f701fdb7126fd0248f6bfb"},{"id":"ssr25","name":"雲外鏡","rarity":"SSR","max":"515","order":26,"img":"197ed5bde32b8affa17f3fbfe7ba62e9"},{"id":"ssr26","name":"鬼童丸","rarity":"SSR","max":"555","order":27,"img":"55d588f42d21145169e36d97a40a0fd4"},{"id":"ssr27","name":"緊那羅","rarity":"SSR","max":"555","order":30,"img":"780603977ee56d37061dded97ae32456"},{"id":"ssr28","name":"千姬","rarity":"SSR","max":"555","order":31,"img":"1adb5148b1543ad1553b2682011faae1"},{"id":"ssr29","name":"帝釋天","rarity":"SSR","max":"555","order":32,"img":"f6cb2514e99a071c27d2284bc8a02afd"},{"id":"ssr30","name":"阿修羅","rarity":"SSR","max":"555","order":33,"img":"4e7fcaea1d2410aec1d7475accdb0f64"},{"id":"ssrn002","name":"石長姬","rarity":"SSR","max":"555","order":63,"img":"670df7d0a7468812da3d3688aa50e153"},{"id":"ssrn003","name":"不相狐禪","rarity":"SSR","max":"555","order":62,"img":"0c8ae782dba0161369cb76f0de8aaa01"},{"id":"ssrn004","name":"毗沙門天","rarity":"SSR","max":"555","order":61,"img":"eae59ecf70ce3f6d3eed9d09af39b7ae"},{"id":"ssrn005","name":"思金神","rarity":"SSR","max":"555","order":60,"img":"243bf239a1fc81e1d06448366be049e8"},{"id":"ssrn006","name":"市加美","rarity":"SSR","max":"555","order":59,"img":"4d948b206894f75c53d768f721000017"},{"id":"ssrn007","name":"葛葉","rarity":"SSR","max":"555","order":58,"img":"471b45a6b8dc816b1658f1893b46aee1"},{"id":"ssrn008","name":"神無月","rarity":"SSR","max":"555","order":57,"img":"38673162010875fc19626ebd6cd31c40"},{"id":"ssrn010","name":"平將門","rarity":"SSR","max":"555","order":56,"img":"89303f057dd3d5240cb0ce0721e3391e"},{"id":"ssrn011","name":"雪御前","rarity":"SSR","max":"555","order":55,"img":"dd17e9495934e7906eb626ac0e42895c"},{"id":"ssrn012","name":"荒骷髏","rarity":"SSR","max":"555","order":54,"img":"3c92383f1d3eba08cdfffb2beb0249ee"},{"id":"ssrn013","name":"卑彌呼","rarity":"SSR","max":"555","order":53,"img":"1a0f3fff6215194e0db70c7d99f38de2"},{"id":"ssrn014","name":"歌留多","rarity":"SSR","max":"555","order":52,"img":"927cd933dfd7347d34d9aee354b553fc"},{"id":"ssrn015","name":"鬼金羊","rarity":"SSR","max":"555","order":51,"img":"6b66baa65e6fbd9e8a4e5f7f9db58b6c"},{"id":"ssrn016","name":"封陽君","rarity":"SSR","max":"555","order":50,"img":"5bca8987e388a8809a7d0dcb4411aaee"},{"id":"ssrn018","name":"禍津神","rarity":"SSR","max":"555","order":48,"img":"abd151ff958d8ae7240d4aa2827d7a67"},{"id":"ssrn019","name":"貓川","rarity":"SSR","max":"555","order":47,"img":"2984ee2e1aaba19b1b4700ba518479e7"},{"id":"ssrn020","name":"申屠子夜","rarity":"合作","max":"555","order":26,"img":"30a3d4c262e9df08554530176bdcba46","cn":true,"work":"霧山五行"},{"id":"ssrn021","name":"瀧","rarity":"SSR","max":"555","order":46,"img":"e82015fc12e7f77828eb2a76b6dcd99d"},{"id":"ssrn023","name":"伊邪那美","rarity":"SSR","max":"555","order":45,"img":"6e7f364dd0094a94ee0298c1e3bd46fb"},{"id":"ssrn024","name":"天照","rarity":"SSR","max":"555","order":44,"img":"064c4b40ebd75bb1758b940289d2702a"},{"id":"ssrn025","name":"聞人翊懸","rarity":"合作","max":"555","order":24,"img":"d3eac8c281bf33f2f95c1cbd6567152d","cn":true,"work":"霧山五行"},{"id":"ssrn026","name":"孔雀明王","rarity":"SSR","max":"555","order":43,"img":"b5708d28f2338a6c77f07c023684379e"},{"id":"ssrn027","name":"言靈","rarity":"SSR","max":"555","order":42,"img":"7adba47b4df7dda0e61fe8df6e39bb14"},{"id":"ssrn028","name":"月讀","rarity":"SSR","max":"555","order":41,"img":"657afd2543a0017391d9126bc3b26ea2"},{"id":"ssrn029","name":"季","rarity":"SSR","max":"555","order":40,"img":"a7403f74aa4b9f3ed247f44b3e30bd27"},{"id":"ssrn030","name":"尋香行","rarity":"SSR","max":"555","order":39,"img":"f1801a7052af0134f276c80847a934a1"},{"id":"ssrn031","name":"須佐之男","rarity":"SSR","max":"555","order":38,"img":"3b37bb95129f4ce5081887cdc465ee08"},{"id":"ssrn032","name":"不見岳","rarity":"SSR","max":"555","order":37,"img":"b18da1c2646bba177fcb54c77e284b3d"},{"id":"ssrn033","name":"鈴彥姬","rarity":"SSR","max":"555","order":36,"img":"432a4312baf3cdc87d7dea5882c50c20"},{"id":"ssrn034","name":"夜刀神","rarity":"合作","max":"515","order":11,"img":"b3a063a1ed86196452df16b56dbe0c75","work":"京極夏彥合作系列"},{"id":"ssrn035","name":"食靈","rarity":"SSR","max":"555","order":34,"img":"a09c20bdbbeebe9919d3d6507b8c5b02"},{"id":"ssrn041","name":"鈴鹿御前","rarity":"SSR","max":"555","order":29,"img":"aed02dd353789761fc2cc876791f780c"},{"id":"ssrn042","name":"緣結神","rarity":"SSR","max":"515","order":28,"img":"79daa6212b3bc510a5a77bf4c4693643"},{"id":"ssrn068","name":"兩面佛","rarity":"SSR","max":"555","order":5,"img":"684da89814b624923c84169ffc4a37fa","shop":"榮譽商店"},{"id":"ur001","name":"妖刀姬·緋夜獵刃","rarity":"UR","max":"555","order":1,"img":"81ee25d5a47f58c69bbe88daf9102c31"},{"id":"ur002","name":"大天狗·??","rarity":"UR","order":2}],"built":"2026/10/08 23:10"};window.STATIC_IMG={"a35dd50ebda6bc5c7aac6099c44b478b":"img/a35dd50ebda6bc5c7aac6099c44b478b.webp","8560184a96b6270c21f6688a38f4db34":"img/8560184a96b6270c21f6688a38f4db34.webp","e035fc8a7bc6cefa4299006325f60f6e":"img/e035fc8a7bc6cefa4299006325f60f6e.webp","68d4fda8f5122eb7966c13c0852f7022":"img/68d4fda8f5122eb7966c13c0852f7022.webp","6359d1c46a39efe40285027aa4abe388":"img/6359d1c46a39efe40285027aa4abe388.webp","3580fd387e0026ad8b6e2aef2c56d947":"img/3580fd387e0026ad8b6e2aef2c56d947.webp","cdf85a9f6ea19573835fa9333d8104c4":"img/cdf85a9f6ea19573835fa9333d8104c4.webp","52500bb8421dd39a98a9d461b0729a6c":"img/52500bb8421dd39a98a9d461b0729a6c.webp","76af0fe824e1040bb38b2b687c066651":"img/76af0fe824e1040bb38b2b687c066651.webp","8c39731662702a47686371e78a42be93":"img/8c39731662702a47686371e78a42be93.webp","6639e8d133a291cd06171471351a3e2e":"img/6639e8d133a291cd06171471351a3e2e.webp","7eb3e5c456dfdc72958f6c07402075ea":"img/7eb3e5c456dfdc72958f6c07402075ea.webp","858b3115d3dbb57c91a50de2d64b88af":"img/858b3115d3dbb57c91a50de2d64b88af.webp","2528316c13ae2defe4f594acbcf620a1":"img/2528316c13ae2defe4f594acbcf620a1.webp","bada984fa67a60bcc0cf1e14021199d9":"img/bada984fa67a60bcc0cf1e14021199d9.webp","1be0c9fe4417d710b430ad6a06ea6e35":"img/1be0c9fe4417d710b430ad6a06ea6e35.webp","c5416fa78a66b864d72db9d310eba4b3":"img/c5416fa78a66b864d72db9d310eba4b3.webp","f62de37aa8817fbd43eb278c3d02c2b5":"img/f62de37aa8817fbd43eb278c3d02c2b5.webp","c083311a8890c31c81d880820bd9c3ec":"img/c083311a8890c31c81d880820bd9c3ec.webp","c68929c1edfa2041edfdf58b786b5049":"img/c68929c1edfa2041edfdf58b786b5049.webp","16b108e24871521291a6b013f61dbc99":"img/16b108e24871521291a6b013f61dbc99.webp","63c321d87a71a3557745ab994bcc4eea":"img/63c321d87a71a3557745ab994bcc4eea.webp","3e903ec922a14c6036f69c6d5c51d16e":"img/3e903ec922a14c6036f69c6d5c51d16e.webp","a3cd7cbe821d9f2762e673fc7bf521e2":"img/a3cd7cbe821d9f2762e673fc7bf521e2.webp","d1657aa9175f0713d1553884251f0678":"img/d1657aa9175f0713d1553884251f0678.webp","33152c1e9fa911c7e13f59f953d5cadd":"img/33152c1e9fa911c7e13f59f953d5cadd.webp","a7788c61a39023cf5f1d004eeeeafbdf":"img/a7788c61a39023cf5f1d004eeeeafbdf.webp","465b4318b9ab5357196e34e9d8f04734":"img/465b4318b9ab5357196e34e9d8f04734.webp","d681cc80d84d7bd21dbb1e2d84cb1184":"img/d681cc80d84d7bd21dbb1e2d84cb1184.webp","337c50ce5567c7b81539ce603c94cdde":"img/337c50ce5567c7b81539ce603c94cdde.webp","bd7c78838eee7651017847d4186f64f9":"img/bd7c78838eee7651017847d4186f64f9.webp","31e8d4961b822344b8095cb244b32ba2":"img/31e8d4961b822344b8095cb244b32ba2.webp","e93ded77d725bfcabab06f2373cdbdb3":"img/e93ded77d725bfcabab06f2373cdbdb3.webp","fd0f90076cb95d5177725eadbcc5f954":"img/fd0f90076cb95d5177725eadbcc5f954.webp","98f4335bf71f9554dc01637ef328b52b":"img/98f4335bf71f9554dc01637ef328b52b.webp","937118503f88dc8499f8c981af2b7c14":"img/937118503f88dc8499f8c981af2b7c14.webp","7118c546f9b1c42fdfb28b1439e1b49e":"img/7118c546f9b1c42fdfb28b1439e1b49e.webp","8f7ebb7bf3e0c86f7807ab2e02f9021e":"img/8f7ebb7bf3e0c86f7807ab2e02f9021e.webp","6245354675c06658762236a753120494":"img/6245354675c06658762236a753120494.webp","9cb64766676abf32d063fae6d71e0d57":"img/9cb64766676abf32d063fae6d71e0d57.webp","3b3416aca42dceb6672fb9eb3dca766a":"img/3b3416aca42dceb6672fb9eb3dca766a.webp","b3ec6a2b1af2a67c9e1f1adc472dbee2":"img/b3ec6a2b1af2a67c9e1f1adc472dbee2.webp","48d95615083c18b6093292ed9df6b66e":"img/48d95615083c18b6093292ed9df6b66e.webp","733775a9ee9efce90271ca90484e3791":"img/733775a9ee9efce90271ca90484e3791.webp","4ec11b57cd3048df976a30e950cf56d0":"img/4ec11b57cd3048df976a30e950cf56d0.webp","4b13fb5d9c783d63d078bd37538c4265":"img/4b13fb5d9c783d63d078bd37538c4265.webp","cbdc5676d41c6b461f150afa1484feb1":"img/cbdc5676d41c6b461f150afa1484feb1.webp","ee59e7fc9dda45de9374c4febc677b25":"img/ee59e7fc9dda45de9374c4febc677b25.webp","4f236b5b7ef3dcb746997d362526c340":"img/4f236b5b7ef3dcb746997d362526c340.webp","6253cadfde328685d6679248648bbff1":"img/6253cadfde328685d6679248648bbff1.webp","f76ee05f9538a9b6b9f786556f83a0c1":"img/f76ee05f9538a9b6b9f786556f83a0c1.webp","f823b532aa2cf1e81deb168b3b9cb74a":"img/f823b532aa2cf1e81deb168b3b9cb74a.webp","4146c401cc96bb4e2b46231d1bfeb2ab":"img/4146c401cc96bb4e2b46231d1bfeb2ab.webp","54e74b9d24c5df13e947bf03d81e1d98":"img/54e74b9d24c5df13e947bf03d81e1d98.webp","1bcf7a6779697f77d3977661643247ff":"img/1bcf7a6779697f77d3977661643247ff.webp","f87721987170c45adb0b3fb1e00b7618":"img/f87721987170c45adb0b3fb1e00b7618.webp","268df614de001ccf40988437c938d4ae":"img/268df614de001ccf40988437c938d4ae.webp","133a97e43f1811637fbbccb52b7e1d32":"img/133a97e43f1811637fbbccb52b7e1d32.webp","39dd8cf296f5bcc04d5f4f151704e233":"img/39dd8cf296f5bcc04d5f4f151704e233.webp","c4c036a0b752380fe1161510fe7613ab":"img/c4c036a0b752380fe1161510fe7613ab.webp","64848ab886b9e1b1d75b88ec63816321":"img/64848ab886b9e1b1d75b88ec63816321.webp","4eeafc496f25830f91e3ccad6361631c":"img/4eeafc496f25830f91e3ccad6361631c.webp","5587949eb0478c34c3156ac2fae0382e":"img/5587949eb0478c34c3156ac2fae0382e.webp","825bf73048d21bebba6f2dc4d79949b8":"img/825bf73048d21bebba6f2dc4d79949b8.webp","3380627ad6a0a535fbcfb5883a1cb2e9":"img/3380627ad6a0a535fbcfb5883a1cb2e9.webp","ad1b64e90034f77b2b3ee94e17f3b039":"img/ad1b64e90034f77b2b3ee94e17f3b039.webp","63ebb468935d809e48589b08ce07860a":"img/63ebb468935d809e48589b08ce07860a.webp","16f1ee8042bec8e18b84f586a3e211ca":"img/16f1ee8042bec8e18b84f586a3e211ca.webp","ce22b314c4b106ea62347f79537a7335":"img/ce22b314c4b106ea62347f79537a7335.webp","6b501ee55de1e615a9cc4507a8e105ce":"img/6b501ee55de1e615a9cc4507a8e105ce.webp","b8884a9759c67ef447ae68c900df686e":"img/b8884a9759c67ef447ae68c900df686e.webp","9b2630c3b65ef0f506b645a67b8c36e5":"img/9b2630c3b65ef0f506b645a67b8c36e5.webp","dbc37287158294e46b38920b5005406d":"img/dbc37287158294e46b38920b5005406d.webp","2592b9f329a1a4fc1d9ef05d325bada9":"img/2592b9f329a1a4fc1d9ef05d325bada9.webp","e480e84763f94c213fc6871d017ea5ce":"img/e480e84763f94c213fc6871d017ea5ce.webp","4de54b176ad60b63c7d759d88e71dfc0":"img/4de54b176ad60b63c7d759d88e71dfc0.webp","a8ee18b4b98b1bf7961d4cb0ad57ae6f":"img/a8ee18b4b98b1bf7961d4cb0ad57ae6f.webp","12760e248f528fe6582c8edc8b344cc9":"img/12760e248f528fe6582c8edc8b344cc9.webp","b1c2ce60c60caa41087cb3219b7ab7cc":"img/b1c2ce60c60caa41087cb3219b7ab7cc.webp","e9721704aacc62d0a95fe05d5e33167e":"img/e9721704aacc62d0a95fe05d5e33167e.webp","e8d93e40e30171770d463463a8ea0474":"img/e8d93e40e30171770d463463a8ea0474.webp","ee242b6ec563dd9712bab1bb5cd49056":"img/ee242b6ec563dd9712bab1bb5cd49056.webp","e0a73f3bd4d05db89186e801c3213903":"img/e0a73f3bd4d05db89186e801c3213903.webp","9399529cbd3425784d46c1a14aac6603":"img/9399529cbd3425784d46c1a14aac6603.webp","7c541abbe57083fec972fad63f19c29b":"img/7c541abbe57083fec972fad63f19c29b.webp","fea7116b44f8c73be514389362a5820e":"img/fea7116b44f8c73be514389362a5820e.webp","a9f376e570c38b8cb181b6f6bff0152e":"img/a9f376e570c38b8cb181b6f6bff0152e.webp","9c1da1a0242ffbb6af8f7967fab304c4":"img/9c1da1a0242ffbb6af8f7967fab304c4.webp","2d5c7dbf0535807384aa89671e91d5ed":"img/2d5c7dbf0535807384aa89671e91d5ed.webp","358680e8eb94cf116608ea359d7e8229":"img/358680e8eb94cf116608ea359d7e8229.webp","725b77e289d90b0199e0416a96ff150a":"img/725b77e289d90b0199e0416a96ff150a.webp","c3a8d1871ce3147f8bbef036b4fa2230":"img/c3a8d1871ce3147f8bbef036b4fa2230.webp","c1549389b7f58fa7f207a7fb5732fd83":"img/c1549389b7f58fa7f207a7fb5732fd83.webp","957496e0ebaf7108681fbb5383c708e3":"img/957496e0ebaf7108681fbb5383c708e3.webp","7eb0a0ec837ed6e561c68a1a69118660":"img/7eb0a0ec837ed6e561c68a1a69118660.webp","be53305115ec2d276d5396d206baca8c":"img/be53305115ec2d276d5396d206baca8c.webp","7db38079bc12cec5046c7fd9f621ffc6":"img/7db38079bc12cec5046c7fd9f621ffc6.webp","2ae05e73f90bf3e47c8ade5662b95453":"img/2ae05e73f90bf3e47c8ade5662b95453.webp","bbeb46207f3de5e2ffcc922458d4b2cf":"img/bbeb46207f3de5e2ffcc922458d4b2cf.webp","a1cb9635b78b86ca4e3c265f6a564686":"img/a1cb9635b78b86ca4e3c265f6a564686.webp","672e0b7d3484a4ffebc25903672acc54":"img/672e0b7d3484a4ffebc25903672acc54.webp","58993659d509e7a043c64915b01b2896":"img/58993659d509e7a043c64915b01b2896.webp","1c462727446f1da6f97b59d63e43e1a0":"img/1c462727446f1da6f97b59d63e43e1a0.webp","da577efb9b1be065f33034e902420fd4":"img/da577efb9b1be065f33034e902420fd4.webp","a646bc38242d8dee994e62ab3fa881c2":"img/a646bc38242d8dee994e62ab3fa881c2.webp","bfd6d4886638ec4b28120a7c942d2856":"img/bfd6d4886638ec4b28120a7c942d2856.webp","4f381258f3eae70e5569463f8bf6f7a0":"img/4f381258f3eae70e5569463f8bf6f7a0.webp","93b27dec37015cae97febc664e94c96d":"img/93b27dec37015cae97febc664e94c96d.webp","6143d97c4ab11dc37816c4c713a38101":"img/6143d97c4ab11dc37816c4c713a38101.webp","c40792702e60137fd7b9a672d932bf64":"img/c40792702e60137fd7b9a672d932bf64.webp","4a3eb2c6c7ba1471397df3ce2522592f":"img/4a3eb2c6c7ba1471397df3ce2522592f.webp","68e31124c1f8c2ca3a8f324e0d36865d":"img/68e31124c1f8c2ca3a8f324e0d36865d.webp","b7757f032d8575e80fc5d49c01b12737":"img/b7757f032d8575e80fc5d49c01b12737.webp","1fc4288c1d2c6bbcce502c6867de2c35":"img/1fc4288c1d2c6bbcce502c6867de2c35.webp","77ea5540dc2220b06fd67f44cdfa44b9":"img/77ea5540dc2220b06fd67f44cdfa44b9.webp","74b4824a25716d7bdae7ae65431ee8df":"img/74b4824a25716d7bdae7ae65431ee8df.webp","2b2e5790e928b5c4399cfe61ed10447a":"img/2b2e5790e928b5c4399cfe61ed10447a.webp","1624638449662b7bed6451993fe4b9c9":"img/1624638449662b7bed6451993fe4b9c9.webp","861df6507cd75b972f3bac14c766c333":"img/861df6507cd75b972f3bac14c766c333.webp","71e5409d3cb8d27cd84e59946878519d":"img/71e5409d3cb8d27cd84e59946878519d.webp","06aed412e33860214e9baa0d9ff28e24":"img/06aed412e33860214e9baa0d9ff28e24.webp","6db29245b3296dccfd047b3fb8190161":"img/6db29245b3296dccfd047b3fb8190161.webp","5a031a967c27f5583f4ed8695748e7c2":"img/5a031a967c27f5583f4ed8695748e7c2.webp","aa45c8fc9824b5c7673057b75627e276":"img/aa45c8fc9824b5c7673057b75627e276.webp","e23fc25933c1140ba0b993db64a91ef6":"img/e23fc25933c1140ba0b993db64a91ef6.webp","c5451861f4c0b6594d722fb9654a4c0d":"img/c5451861f4c0b6594d722fb9654a4c0d.webp","0e78cff7246fff4c4cbfa9b6b49c1b30":"img/0e78cff7246fff4c4cbfa9b6b49c1b30.webp","7e32e3040ab4e6c722f40a13e34140a1":"img/7e32e3040ab4e6c722f40a13e34140a1.webp","d2b0fa39aca2f5c992c97e5fb4c0cf77":"img/d2b0fa39aca2f5c992c97e5fb4c0cf77.webp","b3fce9f62964966ed49d9596de5d0a89":"img/b3fce9f62964966ed49d9596de5d0a89.webp","e3ba7c39960560b56aa107274a2563c6":"img/e3ba7c39960560b56aa107274a2563c6.webp","268d44bacfc891f9881914e8fa37a3b6":"img/268d44bacfc891f9881914e8fa37a3b6.webp","5675dff1f49e0b0a93126d7a5f98a5e8":"img/5675dff1f49e0b0a93126d7a5f98a5e8.webp","5b482dabe0746c0932f9a02b645ec088":"img/5b482dabe0746c0932f9a02b645ec088.webp","c8dc89be3943cde83aad9ef0b369c03c":"img/c8dc89be3943cde83aad9ef0b369c03c.webp","6c39d8802008d802e251badf679878e5":"img/6c39d8802008d802e251badf679878e5.webp","82cfda265d298d19582fff27f65f0d95":"img/82cfda265d298d19582fff27f65f0d95.webp","0fbfa14e2731d3fba97bc099f8608ba0":"img/0fbfa14e2731d3fba97bc099f8608ba0.webp","6214b89dfa141da8fc4f2b986bc2f815":"img/6214b89dfa141da8fc4f2b986bc2f815.webp","f2d99be2dbb3be94abfb05fa1fa7face":"img/f2d99be2dbb3be94abfb05fa1fa7face.webp","927cba11b32f483026bcf605d4f072cd":"img/927cba11b32f483026bcf605d4f072cd.webp","7fe9fdb494594d3c218bbbc91d9264be":"img/7fe9fdb494594d3c218bbbc91d9264be.webp","c8ef34701702f080b1283214457db146":"img/c8ef34701702f080b1283214457db146.webp","97971bed7ddf5be3dca12bc86248d8d6":"img/97971bed7ddf5be3dca12bc86248d8d6.webp","3bbe1d7a2eb7d6729f0061b0c7b46ed4":"img/3bbe1d7a2eb7d6729f0061b0c7b46ed4.webp","7a44d392739bd03c84bca3d6c1b6530e":"img/7a44d392739bd03c84bca3d6c1b6530e.webp","2f1e456aed5b23aaf86a1b5c8ff2d47e":"img/2f1e456aed5b23aaf86a1b5c8ff2d47e.webp","e1b56717af78023098f2772f917b28ce":"img/e1b56717af78023098f2772f917b28ce.webp","4ba0ae419132c173153db35770c89a13":"img/4ba0ae419132c173153db35770c89a13.webp","67fa8d0da5eafce0460389537966184d":"img/67fa8d0da5eafce0460389537966184d.webp","8da7c36c793a4a03b6fe71bb53988b10":"img/8da7c36c793a4a03b6fe71bb53988b10.webp","bf3869ca2a87b976fa674b24135921be":"img/bf3869ca2a87b976fa674b24135921be.webp","9522441c7f01d1272dbaa118271f70d9":"img/9522441c7f01d1272dbaa118271f70d9.webp","da5919d579122f41bd0ed2d29f86605b":"img/da5919d579122f41bd0ed2d29f86605b.webp","d6791f634b88d5e5ce5255e9e67e86d8":"img/d6791f634b88d5e5ce5255e9e67e86d8.webp","c88f74a98b4fa1db1a00c15d4f012863":"img/c88f74a98b4fa1db1a00c15d4f012863.webp","8d487700b7f38383e18ae6462eeafd8b":"img/8d487700b7f38383e18ae6462eeafd8b.webp","ce5e8b8571bdda0af783ba4b7af6beac":"img/ce5e8b8571bdda0af783ba4b7af6beac.webp","0d111ad601a60790247f9391df34371d":"img/0d111ad601a60790247f9391df34371d.webp","38c16fdc91fa3b32f7fdca4d2ae0a930":"img/38c16fdc91fa3b32f7fdca4d2ae0a930.webp","26be03ce0994fe4c963cf5785886b96f":"img/26be03ce0994fe4c963cf5785886b96f.webp","ba4c5ef3d81ea00ece0700fb97362bb4":"img/ba4c5ef3d81ea00ece0700fb97362bb4.webp","b5d252f3f8963e3e5e939b70c5a73891":"img/b5d252f3f8963e3e5e939b70c5a73891.webp","1f7e3d9ef19865a9dc6e8227f9601437":"img/1f7e3d9ef19865a9dc6e8227f9601437.webp","e15e9db5c2d6b38bd38560b8f515d411":"img/e15e9db5c2d6b38bd38560b8f515d411.webp","6079cb33c64b496fa8e4bbb0c3924aaf":"img/6079cb33c64b496fa8e4bbb0c3924aaf.webp","06ffaa9ccdb1e7790f9ccaaaa8494a23":"img/06ffaa9ccdb1e7790f9ccaaaa8494a23.webp","2c125aaca3ee38e0e7db9439e5b2495f":"img/2c125aaca3ee38e0e7db9439e5b2495f.webp","d1c574cb71aa314780ba4230bc7d75c5":"img/d1c574cb71aa314780ba4230bc7d75c5.webp","534bfdb50e17699be1be1485c2bd1d64":"img/534bfdb50e17699be1be1485c2bd1d64.webp","668d861aa7f424547dbb58d1487d52ae":"img/668d861aa7f424547dbb58d1487d52ae.webp","2298a7294d533534589a02ed6e39ebe4":"img/2298a7294d533534589a02ed6e39ebe4.webp","55869aee8c224717098e197117361699":"img/55869aee8c224717098e197117361699.webp","aebb3c9dba3be06d74d8ba7806996a94":"img/aebb3c9dba3be06d74d8ba7806996a94.webp","1b17a8dc96249c9ada0f8beb6ad414cf":"img/1b17a8dc96249c9ada0f8beb6ad414cf.webp","fe97657e140d96a0849081753f8662a5":"img/fe97657e140d96a0849081753f8662a5.webp","5265fa1c4e3d1fb9247c10d3d31ff954":"img/5265fa1c4e3d1fb9247c10d3d31ff954.webp","6707ccaf47fd7706815313e654fc0e5a":"img/6707ccaf47fd7706815313e654fc0e5a.webp","09fbf43c67119417f01ee44fb3d268b5":"img/09fbf43c67119417f01ee44fb3d268b5.webp","9fda20f810824caeab20d05ea405ade9":"img/9fda20f810824caeab20d05ea405ade9.webp","7cd7ac3f1038058a210f60c88a8f4085":"img/7cd7ac3f1038058a210f60c88a8f4085.webp","fba52a1c2475fc58a3195c8fba1a8194":"img/fba52a1c2475fc58a3195c8fba1a8194.webp","e65dc8aed2ae3ed79ba9013159feeded":"img/e65dc8aed2ae3ed79ba9013159feeded.webp","e044f0134687c43517070b909405ae9b":"img/e044f0134687c43517070b909405ae9b.webp","5fd39571c77526c73f61d1cf44ff6aa8":"img/5fd39571c77526c73f61d1cf44ff6aa8.webp","a48a193ea1b1adef7acc804fa1ce97c8":"img/a48a193ea1b1adef7acc804fa1ce97c8.webp","265d8b991d9f22b5b452330587bad3a4":"img/265d8b991d9f22b5b452330587bad3a4.webp","30de3970f017d9032ce2598944350e02":"img/30de3970f017d9032ce2598944350e02.webp","153d0ba7f7c12333b817395a656f082d":"img/153d0ba7f7c12333b817395a656f082d.webp","b8f3bb7f38a7e8610e80f3eaf384becb":"img/b8f3bb7f38a7e8610e80f3eaf384becb.webp","01374fb80d1dbb5db8f9134ad3668b9e":"img/01374fb80d1dbb5db8f9134ad3668b9e.webp","59d685b2dbbf198d16e5a07510109ea4":"img/59d685b2dbbf198d16e5a07510109ea4.webp","cb7e4d992a69a404f97c0bd07641a392":"img/cb7e4d992a69a404f97c0bd07641a392.webp","ea5281eaed99391c98764a730bc188a4":"img/ea5281eaed99391c98764a730bc188a4.webp","afe40e0ba4263aae27ed05b481226aa1":"img/afe40e0ba4263aae27ed05b481226aa1.webp","549fbd833c3567d15b64fcc97503b7ee":"img/549fbd833c3567d15b64fcc97503b7ee.webp","c265f8695f0e0b589d197106a77e77c2":"img/c265f8695f0e0b589d197106a77e77c2.webp","0a9f12873630c0b26e9197a8cd24671f":"img/0a9f12873630c0b26e9197a8cd24671f.webp","c309ddb4ebc34a243f21047a7aa3aa17":"img/c309ddb4ebc34a243f21047a7aa3aa17.webp","aa59547bd460cb6e4d5b1c2ab65b052f":"img/aa59547bd460cb6e4d5b1c2ab65b052f.webp","829aaa087734c9b88c214fbe4a524c20":"img/829aaa087734c9b88c214fbe4a524c20.webp","c04ffeb5b8fb2f9372f1e2c3d0079e55":"img/c04ffeb5b8fb2f9372f1e2c3d0079e55.webp","523819c2be04fbd1633af167d82df388":"img/523819c2be04fbd1633af167d82df388.webp","7a7d80d1df418fe31eef23e34db0ce7f":"img/7a7d80d1df418fe31eef23e34db0ce7f.webp","3955080b43a8607f7f920ac88adcddf4":"img/3955080b43a8607f7f920ac88adcddf4.webp","bbbbbbe9d5df9d8d9fd08734f493dc2f":"img/bbbbbbe9d5df9d8d9fd08734f493dc2f.webp","005bd2243d4de7737993d99b554b95ea":"img/005bd2243d4de7737993d99b554b95ea.webp","6f35ee7ff15ecabfe237865af9cae07d":"img/6f35ee7ff15ecabfe237865af9cae07d.webp","1553cf65b3e6f2b8a171e366fe7283c2":"img/1553cf65b3e6f2b8a171e366fe7283c2.webp","b0b8be9b480d08e351a8afb504efe30c":"img/b0b8be9b480d08e351a8afb504efe30c.webp","df803954325b93ad76b447bf45332aa0":"img/df803954325b93ad76b447bf45332aa0.webp","992b0cd22bc01800fe2d1dcd1ea5d593":"img/992b0cd22bc01800fe2d1dcd1ea5d593.webp","e770840fc3b9628bae8554b43cf6047e":"img/e770840fc3b9628bae8554b43cf6047e.webp","112b5c913f411f7df852a654e98c6721":"img/112b5c913f411f7df852a654e98c6721.webp","c5624938dec939df992434c6a1acc9b7":"img/c5624938dec939df992434c6a1acc9b7.webp","92083d955b6a8e2e002b78b11e3e12e0":"img/92083d955b6a8e2e002b78b11e3e12e0.webp","c703509a0a8affd7b677f3d15d1457ba":"img/c703509a0a8affd7b677f3d15d1457ba.webp","2c6aeba0a72f171e5ed31dc89186be01":"img/2c6aeba0a72f171e5ed31dc89186be01.webp","7875eaaa9bb938be2488783bef328667":"img/7875eaaa9bb938be2488783bef328667.webp","604caf2856c6a22673d6512facc36825":"img/604caf2856c6a22673d6512facc36825.webp","9da1d8c0c37f308372154c1109d0df5f":"img/9da1d8c0c37f308372154c1109d0df5f.webp","9e35620a70ab6bb7cbbc1214052803a6":"img/9e35620a70ab6bb7cbbc1214052803a6.webp","789914cd7ad74b02d986b36aa1c2dffd":"img/789914cd7ad74b02d986b36aa1c2dffd.webp","1a9e3220400211fbd7cc032df26f650a":"img/1a9e3220400211fbd7cc032df26f650a.webp","2fda80fcfdd41e8f4abb115f030b5ac3":"img/2fda80fcfdd41e8f4abb115f030b5ac3.webp","0eb2d8edd799c4c39a3cfeedaeaccc2b":"img/0eb2d8edd799c4c39a3cfeedaeaccc2b.webp","e35175faa4e4c7a033bc219bc2ce5d0d":"img/e35175faa4e4c7a033bc219bc2ce5d0d.webp","f611f8fa08f84f413de98d174a3a0cf6":"img/f611f8fa08f84f413de98d174a3a0cf6.webp","593a28d78f7ba30e5f2f81cd563772d2":"img/593a28d78f7ba30e5f2f81cd563772d2.webp","1729bf292140d11f75547262d83c5d5b":"img/1729bf292140d11f75547262d83c5d5b.webp","83f7b900e1fee7fc7f0b65096dd3b9c3":"img/83f7b900e1fee7fc7f0b65096dd3b9c3.webp","d76752e917576285294cc5173b600ba1":"img/d76752e917576285294cc5173b600ba1.webp","be777bbd82ae1c71c7d6ebd708bb1c37":"img/be777bbd82ae1c71c7d6ebd708bb1c37.webp","d194c12c89f701fdb7126fd0248f6bfb":"img/d194c12c89f701fdb7126fd0248f6bfb.webp","197ed5bde32b8affa17f3fbfe7ba62e9":"img/197ed5bde32b8affa17f3fbfe7ba62e9.webp","55d588f42d21145169e36d97a40a0fd4":"img/55d588f42d21145169e36d97a40a0fd4.webp","780603977ee56d37061dded97ae32456":"img/780603977ee56d37061dded97ae32456.webp","1adb5148b1543ad1553b2682011faae1":"img/1adb5148b1543ad1553b2682011faae1.webp","f6cb2514e99a071c27d2284bc8a02afd":"img/f6cb2514e99a071c27d2284bc8a02afd.webp","4e7fcaea1d2410aec1d7475accdb0f64":"img/4e7fcaea1d2410aec1d7475accdb0f64.webp","670df7d0a7468812da3d3688aa50e153":"img/670df7d0a7468812da3d3688aa50e153.webp","0c8ae782dba0161369cb76f0de8aaa01":"img/0c8ae782dba0161369cb76f0de8aaa01.webp","eae59ecf70ce3f6d3eed9d09af39b7ae":"img/eae59ecf70ce3f6d3eed9d09af39b7ae.webp","243bf239a1fc81e1d06448366be049e8":"img/243bf239a1fc81e1d06448366be049e8.webp","4d948b206894f75c53d768f721000017":"img/4d948b206894f75c53d768f721000017.webp","471b45a6b8dc816b1658f1893b46aee1":"img/471b45a6b8dc816b1658f1893b46aee1.webp","38673162010875fc19626ebd6cd31c40":"img/38673162010875fc19626ebd6cd31c40.webp","89303f057dd3d5240cb0ce0721e3391e":"img/89303f057dd3d5240cb0ce0721e3391e.webp","dd17e9495934e7906eb626ac0e42895c":"img/dd17e9495934e7906eb626ac0e42895c.webp","3c92383f1d3eba08cdfffb2beb0249ee":"img/3c92383f1d3eba08cdfffb2beb0249ee.webp","1a0f3fff6215194e0db70c7d99f38de2":"img/1a0f3fff6215194e0db70c7d99f38de2.webp","927cd933dfd7347d34d9aee354b553fc":"img/927cd933dfd7347d34d9aee354b553fc.webp","6b66baa65e6fbd9e8a4e5f7f9db58b6c":"img/6b66baa65e6fbd9e8a4e5f7f9db58b6c.webp","5bca8987e388a8809a7d0dcb4411aaee":"img/5bca8987e388a8809a7d0dcb4411aaee.webp","abd151ff958d8ae7240d4aa2827d7a67":"img/abd151ff958d8ae7240d4aa2827d7a67.webp","2984ee2e1aaba19b1b4700ba518479e7":"img/2984ee2e1aaba19b1b4700ba518479e7.webp","30a3d4c262e9df08554530176bdcba46":"img/30a3d4c262e9df08554530176bdcba46.webp","e82015fc12e7f77828eb2a76b6dcd99d":"img/e82015fc12e7f77828eb2a76b6dcd99d.webp","6e7f364dd0094a94ee0298c1e3bd46fb":"img/6e7f364dd0094a94ee0298c1e3bd46fb.webp","064c4b40ebd75bb1758b940289d2702a":"img/064c4b40ebd75bb1758b940289d2702a.webp","d3eac8c281bf33f2f95c1cbd6567152d":"img/d3eac8c281bf33f2f95c1cbd6567152d.webp","b5708d28f2338a6c77f07c023684379e":"img/b5708d28f2338a6c77f07c023684379e.webp","7adba47b4df7dda0e61fe8df6e39bb14":"img/7adba47b4df7dda0e61fe8df6e39bb14.webp","657afd2543a0017391d9126bc3b26ea2":"img/657afd2543a0017391d9126bc3b26ea2.webp","a7403f74aa4b9f3ed247f44b3e30bd27":"img/a7403f74aa4b9f3ed247f44b3e30bd27.webp","f1801a7052af0134f276c80847a934a1":"img/f1801a7052af0134f276c80847a934a1.webp","3b37bb95129f4ce5081887cdc465ee08":"img/3b37bb95129f4ce5081887cdc465ee08.webp","b18da1c2646bba177fcb54c77e284b3d":"img/b18da1c2646bba177fcb54c77e284b3d.webp","432a4312baf3cdc87d7dea5882c50c20":"img/432a4312baf3cdc87d7dea5882c50c20.webp","b3a063a1ed86196452df16b56dbe0c75":"img/b3a063a1ed86196452df16b56dbe0c75.webp","a09c20bdbbeebe9919d3d6507b8c5b02":"img/a09c20bdbbeebe9919d3d6507b8c5b02.webp","aed02dd353789761fc2cc876791f780c":"img/aed02dd353789761fc2cc876791f780c.webp","79daa6212b3bc510a5a77bf4c4693643":"img/79daa6212b3bc510a5a77bf4c4693643.webp","684da89814b624923c84169ffc4a37fa":"img/684da89814b624923c84169ffc4a37fa.webp","81ee25d5a47f58c69bbe88daf9102c31":"img/81ee25d5a47f58c69bbe88daf9102c31.webp","040999e5e3f099dab11f9c7159490ac8":"img/040999e5e3f099dab11f9c7159490ac8.webp","2157c87974723988d75ce3b07be9a88e":"img/2157c87974723988d75ce3b07be9a88e.webp","0f85291f17960153e77f237d5b0d7546":"img/0f85291f17960153e77f237d5b0d7546.webp","43a04d36a203bf533983b06d234852ad":"img/43a04d36a203bf533983b06d234852ad.webp","46b97897375f5c2c0487c93fbd246e85":"img/46b97897375f5c2c0487c93fbd246e85.webp","9f56a4cc7e32920662d9ac2f8bc4912d":"img/9f56a4cc7e32920662d9ac2f8bc4912d.webp","3089d38030df7479515a8a450258b0cd":"img/3089d38030df7479515a8a450258b0cd.png","ab4f861b147eb58b215ddb9c68de0f80":"img/ab4f861b147eb58b215ddb9c68de0f80.webp"};</script>
+<script>
+document.getElementById("nojs")?.remove();
+const RAR=["合作","UR","SP","SSR","SR","R","N","呱太"];
+const RCLS={"全部":"all","合作":"col","UR":"ur","SP":"sp","SSR":"ssr","SR":"sr","R":"r","N":"n","呱太":"gt"};
+const RIMG={UR:"040999e5e3f099dab11f9c7159490ac8",SP:"2157c87974723988d75ce3b07be9a88e",SSR:"0f85291f17960153e77f237d5b0d7546",SR:"43a04d36a203bf533983b06d234852ad",R:"46b97897375f5c2c0487c93fbd246e85",N:"9f56a4cc7e32920662d9ac2f8bc4912d","呱太":"3089d38030df7479515a8a450258b0cd"};
+const BLOB=id=>(window.STATIC_IMG&&STATIC_IMG[id])||"/_blob/"+id;
+const RB=(r,sz)=>RIMG[r]?`<img class="rimg${sz?" "+sz:""}" src="${BLOB(RIMG[r])}" alt="${esc(r)}">`:`<span class="rar rar-${RCLS[r]||"x"}${sz?" "+sz:""}" data-t="${esc(r)}"><b>${esc(r)}</b></span>`;
+const DEFACC=[{k:"asia",name:"亞服"},{k:"test",name:"體服"}];
+const ACC=()=>S.owner===false?S.gAccts:S.accts;
+const GDEF={asia:["亞服","帳號1","1號機"],test:["體服","帳號2","2號機"]};
+const isEgg=()=>{const p=document.getElementById("pane-egg");return !!p&&!p.hidden};
+function DN(a,egg){if(!S.personal&&S.owner!==true&&GDEF[a.k]&&GDEF[a.k].includes(a.name)){const i=a.k==="asia"?1:2;return (egg??isEgg())?i+"號機":"帳號"+i}return a.name}
+const ANAME=(k,egg)=>{const a=ACC().find(a=>a.k===k);return a?DN(a,egg):k};
+const SRV=new Proxy({},{get:(_,k)=>ANAME(k)});
+const S={accts:DEFACC.map(a=>({...a})),gAccts:DEFACC.map(a=>({...a})),eggCol:false,hideCn:false,owner:null,mine:{},dirty:false,shiki:[],filter:"all",edit:false,srv:"asia",eggF:"all",db:null,assets:null,cur:null,pendingImg:undefined,bulk:null};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const pref=(k,v)=>{try{if(v===undefined)return localStorage.getItem(k);localStorage.setItem(k,v)}catch(e){return null}};
+$("pvRar").innerHTML=RAR.map(r=>`<option>${r}</option>`).join("");
+
+let tt;function toast(m){const t=$("toast");t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(()=>t.hidden=true,2000)}
+function notice(m){$("notice").textContent=m||"";$("notice").hidden=!m}
+
+/* black egg math: per skill digit, max - current */
+const digits=s=>String(s??"").replace(/\D/g,"").split("").map(Number);
+function fed(max,cur){if(cur===undefined||cur===null||String(cur).trim()==="")return 0;const m=digits(max),c=digits(cur);let n=0;m.forEach((d,i)=>{n+=Math.max(0,Math.min(c[i]??1,d)-1)});return n}
+function SK(s,k=S.srv){const v=ST(s)[k];if(v!==undefined&&v!==null&&String(v)!=="")return v;const n=digits(s.max).length;return n&&OW(s,k)?"1".repeat(n):v}
+function acctStats(k){let o=0,f=0,own=0;for(const s of VIS()){if(rarOf(s)==="合作"&&!S.eggCol)continue;const v=SK(s,k);const w=owe(s.max,v);if(w)o+=w;f+=fed(s.max,v)}
+  for(const s of VIS())if(OW(s,k))own++;return{o,f,own}}
+function owe(max,cur){
+  if(cur===undefined||cur===null||String(cur).trim()==="")return null;
+  const m=digits(max),c=digits(cur);if(!m.length)return null;
+  let n=0;m.forEach((d,i)=>{n+=Math.max(0,d-(c[i]??0))});return n;
+}
+
+/* tabs */
+function showTab(k){
+  $("acctBtn").textContent=k==="egg"?"±N號機記錄用":"±小號記錄";setTimeout(()=>{if(typeof syncSrv==="function")syncSrv()},0);
+  $("tab-shiki").setAttribute("aria-selected",k==="shiki");$("tab-egg").setAttribute("aria-selected",k==="egg");
+  $("pane-shiki").hidden=k!=="shiki";$("pane-egg").hidden=k!=="egg";pref("tab",k);
+}
+$("tab-shiki").onclick=()=>{showTab("shiki");buildJump()};$("tab-egg").onclick=()=>{showTab("egg");buildJump()};
+function activePane(){return $("pane-egg").hidden?$("pane-shiki"):$("pane-egg")}
+function buildJump(){
+  const hs=[...activePane().querySelectorAll(".group-h[data-r]")];
+  $("jump").innerHTML=`<button class="jb" type="button" data-r="" aria-label="回到最上面，看全部">${RB("全部")}</button>`+hs.map(x=>`<button class="jb" type="button" data-r="${esc(x.dataset.r)}" aria-label="跳到 ${esc(x.dataset.r)}">${RB(x.dataset.r)}</button>`).join("");
+  $("jump").querySelectorAll(".jb").forEach(b=>b.onclick=()=>{
+    if(!b.dataset.r){window.scrollTo({top:0,behavior:"smooth"});return}
+    const g=hs.find(x=>x.dataset.r===b.dataset.r);if(!g)return;
+    const gt=Math.min(g.getBoundingClientRect().top,...[...g.querySelectorAll("img,.rar")].map(e=>e.getBoundingClientRect().top));const y=gt+scrollY-$("top").offsetHeight-22;
+    nowLock=b.dataset.r;clearTimeout(nowLockT);nowLockT=setTimeout(()=>{nowLock=null},1200);updateNow(true);
+    window.scrollTo({top:y,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"});
+  });
+  setHdr();updateNow(true);
+}
+let nowR=null,nowRaf=0,nowLock=null,nowLockT=0;
+function updateNow(force){
+  const hs=[...activePane().querySelectorAll(".group-h[data-r]")];
+  if(!hs.length){$("nowRar").innerHTML="";nowR=null;return}
+  const tb=$("top").getBoundingClientRect().bottom,lim=tb+Math.min((innerHeight-tb)*.3,90);let cur=null;
+  for(const x of hs){if(x.getBoundingClientRect().top<=lim)cur=x;else break}
+  if(innerHeight+scrollY>=document.documentElement.scrollHeight-4){for(const x of hs)if(x.getBoundingClientRect().top<innerHeight-80)cur=x}
+  const r=nowLock??(cur?cur.dataset.r:"");
+  {const ci=hs.findIndex(x=>x.dataset.r==="合作");let show=false;
+   if(ci>=0){const top=hs[ci].getBoundingClientRect().top,nx=hs[ci+1]?hs[ci+1].getBoundingClientRect().top:Infinity;show=top<innerHeight-60&&nx>tb+120}
+   $("cnFab").hidden=!show}if(r===nowR&&!force)return;nowR=r;
+  $("nowRar").innerHTML=`<span>正在看</span>${RB(r||"全部")}`;
+  const jb=[...$("jump").children];let act=null;
+  jb.forEach(b=>{const on=b.dataset.r===r;b.setAttribute("aria-current",on);if(on)act=b});
+  if(act){const J=$("jump"),L=act.offsetLeft-J.offsetLeft;if(L<J.scrollLeft||L+act.offsetWidth>J.scrollLeft+J.clientWidth)J.scrollTo({left:L-J.clientWidth/2+act.offsetWidth/2,behavior:"smooth"})}
+}
+addEventListener("scroll",()=>{if(nowLock){clearTimeout(nowLockT);nowLockT=setTimeout(()=>{nowLock=null;updateNow()},180)}if(nowRaf)return;nowRaf=requestAnimationFrame(()=>{nowRaf=0;updateNow()})},{passive:true});
+function setHdr(){document.documentElement.style.setProperty("--hdr",$("top").offsetHeight+"px")}
+try{new ResizeObserver(setHdr).observe($("top"))}catch(_){addEventListener("resize",setHdr)}
+if(pref("tab")==="egg"||location.hash==="#egg")showTab("egg");
+function syncSrv(){
+  const A=ACC();if(!A.some(a=>a.k===S.srv))S.srv=A[0].k;
+  document.querySelectorAll(".acctseg").forEach(g=>{g.innerHTML=A.map(a=>`<button type="button" data-srv="${esc(a.k)}" aria-pressed="${a.k===S.srv}">${esc(DN(a))}</button>`).join("");
+    g.querySelectorAll("[data-srv]").forEach(b=>b.onclick=()=>{S.srv=b.dataset.srv;pref("srv",S.srv);syncSrv();renderShiki();renderEggs()})});
+}
+S.srv=pref("srv")||"asia";syncSrv();
+document.querySelectorAll(".acctbtn").forEach(b=>b.onclick=openAccts);
+let aDel=null;
+function openAccts(){aDel=null;drawAccts();$("aScrim").hidden=false}
+function drawAccts(){
+  const A=ACC();
+  $("aHint").textContent=S.owner===false?"訪客的帳號只存在這次頁面，記得匯出一起帶走。":"帳號名稱可以直接改；刪除帳號會把它從清單拿掉。";
+  $("aList").innerHTML=A.map(a=>`<div class="arow"><input type="text" maxlength="12" data-ak="${esc(a.k)}" value="${esc(DN(a))}" aria-label="帳號名稱">${A.length>1?`<button class="btn ${aDel===a.k?"danger":"ghost"}" type="button" data-adel="${esc(a.k)}" style="flex:none">${aDel===a.k?"確定刪除":"刪除"}</button>`:""}</div>`).join("");
+  $("aList").querySelectorAll("[data-ak]").forEach(i=>i.onchange=()=>{const v=i.value.trim();if(!v){i.value=ANAME(i.dataset.ak);return}saveAccts(ACC().map(a=>a.k===i.dataset.ak?{...a,name:v}:a))});
+  $("aList").querySelectorAll("[data-adel]").forEach(b=>b.onclick=()=>{const k=b.dataset.adel;if(aDel!==k){aDel=k;drawAccts();return}aDel=null;saveAccts(ACC().filter(a=>a.k!==k))});
+}
+async function saveAccts(list){
+  if(S.owner===false){S.gAccts=list;markDirty()}
+  else{S.accts=list;if(S.db){try{await S.db.doc("meta/accounts").set({list})}catch(e){toast("帳號沒存到："+(e.code||"錯誤"))}}}
+  syncSrv();drawAccts();renderShiki();renderEggs();
+}
+$("aAdd").onclick=()=>{const v=$("aNew").value.trim();if(!v){toast("先打帳號名稱喔");return}
+  const k="x"+Date.now().toString(36);$("aNew").value="";S.srv=k;pref("srv",k);saveAccts([...ACC(),{k,name:v}]);toast(`已新增「${v}」✧`)};
+$("aNew").onkeydown=e=>{if(e.key==="Enter")$("aAdd").click()};
+$("aClose").onclick=()=>{$("aScrim").hidden=true};
+$("aScrim").onclick=e=>{if(e.target===$("aScrim"))$("aScrim").hidden=true};
+S.eggF=pref("eggF")||"all";if(!["all","owe","full","none"].includes(S.eggF))S.eggF="all";
+function syncEF(){document.querySelectorAll("[data-ef]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.ef===S.eggF))}
+syncEF();document.querySelectorAll("[data-ef]").forEach(b=>b.onclick=()=>{S.eggF=b.dataset.ef;pref("eggF",S.eggF);syncEF();renderEggs()});
+const EFMSG={owe:"這組沒有未滿的了 ✧",full:"這組還沒有滿技能的 (；´Д｀)",none:"這組全部都擁有了 ✧",all:""};
+
+document.querySelectorAll(".chip[data-f]").forEach(c=>c.onclick=()=>{S.filter=c.dataset.f;document.querySelectorAll(".chip[data-f]").forEach(x=>x.setAttribute("aria-pressed",x===c));renderShiki()});
+$("addShiki").onclick=()=>openSheet(null);
+$("editBtn").onclick=()=>{S.edit=!S.edit;$("editBtn").setAttribute("aria-pressed",S.edit);$("editBtn").textContent=S.edit?"完成":"編輯";renderShiki()};
+
+const imgSrc=s=>s.img?BLOB(s.img):"";
+const faceHTML=s=>s.img?`<img src="${imgSrc(s)}" alt="">`:`<span class="ini">${esc((s.name||"?").slice(0,1))}</span>`;
+const rarOf=s=>s.rarity||"SSR";
+function sortGroup(L){
+  if(!L.some(s=>s.work))return L.sort(sortFn);
+  const wk=s=>(s.cn?"1":"0")+"|"+(s.work||"");const first={};
+  L.forEach(s=>{const k=wk(s);first[k]=Math.min(first[k]??1e9,s.order??999)});
+  return L.sort((a,b)=>(a.cn?1:0)-(b.cn?1:0)||first[wk(a)]-first[wk(b)]||String(a.work||"").localeCompare(String(b.work||""),"zh-Hant")||sortFn(a,b));
+}
+const wkKey=s=>s.work?(s.cn?"1":"0")+"|"+s.work:"";
+const sortFn=(a,b)=>(a.order??999)-(b.order??999)||String(a.name).localeCompare(b.name,"zh-Hant");
+function ranks(){return [...RAR,...new Set(S.shiki.map(rarOf).filter(r=>!RAR.includes(r)))]}
+
+function renderShiki(){
+  if(typeof D!=="undefined"&&D.t){D.pending=true;return}
+  const all=VIS(),base=all.filter(s=>rarOf(s)!=="合作"),on=base.filter(s=>OW(s)).length;
+  $("cnt").innerHTML=`${on}<small> / ${base.length}</small>`;
+  $("barfill").style.width=base.length?(on/base.length*100)+"%":"0";
+  {const hon=all.filter(s=>rarOf(s)!=="合作"),col=all.filter(s=>rarOf(s)==="合作"),c=L=>`<b>${L.filter(s=>OW(s)).length}</b> / ${L.length}`;
+   $("cntSplit").innerHTML=`<span class="pill">本家 ${c(hon)}</span><span class="pill">合作 ${c(col)}</span><span class="pill">${ANAME(S.srv,false)}合計 ${c(S.shiki.filter(s=>!s.cn&&rarOf(s)!=="合作"))}</span><span class="pill">含陸服限定 ${c(S.shiki)}</span>`}
+  let html="";
+  for(const r of ranks()){
+    const inR=all.filter(s=>rarOf(s)===r);if(!inR.length)continue;
+    const shown=sortGroup(inR.filter(s=>S.filter==="all"||(S.filter==="yes"?OW(s):!OW(s))));
+    html+=`<h3 class="group-h" data-r="${esc(r)}">${RB(r,"lg")}${r==="合作"?CNMINI():""}<span>${inR.filter(s=>OW(s)).length} / ${inR.length}</span></h3><div class="grid${S.edit?" editing":""}">`;
+    let lw=null;for(const s of shown){const w=wkKey(s);if(w&&w!==lw)html+=`<div class="wk">${esc(s.work)}${s.cn?" ・陸服限定":""}</div>`;lw=w;html+=`<button class="tile${OW(s)?" on":""}${s.cn?" cn":""}" data-id="${esc(s.id)}" aria-pressed="${OW(s)}"><div class="face">${faceHTML(s)}${s.cn?'<span class="cnb">陸服限定</span>':""}<span class="pen">改</span></div><span class="nm">${esc(s.name)}</span></button>`;}
+    html+=`</div>`;
+    if(!shown.length)html+=`<div class="allfull" style="color:var(--ink-soft)">${S.filter==="yes"?"這組還沒有入手的 (；´Д｀)":"這組全部入手了 ✧"}</div>`;
+  }
+  if(!all.length)html=`<div class="empty">還沒有式神～按「編輯」再點 ＋ 新增第一隻 (´,,•ω•,,)</div>`;
+  else if(!html)html=`<div class="empty">${S.filter==="yes"?"還沒有入手的…抽卡加油 (；´Д｀)":"全部入手了！？歐皇請收下我的膝蓋 m(_ _)m"}</div>`;
+  if(S.edit)html+=`<div class="grid editing" style="margin-top:14px"><button class="tile addtile" data-add="1"><div class="face"><span class="ini">＋</span></div><span class="nm">新增式神</span></button></div>`;
+  $("groups").innerHTML=html;
+  if(typeof buildJump==="function"&&!$("pane-shiki").hidden)buildJump();
+  document.querySelectorAll("#groups .tile").forEach(t=>{
+    t.addEventListener("contextmenu",e=>e.preventDefault());
+    t.addEventListener("pointerdown",e=>{if(e.pointerType==="mouse"&&e.button===0)pressStart(t,e.clientX,e.clientY)});
+    t.addEventListener("touchstart",e=>{if(e.touches.length===1)pressStart(t,e.touches[0].clientX,e.touches[0].clientY)},{passive:true});
+    t.onclick=()=>{
+      if(D.suppress){D.suppress=false;return}
+      if(t.dataset.add){openSheet(null);return}
+      const x=S.shiki.find(y=>y.id===t.dataset.id);if(!x)return;
+      S.edit?openSheet(x):toggleOwned(x);
+    };
+  });
+}
+/* long press: hold still then release = edit; hold then drag = move (floating copy follows the finger) */
+const D={t:null,timer:null,lifted:false,moved:false,x0:0,y0:0,x:0,y:0,suppress:false,grid:null,before:null,ghost:null,dx:0,dy:0,raf:0,pending:false};
+function pressStart(t,x,y){
+  if(t.dataset.add||D.t||S.owner!==true)return;
+  D.t=t;D.lifted=false;D.moved=false;D.x0=D.x=x;D.y0=D.y=y;D.grid=t.parentElement;
+  D.before=[...D.grid.querySelectorAll(".tile[data-id]")].map(e=>e.dataset.id).join(",");
+  D.timer=setTimeout(lift,380);
+}
+function lift(){
+  const t=D.t;if(!t)return;D.lifted=true;
+  const r=t.getBoundingClientRect();D.dx=D.x0-r.left;D.dy=D.y0-r.top;
+  const g=t.cloneNode(true);g.classList.add("ghost");g.style.width=r.width+"px";g.style.height=r.height+"px";
+  g.style.transform=`translate3d(${r.left}px,${r.top}px,0) scale(1.08)`;document.body.appendChild(g);D.ghost=g;
+  t.classList.add("placeholder");document.body.classList.add("dragging");
+  try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}
+  D.raf=requestAnimationFrame(tick);
+}
+function onMove(x,y,ev){
+  if(!D.t)return;D.x=x;D.y=y;
+  if(!D.lifted){if(Math.hypot(x-D.x0,y-D.y0)>8){clearTimeout(D.timer);D.t=null}return}
+  if(ev&&ev.cancelable)ev.preventDefault();
+  D.moved=true;
+}
+function tick(){
+  if(!D.lifted)return;
+  const x=D.x,y=D.y;
+  if(D.ghost)D.ghost.style.transform=`translate3d(${x-D.dx}px,${y-D.dy}px,0) scale(1.08)`;
+  const edge=80,topE=$("top").getBoundingClientRect().bottom+60;if(y<topE)window.scrollBy(0,-Math.ceil((topE-y)/5));else if(y>innerHeight-edge)window.scrollBy(0,Math.ceil((y-(innerHeight-edge))/5));
+  if(D.moved&&S.filter==="all"){
+    let best=null,bd=1e9;
+    for(const el of D.grid.querySelectorAll(".tile[data-id]")){
+      if(el===D.t)continue;const r=el.getBoundingClientRect();const cx=r.left+r.width/2,cy=r.top+r.height/2;
+      const d=Math.hypot(x-cx,y-cy);if(d<bd){bd=d;best={el,r,cx,cy}}
+    }
+    const me=D.t.getBoundingClientRect();
+    if(best&&bd<Math.max(best.r.width,best.r.height)*.75&&Math.hypot(x-(me.left+me.width/2),y-(me.top+me.height/2))>bd){
+      const kids=[...D.grid.children],iMe=kids.indexOf(D.t),iT=kids.indexOf(best.el);
+      D.grid.insertBefore(D.t,iMe<iT?best.el.nextSibling:best.el);
+    }
+  }
+  D.raf=requestAnimationFrame(tick);
+}
+document.addEventListener("pointermove",e=>{if(e.pointerType==="mouse")onMove(e.clientX,e.clientY,e)});
+document.addEventListener("touchmove",e=>{const p=e.touches[0];if(p)onMove(p.clientX,p.clientY,e)},{passive:false});
+function pressEnd(){
+  if(!D.t)return;clearTimeout(D.timer);cancelAnimationFrame(D.raf);
+  const t=D.t,wasLifted=D.lifted,moved=D.moved;D.t=null;D.lifted=false;
+  if(D.ghost){D.ghost.remove();D.ghost=null}
+  t.classList.remove("placeholder");document.body.classList.remove("dragging");
+  if(D.pending){D.pending=false;setTimeout(renderShiki,0)}
+  if(!wasLifted)return;
+  D.suppress=true;setTimeout(()=>{D.suppress=false},450);
+  const ids=[...D.grid.querySelectorAll(".tile[data-id]")].map(e=>e.dataset.id);
+  if(moved&&S.filter!=="all"){toast("切到「全部」才能拖曳換位置喔");return}
+  if(moved&&ids.join(",")!==D.before)saveOrder(ids);
+  else if(!moved){const s=S.shiki.find(y=>y.id===t.dataset.id);if(s)openSheet(s)}
+}
+document.addEventListener("pointerup",e=>{if(e.pointerType==="mouse")pressEnd()});
+document.addEventListener("touchend",pressEnd);
+document.addEventListener("touchcancel",pressEnd);
+async function saveOrder(ids){
+  if(!S.db)return;let n=0;
+  const ch=ids.map((id,i)=>({s:S.shiki.find(x=>x.id===id),o:i+1})).filter(c=>c.s&&c.s.order!==c.o);
+  ch.forEach(c=>{c.s.order=c.o});
+  for(const c of ch){try{await S.db.doc("shiki/"+c.s.id).update({order:c.o});n++}catch(e){}}
+  toast(n===ch.length?"位置已更新 ✧":"有 "+(ch.length-n)+" 隻沒存到，再拖一次試試");
+}
+S.hideCn=pref("hideCn")!=="0";S.eggCol=pref("eggCol")==="1";
+$("eggCol").checked=S.eggCol;$("eggCol").onchange=()=>{S.eggCol=$("eggCol").checked;pref("eggCol",S.eggCol?"1":"0");renderEggs()};
+const VIS=()=>S.hideCn?S.shiki.filter(s=>!s.cn):S.shiki;
+function CNMINI(){return `<button class="cnmini" type="button" aria-pressed="${S.hideCn}" title="${S.hideCn?"顯示":"隱藏"}陸服限定" aria-label="${S.hideCn?"顯示":"隱藏"}陸服限定">${S.hideCn?"🙉 顯示陸服限定":"🙈 隱藏陸服限定"}</button>`}
+function syncCn(){document.querySelectorAll(".cnchip").forEach(b=>{b.setAttribute("aria-pressed",S.hideCn);b.textContent=S.hideCn?"顯示陸服限定":"隱藏陸服限定"});
+  const f=$("cnFab");f.setAttribute("aria-pressed",S.hideCn);f.textContent=S.hideCn?"±陸限 🙈":"±陸限 🙉"}
+function toggleCn(){S.hideCn=!S.hideCn;pref("hideCn",S.hideCn?"1":"0");syncCn();renderShiki();renderEggs();toast(S.hideCn?"陸服限定已隱藏 🙈":"陸服限定已顯示 🙉")}
+document.addEventListener("click",e=>{const b=e.target.closest&&e.target.closest(".cnchip,.cnmini,#cnFab");if(b){e.preventDefault();toggleCn()}});
+syncCn();
+const OKEY=k=>k==="asia"?"owned":k==="test"?"ownedT":"o_"+k;
+function OW(s,k=S.srv){const m=ST(s);if(k==="test"&&m.ownedT===undefined)return !!m.test;return !!m[OKEY(k)]}
+const ST=s=>S.owner!==false?s:(S.mine[s.id]||(S.mine[s.id]={}));
+function markDirty(){if(S.owner===false){S.dirty=true;renderIO()}}
+const busy=new Set();
+async function toggleOwned(s){
+  const ok=OKEY(S.srv);
+  if(S.owner===false){const m=ST(s);m[ok]=!OW(s);markDirty();renderShiki();renderEggs();return}
+  if(!S.db){toast("還沒連上儲存，等一下再點");return}
+  if(busy.has(s.id))return;busy.add(s.id);
+  const prev=s[ok],v=!OW(s);s[ok]=v;renderShiki();
+  try{await S.db.doc("shiki/"+s.id).update({[ok]:v})}catch(e){s[ok]=prev;renderShiki();toast("沒存到："+(e.code||"錯誤"))}
+  busy.delete(s.id);
+}
+
+/* eggs */
+const DARUMA_ID="ab4f861b147eb58b215ddb9c68de0f80";const DARUMA=`<img src="${BLOB(DARUMA_ID)}" alt="">`;
+$("eggArt").innerHTML=DARUMA;
+function stdHTML(s,cur){
+  const m=digits(s.max);if(!m.length)return`<small>標準 未設定</small>`;
+  const c=digits(cur);const has=cur!==null&&cur!==undefined&&String(cur)!=="";
+  return `<span class="std" title="標準技能">${m.map((d,i)=>`<i class="${has&&(c[i]??0)<d?"lack":""}">${d}</i>`).join("")}</span>`;
+}
+const TAGS=s=>(s.cn?'<span class="cntag">陸服限定</span>':"")+(s.shrine?'<span class="tag">神龕</span>':"")+(s.shop?`<span class="tag">${esc(s.shop)}</span>`:"");
+function renderEggs(){
+  const k=S.srv;$("eggLbl").textContent=ANAME(k,true)+"尚欠黑蛋";
+  let total=0,html="",pills="";
+  for(const r of ranks()){
+    const inR=sortGroup(VIS().filter(s=>rarOf(s)===r));if(!inR.length)continue;
+    let sum=0,sumS=0,filled=0,lacking=0;
+    const rows=inR.map(s=>{const o=owe(s.max,SK(s,k));if(o!==null){filled++;s.shrine?sumS+=o:sum+=o;if(o>0)lacking++}return{s,o}});
+    const counted=r!=="合作"||S.eggCol;
+    if(counted)total+=sum+sumS;
+    if(counted&&sum+sumS>0)pills+=`<span class="pill">${RB(r)} <b>${sum+sumS}</b>${sumS?`（神龕 ${sumS}）`:""}</span>`;
+    const F=S.eggF,shown=rows.filter(x=>F==="all"||(F==="owe"&&x.o>0)||(F==="full"&&x.o===0)||(F==="none"&&x.o===null));
+    html+=`<h3 class="group-h" data-r="${esc(r)}">${RB(r,"lg")}${r==="合作"?CNMINI():""}<span><span class="dm">${DARUMA}</span>欠 ${sum}${sumS?` ・神龕 ${sumS}`:""} ・已填 ${filled}/${inR.length}${r==="合作"&&!S.eggCol?" ・不計入總數":""}</span><button class="gfull" type="button" data-gfull="${esc(r)}" ${lacking?"":"disabled"} title="只補滿這個稀有度已擁有的式神">${lacking?"一鍵全滿":"全滿了 ✧"}</button></h3><ul class="rows">`;
+    html+=shown.map(({s,o},i)=>`${wkKey(s)&&(i===0||wkKey(shown[i-1].s)!==wkKey(s))?`<li class="wkli">${esc(s.work)}${s.cn?" ・陸服限定":""}</li>`:""}<li class="srow${s.cn?" cn":""}"><div class="mini">${s.img?`<img src="${imgSrc(s)}" alt="">`:esc((s.name||"?").slice(0,1))}</div>
+      <div class="who" data-id="${esc(s.id)}" role="button" tabindex="0" ${S.owner===true?'title="點一下編輯"':""}><b>${esc(s.name)}${TAGS(s)}</b>${stdHTML(s,SK(s,k))}</div>
+      <input class="cur" data-id="${esc(s.id)}" inputmode="numeric" maxlength="4" value="${esc(SK(s,k)??"")}" placeholder="${digits(s.max).length?"1".repeat(digits(s.max).length):"—"}" aria-label="${esc(s.name)} ${ANAME(k,true)}現有技能">
+      <button class="nown${o===null?" on":""}" data-none="${esc(s.id)}" aria-pressed="${o===null}" ${!digits(s.max).length?"disabled":""} title="${o===null?"再按一次變成擁有（技能從 1 開始）":"設成未擁有"}" aria-label="${esc(s.name)} ${o===null?"設成擁有":"設成未擁有"}">未</button>
+      <button class="full${o===0?" is-full":""}" data-full="${esc(s.id)}" ${!digits(s.max).length?"disabled":""} aria-pressed="${o===0}" aria-label="${esc(s.name)} ${o===0?"技能變回 1":"設成滿技能"}" title="${o===0?"再按一次變回 "+"1".repeat(digits(s.max).length):"設成滿技能"}">滿</button>
+      <div class="owe ${o===null?"none":o===0?"zero":""}">${o===null?"未有":o===0?"已滿":o}</div></li>`).join("")||`<li class="allfull">${EFMSG[S.eggF]||"這組沒有式神"}</li>`;
+    html+=`</ul>`;
+  }
+  $("eggTotal").textContent=total;$("eggPills").innerHTML=pills;
+  {const A=ACC(),st=A.map(a=>({a,...acctStats(a.k)}));const me=st.find(x=>x.a.k===k)||{f:0};
+   $("eggFed").innerHTML=`這個帳號已餵 <b>${me.f}</b> 顆`;
+   const T=st.reduce((t,x)=>({o:t.o+x.o,f:t.f+x.f}),{o:0,f:0});
+   $("acctSum").innerHTML=`<table><thead><tr><th>帳號</th><th>尚欠</th><th>已餵</th></tr></thead><tbody>${st.map(x=>`<tr class="${x.a.k===k?"cur":""}"><td>${esc(DN(x.a,true))}</td><td>${x.o}</td><td>${x.f}</td></tr>`).join("")}<tr class="tot"><td>所有帳號合計</td><td>${T.o}</td><td>${T.f}</td></tr></tbody></table>`;}
+  $("eggGroups").innerHTML=html||`<div class="empty">${S.shiki.length?"全部技能都滿了！黑蛋自由啦 (๑˃ᴗ˂)ﻭ":"還沒有式神資料"}</div>`;
+  document.querySelectorAll(".cur").forEach(inp=>{
+    inp.onchange=()=>saveCur(inp);
+    inp.onkeydown=e=>{if(e.key==="Enter")inp.blur()};
+  });
+  document.querySelectorAll("[data-full]").forEach(b=>b.onclick=()=>{
+    const s=S.shiki.find(x=>x.id===b.dataset.full);if(!s)return;const m=digits(s.max);
+    setCur(s,owe(s.max,SK(s))===0?"1".repeat(m.length):m.join(""));
+  });
+  document.querySelectorAll("[data-none]").forEach(b=>b.onclick=()=>{
+    const s=S.shiki.find(x=>x.id===b.dataset.none);if(!s)return;const m=digits(s.max);
+    const isNone=owe(s.max,SK(s))===null;setCur(s,isNone?"1".repeat(m.length):"",false,!isNone);
+  });
+  document.querySelectorAll("[data-gfull]").forEach(b=>b.onclick=()=>{
+    const r=b.dataset.gfull,n=fullTargets(r).length;if(!n)return;
+    if(b.dataset.armed){delete b.dataset.armed;doFull(r);return}
+    b.dataset.armed="1";b.textContent=`確定補滿 ${n} 隻？`;b.classList.add("armed");
+    setTimeout(()=>{if(b.isConnected&&b.dataset.armed){delete b.dataset.armed;b.textContent="一鍵全滿";b.classList.remove("armed")}},3000);
+  });
+  if(typeof buildJump==="function"&&!$("pane-egg").hidden)buildJump();
+  if(S.owner===true)document.querySelectorAll(".srow .who").forEach(w=>w.onclick=()=>{const s=S.shiki.find(x=>x.id===w.dataset.id);if(s)openSheet(s)});
+}
+async function setCur(s,v,quiet,unown){
+  const field=S.srv;
+  if(S.owner===false){const m=ST(s);m[field]=v||null;if(v)m[OKEY(field)]=true;if(unown)m[OKEY(field)]=false;markDirty();
+    if(!quiet){toast(v?`${s.name} ${ANAME(field,true)}：${v}${owe(s.max,v)===0?" 滿了 ✧":""}`:(unown?`${s.name} 設成未擁有`:`${s.name} 已清空`));renderEggs();renderShiki()}return true}
+  if(!S.db)return false;
+  try{await S.db.doc("shiki/"+s.id).update({[field]:v||null,...(v?{[OKEY(field)]:true}:{}),...(unown?{[OKEY(field)]:false}:{})});
+    if(!quiet)toast(v?`${s.name} ${ANAME(field,true)}：${v}${owe(s.max,v)===0?" 滿了 ✧":""}`:(unown?`${s.name} 設成未擁有`:`${s.name} 已清空`));return true}
+  catch(e){toast("沒存到："+(e.code||"錯誤"));return false}
+}
+async function saveCur(inp){
+  const s=S.shiki.find(x=>x.id===inp.dataset.id);if(!s)return;
+  const v=inp.value.replace(/\D/g,"");
+  const m=digits(s.max);
+  if(v&&m.length&&v.length!==m.length){inp.classList.add("bad");toast(`${s.name} 的技能要打 ${m.length} 位數字`);return}
+  inp.classList.remove("bad");setCur(s,v);
+}
+/* one-tap full: only shikigami already filled in (owned) on this server */
+let fullScope=null;
+function fullTargets(scope){
+  return S.shiki.filter(s=>(!scope||rarOf(s)===scope)&&digits(s.max).length&&(owe(s.max,SK(s))||0)>0);
+}
+function askFull(scope){
+  const list=fullTargets(scope);
+  if(!list.length){toast("已填的都滿了，沒有要補的 (๑˃ᴗ˂)ﻭ");return}
+  fullScope=scope||null;
+  $("fullMsg").textContent=`把${ANAME(S.srv,true)}${scope?`「${scope}」`:"全部"}已填的 ${list.length} 隻設成滿技能？還沒填的不會動。`;
+  $("fullConfirm").hidden=false;$("fullConfirm").scrollIntoView({block:"nearest"});
+}
+$("allFull").onclick=()=>askFull(null);
+$("fullNo").onclick=()=>{$("fullConfirm").hidden=true};
+$("fullYes").onclick=()=>{$("fullConfirm").hidden=true;doFull(fullScope)};
+async function doFull(scope){
+  const list=fullTargets(scope);let ok=0;
+  for(const s of list){if(await setCur(s,digits(s.max).join(""),true))ok++;toast(`補滿中… ${ok}/${list.length}`)}
+  toast(`${scope?scope+" ":""}${ok} 隻全滿了 ✧٩(ˊᗜˋ*)و`);if(S.owner===false){renderEggs();renderShiki()}
+}
+
+/* edit sheet */
+function openSheet(s){
+  S.cur=s;S.pendingImg=undefined;
+  $("sheetTitle").textContent=s?"編輯式神":"新增式神";
+  $("pvName").value=s?s.name:"";$("pvRar").value=s?rarOf(s):"SSR";
+  $("pvMax").value=s?(s.max||""):"";$("pvOrder").value=s?(s.order??""):"";$("pvShrine").checked=!!(s&&s.shrine);$("pvWork").value=s?(s.work||""):"";$("pvCn").checked=!!(s&&s.cn);
+  $("pvDel").hidden=!s;$("pvConfirm").hidden=true;
+  $("pvUpLbl").hidden=!S.assets;$("pvClearImg").hidden=!S.assets;
+  drawPreview();$("scrim").hidden=false;
+}
+function drawPreview(){
+  const name=$("pvName").value||"?";let src="";
+  if(S.pendingImg&&S.pendingImg.url)src=S.pendingImg.url;
+  else if(S.pendingImg!==null&&S.cur&&S.cur.img)src=imgSrc(S.cur);
+  $("pvFace").innerHTML=src?`<img src="${src}" alt="">`:`<span class="ini">${esc(name.slice(0,1))}</span>`;
+}
+$("pvName").oninput=drawPreview;
+function closeSheet(){$("scrim").hidden=true;S.cur=null;$("pvFile").value=""}
+$("pvCancel").onclick=closeSheet;
+$("scrim").onclick=e=>{if(e.target===$("scrim"))closeSheet()};
+document.addEventListener("keydown",e=>{if(e.key!=="Escape")return;if(!$("scrim").hidden)closeSheet();if(!$("bScrim").hidden)endBulk()});
+$("pvClearImg").onclick=()=>{S.pendingImg=null;drawPreview()};
+
+async function shrink(file){
+  const url=URL.createObjectURL(file);
+  try{
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=url});
+    const side=Math.min(img.width,img.height),out=Math.min(512,side);
+    const c=document.createElement("canvas");c.width=c.height=out;
+    c.getContext("2d").drawImage(img,(img.width-side)/2,(img.height-side)/2,side,side,0,0,out,out);
+    const b=await new Promise(r=>c.toBlob(r,"image/webp",.92));
+    return b&&b.type==="image/webp"?b:file;
+  }finally{URL.revokeObjectURL(url)}
+}
+const upErr=err=>toast(err&&err.code==="quota_exceeded"?"圖片空間滿了，刪掉一些舊圖再試":"上傳失敗："+((err&&err.code)||"錯誤"));
+$("pvFile").onchange=async e=>{
+  const f=e.target.files[0];if(!f||!S.assets)return;
+  $("pvUpLbl").textContent="上傳中…";
+  try{const r=await S.assets.upload(await shrink(f));S.pendingImg={id:r.id,url:r.url};drawPreview()}catch(err){upErr(err)}
+  $("pvUpLbl").textContent="上傳 icon 截圖";
+};
+$("pvSave").onclick=async()=>{
+  const name=$("pvName").value.trim();if(!name){toast("名字不能空白喔");return}
+  if(!S.db)return;
+  const ord=$("pvOrder").value===""?null:+$("pvOrder").value;
+  const body={name,rarity:$("pvRar").value,max:$("pvMax").value.replace(/\D/g,"")||null,shrine:$("pvShrine").checked,work:$("pvWork").value.trim()||null,cn:$("pvCn").checked,order:ord??Date.now()};
+  const oldImg=S.cur?S.cur.img:null;
+  if(S.pendingImg)body.img=S.pendingImg.id;else if(S.pendingImg===null)body.img=null;
+  try{
+    if(S.cur)await S.db.doc("shiki/"+S.cur.id).update(body);
+    else await S.db.collection("shiki").add({...body,img:body.img??null,owned:false,ownedT:false,asia:null,test:null});
+    if(oldImg&&S.pendingImg!==undefined&&body.img!==oldImg&&S.assets)S.assets.delete(oldImg).catch(()=>{});
+    closeSheet();toast("已儲存");
+  }catch(e){toast("沒存到："+(e.code||"錯誤"))}
+};
+$("pvDel").onclick=()=>{$("pvConfirm").hidden=false};
+$("pvNo").onclick=()=>{$("pvConfirm").hidden=true};
+$("pvYes").onclick=async()=>{
+  const s=S.cur;if(!s||!S.db)return;
+  try{await S.db.doc("shiki/"+s.id).delete();if(s.img&&S.assets)S.assets.delete(s.img).catch(()=>{});closeSheet();toast("已刪除")}
+  catch(e){toast("刪不掉："+(e.code||"錯誤"))}
+};
+
+/* bulk icon assign */
+/* grid split: one screenshot of the in-game 圖鑑 grid -> one image per cell */
+const G={imgs:[]};
+const loadImg=f=>new Promise((res,rej)=>{const u=URL.createObjectURL(f);const i=new Image();i.onload=()=>{res(i)};i.onerror=rej;i.src=u});
+$("bulkFile").onchange=async e=>{
+  const files=[...e.target.files];e.target.value="";if(!files.length)return;
+  try{G.imgs=await Promise.all(files.map(loadImg))}catch(err){toast("有圖片讀不到，換一張試試");return}
+  const f=G.imgs[0];$("gCols").value=4;$("gRows").value=Math.max(1,Math.round(f.height/(f.width/4)));
+  $("gSingle").checked=f.width<220&&Math.abs(f.width-f.height)<f.width*.15;
+  drawGrid();$("gScrim").hidden=false;
+};
+function gridOf(img){
+  if($("gSingle").checked)return{c:1,r:1};
+  const c=Math.max(1,Math.min(10,+$("gCols").value||4));
+  const r=img===G.imgs[0]?Math.max(1,Math.min(20,+$("gRows").value||1)):Math.max(1,Math.round(img.height/(img.width/c)));
+  return{c,r};
+}
+function cellBox(img,c,r,i,j){
+  const cw=img.width/c,ch=img.height/r;
+  if(c===1&&r===1)return[0,0,img.width,img.height];
+  const x=i*cw+cw*.10,y=j*ch+ch*.06,w=cw*.80,h=Math.min(cw*.80,ch*.70);
+  const s=Math.min(w,h);return[x+(w-s)/2,y,s,s];
+}
+function drawGrid(){
+  const img=G.imgs[0];if(!img)return;const cv=$("gCanvas"),ctx=cv.getContext("2d");
+  cv.width=img.width;cv.height=img.height;ctx.drawImage(img,0,0);
+  const{c,r}=gridOf(img);const lw=Math.max(2,img.width/150);
+  ctx.lineWidth=lw;ctx.strokeStyle="#d9ff1f";
+  for(let j=0;j<r;j++)for(let i=0;i<c;i++){const[x,y,w,h]=cellBox(img,c,r,i,j);ctx.strokeRect(x,y,w,h)}
+  const n=G.imgs.reduce((t,im)=>{const g=gridOf(im);return t+g.c*g.r},0);
+  $("gInfo").textContent=`${G.imgs.length} 張圖，會切出 ${n} 個頭像（螢光框＝會被裁下來的範圍）`;
+}
+["gCols","gRows","gSingle"].forEach(id=>$(id).oninput=drawGrid);
+$("gCancel").onclick=()=>{$("gScrim").hidden=true;G.imgs=[]};
+$("gGo").onclick=async()=>{
+  $("gGo").disabled=true;const blobs=[];
+  for(const img of G.imgs){
+    const{c,r}=gridOf(img);
+    for(let j=0;j<r;j++)for(let i=0;i<c;i++){
+      const[x,y,w,h]=cellBox(img,c,r,i,j);const out=Math.min(512,Math.max(96,Math.round(w)));
+      const cv=document.createElement("canvas");cv.width=cv.height=out;
+      cv.getContext("2d").drawImage(img,x,y,w,h,0,0,out,out);
+      const b=await new Promise(res=>cv.toBlob(res,"image/webp",.92));if(b)blobs.push(b);
+    }
+  }
+  $("gGo").disabled=false;$("gScrim").hidden=true;G.imgs=[];
+  if(!blobs.length){toast("切不出圖片，再試一次");return}
+  S.bulk={files:blobs,i:0,url:null};showBulk();
+};
+function showBulk(){
+  const B=S.bulk;if(!B||B.i>=B.files.length){endBulk(true);return}
+  if(B.url)URL.revokeObjectURL(B.url);B.url=null;
+  const it=B.files[B.i];
+  if(it.pid){$("bFace").innerHTML=`<img src="/_blob/${esc(it.img)}" alt="">`}else{B.url=URL.createObjectURL(it)}
+  $("bDrop").hidden=!it.pid;
+  if(it.r&&it.r!==B.hint){pickRar=it.r;B.hint=it.r}
+  if(B.url)$("bFace").innerHTML=`<img src="${B.url}" alt="">`;
+  $("bProg").textContent=`第 ${B.i+1} / ${B.files.length} 張`;
+  $("bSearch").value="";drawPick();$("bScrim").hidden=false;$("bSearch").focus();
+}
+let pickRar=null;
+function drawPick(){
+  const rs=ranks().filter(r=>S.shiki.some(s=>rarOf(s)===r));
+  $("bRar").innerHTML=[null,...rs].map(r=>`<button class="chip" data-r="${r??""}" aria-pressed="${r===pickRar}">${RB(r??"全部")}</button>`).join("");
+  $("bRar").querySelectorAll(".chip").forEach(c=>c.onclick=()=>{pickRar=c.dataset.r||null;drawPick();$("bSearch").focus()});
+  const q=$("bSearch").value.trim();
+  let list=S.shiki.filter(s=>(!pickRar||rarOf(s)===pickRar)&&(!q||String(s.name).includes(q)));
+  list.sort((a,b)=>RAR.indexOf(rarOf(a))-RAR.indexOf(rarOf(b))||(!!a.img-!!b.img)||sortFn(a,b));
+  let html="",last=null;
+  for(const s of list.slice(0,120)){
+    if(!pickRar&&rarOf(s)!==last){last=rarOf(s);html+=`<div class="pickh">${RB(last)}</div>`}
+    html+=`<button data-id="${esc(s.id)}"><span>${esc(s.name)}</span><small>${RB(rarOf(s))}${s.img?" ・已有圖":""}</small></button>`;
+  }
+  $("bList").innerHTML=html||`<div class="empty">找不到，換個字試試</div>`;
+  $("bList").querySelectorAll("button").forEach(b=>b.onclick=()=>assign(b.dataset.id));
+}
+$("bSearch").oninput=drawPick;
+async function assign(id){
+  const B=S.bulk,s=S.shiki.find(x=>x.id===id);if(!B||!s||!S.db)return;
+  if(!B.files[B.i].pid&&!S.assets){toast("目前不能上傳圖片");return}
+  $("bList").innerHTML=`<div class="empty">上傳中…</div>`;
+  try{
+    const it=B.files[B.i];let newId;
+    if(it.pid){newId=it.img}else{const r=await S.assets.upload(await shrink(it));newId=r.id}
+    const old=s.img;await S.db.doc("shiki/"+s.id).update({img:newId});
+    if(it.pid)S.db.doc("pending/"+it.pid).delete().catch(()=>{});
+    if(old&&old!==newId)S.assets.delete(old).catch(()=>{});
+    toast(`${s.name} ✓`);B.i++;showBulk();
+  }catch(err){upErr(err);drawPick()}
+}
+$("bSkip").onclick=()=>{S.bulk.i++;showBulk()};
+$("bDrop").onclick=async()=>{const it=S.bulk&&S.bulk.files[S.bulk.i];if(!it||!it.pid)return;
+  try{await S.db.doc("pending/"+it.pid).delete();if(S.assets)S.assets.delete(it.img).catch(()=>{})}catch(e){}
+  S.bulk.i++;showBulk()};
+function renderPending(){const n=(S.pending||[]).length;$("pendBar").hidden=!n;$("pendMsg").textContent=`有 ${n} 張切好的頭像等你配對 (´,,•ω•,,)`}
+$("pendGo").onclick=()=>{const L=[...(S.pending||[])].sort((a,b)=>(a.n||0)-(b.n||0)).map(p=>({pid:p.id,img:p.img,r:p.r}));if(!L.length)return;S.bulk={files:L,i:0,url:null};showBulk()};
+$("bStop").onclick=()=>endBulk();
+function endBulk(done){if(S.bulk&&S.bulk.url)URL.revokeObjectURL(S.bulk.url);S.bulk=null;$("bScrim").hidden=true;if(done)toast("這批配對完成 (๑˃ᴗ˂)ﻭ")}
+
+/* ===== per-viewer records: owner = cloud; everyone else = this visit only, export/import to continue ===== */
+/* owner: build a self-contained HTML (no login, no Claude) with today's 式神 list + icons */
+const toDataURL=(blob)=>new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=()=>res(null);r.readAsDataURL(blob)});
+async function shrinkData(url,max){
+  const im=await loadImg2(url);if(!im)return null;const s=Math.min(max,im.width,im.height)||max;
+  const sc=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement("canvas");c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);
+  c.getContext("2d").drawImage(im,0,0,c.width,c.height);let d=c.toDataURL("image/webp",.86);if(!d.startsWith("data:image/webp"))d=c.toDataURL("image/png");return d;
+}
+async function exportStatic(personal){
+  const btn=$(personal?"exMine":"exStatic");btn.disabled=true;
+  try{
+    toast("打包中…（讀取頁面）");
+    const tr=await fetch("standalone-template.txt",{cache:"no-store"});if(!tr.ok)throw new Error("找不到模板，請通知羊");
+    let tpl=await tr.text();
+    const keep=["name","rarity","max","order","img","cn","work","shrine","shop"];
+    const shiki=S.shiki.map(s=>{const o={id:s.id};keep.forEach(k=>{if(s[k]!==undefined&&s[k]!==null&&s[k]!==false&&s[k]!=="")o[k]=s[k]});return o});
+    const ids=[...new Set([...shiki.filter(s=>s.img).map(s=>s.img),...Object.values(RIMG),DARUMA_ID])];
+    const IMG={};let n=0;
+    for(const id of ids){const isIcon=!Object.values(RIMG).includes(id)&&id!==DARUMA_ID;const d=await shrinkData("/_blob/"+id,isIcon?160:256);if(d)IMG[id]=d;n++;if(n%20===0)toast(`打包頭像中… ${n}/${ids.length}`)}
+    const sdb={shiki,built:stamp().txt};if(personal){sdb.mine=packData();sdb.personal=true}
+    const js=`window.STATIC_DB=${JSON.stringify(sdb)};window.STATIC_IMG=${JSON.stringify(IMG)};`.replace(/<\/script/gi,"<\\/script");
+    const SLOT='<script id="static-data"><'+'/script>';const html=tpl.replace(SLOT,'<script id="static-data">'+js+'<'+'/script>');
+    const fn=`點心紙-${personal?"我的":""}免登入版-${stamp().file}.html`;
+    const r=await saveFile(fn,new Blob([html],{type:"text/html"}),"text/html");
+    if(r===true)toast(`已匯出免登入版（${(html.length/1048576).toFixed(1)} MB）✧`);else if(r===null)toast("這裡沒辦法下載檔案，請叫朔幫你打包");
+  }catch(e){toast("打包失敗："+(e.message||e))}
+  btn.disabled=false;
+}
+$("exStatic").onclick=()=>exportStatic(false);
+$("exMine").onclick=()=>exportStatic(true);
+$("pvGuest").onclick=()=>{
+  if(S.previewing){S.previewing=false;S.owner=true;S.mine={};S.dirty=false;toast("回到擁有者模式 ✧")}
+  else{S.previewing=true;S.owner=false;S.mine={};S.gAccts=DEFACC.map(a=>({...a}));S.dirty=false;S.edit=false;toast("預覽訪客模式：這裡的操作不會動到你的資料 👀")}
+  syncSrv();renderIO();renderShiki();renderEggs();window.scrollTo({top:0});
+};
+function renderIO(){
+  const g=S.owner===false;$("io").hidden=S.owner===null;$("io").classList.toggle("guest",g);
+  $("imLbl").hidden=!(g||S.owner===true);$("imLbl").textContent=S.owner===true?"匯入改動":"匯入紀錄";$("exMine").hidden=S.owner!==true;if(S.owner!==true)$("imConfirm").hidden=true;
+  $("pvGuest").hidden=!(S.owner===true||S.previewing);$("exStatic").hidden=S.owner===null||!!S.isStatic;$("pvGuest").textContent=S.previewing?"↩ 結束預覽":"👀 預覽訪客模式";
+  $("io").classList.toggle("preview",!!S.previewing);
+  $("copyLine").hidden=!!S.personal||S.owner===true;
+  $("ioMsg").innerHTML=S.personal
+    ?(S.dirty?'<span class="dirty">有未匯出的變更</span>':"")
+    :g
+    ?`${S.previewing?'<span class="pvtag">預覽中・只有你看得到</span><br>':""}<b>訪客模式</b>：你的點亮和技能紀錄只存在這次打開的頁面，關掉就會清空。離開前按「匯出」存檔，下次按「匯入紀錄」選回同一個檔案就能接續。${S.dirty?'<span class="dirty">有未匯出的變更</span>':""}`
+    :`<b>擁有者模式</b>：你的紀錄自動存在雲端。匯出可以當備份；「我的免登入版」帶著你的紀錄，在外面改完匯出 MD，回來按「匯入改動」就能合併回雲端。`;
+  const own=S.owner===true;$("editBtn").hidden=!own;$("addShiki").hidden=!own;$("ownerHint").hidden=!own;if(!own){$("bulkLbl").hidden=true;$("pendBar").hidden=true;S.edit=false}else{$("bulkLbl").hidden=!S.assets;if(typeof renderPending==="function"&&S.pending)renderPending()}
+}
+addEventListener("beforeunload",e=>{if(S.owner===false&&S.dirty){e.preventDefault();e.returnValue=""}});
+function eggTotals(){const t={};for(const a of ACC())t[a.k]=acctStats(a.k);return t}
+function stamp(){const d=new Date(),z=n=>String(n).padStart(2,"0");return{txt:`${d.getFullYear()}/${z(d.getMonth()+1)}/${z(d.getDate())} ${z(d.getHours())}:${z(d.getMinutes())}`,file:`${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}-${z(d.getHours())}${z(d.getMinutes())}`}}
+function packData(){const A=ACC(),d={};for(const s of S.shiki){const e={};for(const a of A){const o=OW(s,a.k)?1:0,v=ST(s)[a.k]||"";if(o||v)e[a.k]=[o,v]}if(Object.keys(e).length)d[s.id]=[s.name,e]}return{v:2,a:A,d}}
+function buildMd(){
+  const st=stamp(),A=ACC(),eg=eggTotals(),N=S.shiki.length;
+  let md=`# 式神點心紙紀錄\n\n- 匯出時間：${st.txt}\n`;
+  for(const a of A)md+=`- ${DN(a,false)}：已入手 ${eg[a.k].own} / ${N}，尚欠黑蛋 ${eg[a.k].o}，已餵黑蛋 ${eg[a.k].f}\n`;
+  for(const r of ranks()){
+    const L=sortGroup(S.shiki.filter(s=>rarOf(s)===r));if(!L.length)continue;
+    md+=`\n## ${r}（${A.map(a=>`${DN(a,false)} ${L.filter(s=>OW(s,a.k)).length}/${L.length}`).join("・")}）\n\n`;
+    for(const s of L){const parts=A.map(a=>{const o=OW(s,a.k),v=ST(s)[a.k];return o||v?`｜${DN(a,false)} ${o?"✓":"✗"}${v?" "+v:""}`:""}).join("");
+      md+=`- [${OW(s,A[0].k)?"x":" "}] ${s.name}${s.max?`（標準 ${s.max}）`:""}${parts}\n`}
+  }
+  const pk=JSON.stringify(packData()).replace(/-->/g,"--\\u003e");
+  return md+`\n<!-- 以下是匯入用資料，請不要修改 -->\n<!-- dxz-data:${pk} -->\n`;
+}
+async function saveFile(filename,data,mime){
+  if(!window.claude){try{const bl=data instanceof Blob?data:new Blob([data],{type:(mime||"text/plain")+";charset=utf-8"});const u=URL.createObjectURL(bl);const a=document.createElement("a");a.href=u;a.download=filename;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),4000);return true}catch(_){return null}}
+  try{const dl=await claude.use("downloads");if(dl){const r=await dl.save({filename,data});if(r)return true}}catch(e){if(e&&e.code==="cancelled")return false}
+  return null;
+}
+function showFallback(title,hint,text,imgUrl){
+  $("xTitle").textContent=title;$("xHint").textContent=hint;
+  $("xText").hidden=!text;$("xText").value=text||"";$("xCopy").hidden=!text;
+  $("xImg").hidden=!imgUrl;if(imgUrl)$("xImg").src=imgUrl;$("xScrim").hidden=false;
+}
+$("xClose").onclick=()=>{$("xScrim").hidden=true};
+$("xCopy").onclick=async()=>{try{await navigator.clipboard.writeText($("xText").value);toast("已複製，貼到記事本存起來 ✧")}catch(_){$("xText").select();toast("已選取全部文字，請手動複製")}};
+$("exMd").onclick=async()=>{
+  const md=buildMd(),fn=`點心紙紀錄-${stamp().file}.md`;
+  const r=await saveFile(fn,md,"text/markdown");
+  if(r===true){S.dirty=false;renderIO();toast("已匯出 MD ✧")}
+  else if(r===null){showFallback("匯出 MD","這裡沒辦法直接下載，請複製下面全部文字，貼到記事本存成 .md 或 .txt。下次匯入時選那個檔案就可以。",md);S.dirty=false;renderIO()}
+};
+/* PNG with embedded data (tEXt chunk "dxz") */
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xedb88320^(c>>>1):c>>>1;t[n]=c>>>0}return b=>{let c=0xffffffff;for(let i=0;i<b.length;i++)c=t[(c^b[i])&255]^(c>>>8);return(c^0xffffffff)>>>0}})();
+async function addPngText(blob,key,text){
+  const buf=new Uint8Array(await blob.arrayBuffer());
+  const enc=s=>Uint8Array.from(s,c=>c.charCodeAt(0)&255);
+  const body=new Uint8Array([...enc(key),0,...enc(text)]);
+  const type=enc("tEXt"),len=body.length;
+  const chunk=new Uint8Array(12+len),dv=new DataView(chunk.buffer);
+  dv.setUint32(0,len);chunk.set(type,4);chunk.set(body,8);
+  const crcIn=new Uint8Array(4+len);crcIn.set(type,0);crcIn.set(body,4);dv.setUint32(8+len,CRC(crcIn));
+  const iend=buf.length-12;const out=new Uint8Array(buf.length+chunk.length);
+  out.set(buf.subarray(0,iend),0);out.set(chunk,iend);out.set(buf.subarray(iend),iend+chunk.length);
+  return new Blob([out],{type:"image/png"});
+}
+function readPngText(buf,key){
+  const b=new Uint8Array(buf),dv=new DataView(buf);let i=8;
+  while(i+8<=b.length){const len=dv.getUint32(i),type=String.fromCharCode(...b.subarray(i+4,i+8));
+    if(type==="tEXt"){const d=b.subarray(i+8,i+8+len);const z=d.indexOf(0);const k=String.fromCharCode(...d.subarray(0,z));
+      if(k===key){let s="";for(let j=z+1;j<d.length;j++)s+=String.fromCharCode(d[j]);return s}}
+    if(type==="IEND")break;i+=12+len}
+  return null;
+}
+const loadImg2=src=>new Promise(res=>{const i=new Image();i.onload=()=>res(i);i.onerror=()=>res(null);i.src=src});
+async function buildPng(){
+  try{await document.fonts.ready}catch(_){}
+  const css=getComputedStyle(document.documentElement),C=v=>css.getPropertyValue(v).trim();
+  const P={bg:C("--paper"),sheet:C("--sheet"),ink:C("--ink"),soft:C("--ink-soft"),neon:C("--neon"),off:C("--tile-off")};
+  const F='"Huninn","Noto Sans TC",sans-serif';
+  const cols=10,cell=64,gap=8,nameH=18,pad=24,W=pad*2+cols*cell+(cols-1)*gap;
+  const groups=[];for(const r of ranks()){const L=sortGroup(S.shiki.filter(s=>rarOf(s)===r));if(L.length)groups.push([r,L])}
+  let H=pad+96;for(const[,L]of groups)H+=44+Math.ceil(L.length/cols)*(cell+nameH+gap)+8;H+=pad;
+  const need=new Set();S.shiki.forEach(s=>{if(s.img)need.add(BLOB(s.img))});groups.forEach(([r])=>{if(RIMG[r])need.add(BLOB(RIMG[r]))});
+  const imgs={};await Promise.all([...need].map(async u=>{imgs[u]=await loadImg2(u)}));
+  const sc=2,cv=document.createElement("canvas");cv.width=W*sc;cv.height=H*sc;const x=cv.getContext("2d");x.scale(sc,sc);
+  x.fillStyle=P.bg;x.fillRect(0,0,W,H);
+  const st=stamp(),eg=eggTotals()[S.srv]||{o:0,f:0},on=S.shiki.filter(s=>OW(s)).length;
+  x.fillStyle=P.ink;x.font=`900 30px ${F}`;x.textBaseline="top";x.fillText("式神點心紙",pad,pad);
+  x.font=`15px ${F}`;x.fillStyle=P.soft;x.fillText(`${st.txt}　${ANAME(S.srv,false)}已入手 ${on} / ${S.shiki.length}`,pad,pad+42);
+  x.fillText(`尚欠黑蛋 ${eg.o}　已餵黑蛋 ${eg.f}`,pad,pad+64);
+  const rr=(X,Y,w,h,r)=>{x.beginPath();x.moveTo(X+r,Y);x.arcTo(X+w,Y,X+w,Y+h,r);x.arcTo(X+w,Y+h,X,Y+h,r);x.arcTo(X,Y+h,X,Y,r);x.arcTo(X,Y,X+w,Y,r);x.closePath()};
+  let y=pad+96;
+  for(const[r,L]of groups){
+    const ri=RIMG[r]&&imgs[BLOB(RIMG[r])];
+    if(ri){const h=28,w=ri.width*h/ri.height;x.drawImage(ri,pad,y+4,w,h)}else{x.font=`900 22px ${F}`;x.fillStyle=P.ink;x.fillText(r,pad,y+6)}
+    x.font=`14px ${F}`;x.fillStyle=P.soft;x.fillText(`${L.filter(s=>OW(s)).length} / ${L.length}`,pad+(ri?ri.width*28/ri.height:x.measureText(r).width+30)+10,y+12);
+    y+=44;
+    L.forEach((s,i)=>{const cx=pad+(i%cols)*(cell+gap),cy=y+Math.floor(i/cols)*(cell+nameH+gap),own=OW(s);
+      x.save();rr(cx,cy,cell,cell,12);x.clip();x.fillStyle=P.off;x.fillRect(cx,cy,cell,cell);
+      const im=s.img&&imgs[BLOB(s.img)];
+      if(im)x.drawImage(im,cx,cy,cell,cell);else{x.fillStyle=P.soft;x.font=`24px ${F}`;x.textAlign="center";x.fillText((s.name||"?").slice(0,1),cx+cell/2,cy+18);x.textAlign="left"}
+      if(!own){x.fillStyle=P.bg;x.globalAlpha=.62;x.fillRect(cx,cy,cell,cell);x.globalAlpha=1}
+      x.restore();
+      if(own){x.lineWidth=3;x.strokeStyle=P.neon;rr(cx+1.5,cy+1.5,cell-3,cell-3,11);x.stroke()}
+      else if(s.cn){x.lineWidth=3;x.strokeStyle="#6fe3ff";rr(cx+1.5,cy+1.5,cell-3,cell-3,11);x.stroke()}
+      x.font=`10px ${F}`;x.fillStyle=own?P.ink:P.soft;x.textAlign="center";
+      let n=s.name;while(x.measureText(n).width>cell+gap-2&&n.length>1)n=n.slice(0,-1);if(n!==s.name)n=n.slice(0,-1)+"…";
+      x.fillText(n,cx+cell/2,cy+cell+3);x.textAlign="left";
+    });
+    y+=Math.ceil(L.length/cols)*(cell+nameH+gap)+8;
+  }
+  const blob=await new Promise(res=>cv.toBlob(res,"image/png"));
+  return addPngText(blob,"dxz",JSON.stringify(packData()).replace(/[^\x20-\x7e]/g,c=>"\\u"+c.charCodeAt(0).toString(16).padStart(4,"0")));
+}
+$("exPng").onclick=async()=>{
+  $("exPng").disabled=true;toast("製作圖片中…");
+  try{const blob=await buildPng(),fn=`點心紙-${stamp().file}.png`;
+    const r=await saveFile(fn,blob,"image/png");
+    if(r===true){S.dirty=false;renderIO();toast("已匯出圖片 ✧")}
+    else if(r===null){showFallback("匯出圖片","這裡沒辦法直接下載：長按（或右鍵）下面的圖片另存。這張圖本身就藏著你的紀錄，下次可以直接用它匯入。",null,URL.createObjectURL(blob));S.dirty=false;renderIO()}
+  }catch(e){toast("圖片做不出來："+(e.message||e))}
+  $("exPng").disabled=false;
+};
+function applyPack(pk){
+  const d=pk&&pk.d;if(!d)return 0;S.mine={};let n=0;
+  const byName={};S.shiki.forEach(s=>byName[s.name]=s);
+  if(pk.v===2){
+    if(Array.isArray(pk.a)&&pk.a.length){S.gAccts=pk.a.filter(a=>a&&a.k&&a.name).map(a=>({k:String(a.k),name:String(a.name)}))}
+    for(const[id,v]of Object.entries(d)){const s=S.shiki.find(x=>x.id===id)||byName[v[0]];if(!s)continue;const m={};
+      for(const[k,[o,val]]of Object.entries(v[1]||{})){m[k]=val||null;m[OKEY(k)]=!!o}S.mine[s.id]=m;n++}
+  }else{
+    S.gAccts=DEFACC.map(a=>({...a}));
+    for(const[id,v]of Object.entries(d)){const s=S.shiki.find(x=>x.id===id)||byName[v[3]];if(!s)continue;S.mine[s.id]={owned:!!v[0],asia:v[1]||null,test:v[2]||null,ownedT:v[4]===undefined?!!v[2]:!!v[4]};n++}
+  }
+  syncSrv();return n;
+}
+function parseMdLines(txt){
+  const byName={};S.shiki.forEach(s=>byName[s.name]=s);S.mine={};let n=0;
+  const names=[];for(const ln of txt.split(/\r?\n/)){const m=ln.match(/^- (.+?)：已入手/);if(m)names.push(m[1].trim())}
+  if(names.length)S.gAccts=names.map((nm,i)=>({k:i===0?"asia":i===1&&nm==="體服"?"test":"x"+i,name:nm}));
+  for(const ln of txt.split(/\r?\n/)){const m=ln.match(/^- \[( |x|X)\] (.+?)(?:（標準 \d+）)?((?:｜.*)?)$/);if(!m)continue;
+    const s=byName[m[2].trim()];if(!s)continue;const mm={};
+    for(const seg of (m[3]||"").split("｜").filter(Boolean)){const q=seg.match(/^(.+?) (✓|✗)(?: (\d+))?$/);if(!q)continue;const a=S.gAccts.find(a=>a.name===q[1]||DN(a,false)===q[1]||DN(a,true)===q[1]||(GDEF[a.k]&&GDEF[a.k].includes(q[1])&&GDEF[a.k].includes(a.name)));if(!a)continue;mm[a.k]=q[3]||null;mm[OKEY(a.k)]=q[2]==="✓"}
+    if(Object.keys(mm).length){S.mine[s.id]=mm;n++}}
+  syncSrv();return n;
+}
+$("imFile").onchange=async e=>{
+  const f=e.target.files[0];e.target.value="";if(!f)return;
+  if(!S.shiki.length){toast("式神資料還在載入，等一下再匯入");return}
+  const asOwner=S.owner===true,bkM=S.mine,bkA=S.gAccts;
+  let n=-1;
+  try{
+    if(/\.png$/i.test(f.name)||f.type==="image/png"){const t=readPngText(await f.arrayBuffer(),"dxz");if(t)n=applyPack(JSON.parse(t))}
+    else{const txt=await f.text();const m=txt.match(/dxz-data:(\{[\s\S]*?\})\s*-->/);n=m?applyPack(JSON.parse(m[1])):parseMdLines(txt)}
+  }catch(_){n=-1}
+  if(asOwner){const imp={mine:S.mine,accts:S.gAccts};S.mine=bkM;S.gAccts=bkA;syncSrv();if(n<0){toast("讀不到紀錄，請選之前從這裡匯出的 MD 或圖片");return}ownerImportPrep(imp);return}
+  if(n<0){toast("讀不到紀錄，請選之前從這裡匯出的 MD 或圖片");return}
+  S.dirty=false;renderIO();renderShiki();renderEggs();toast(`已載入 ${n} 筆紀錄 ✧٩(ˊᗜˋ*)و`);
+};
+
+let IMPEND=null;
+function ownerImportPrep(imp){
+  const A=imp.accts||[];if(!A.length){toast("檔案裡沒有帳號資料");return}
+  const ch=[];
+  for(const s of S.shiki){const m=imp.mine[s.id]||{},up={};
+    for(const a of A){const ok=OKEY(a.k),o=!!m[ok],v=m[a.k]||null;
+      if(!!OW(s,a.k)!==o)up[ok]=o;if((s[a.k]||null)!==v)up[a.k]=v;
+      if(a.k==="test"&&s.ownedT===undefined&&up.ownedT===undefined)up.ownedT=o}
+    if(Object.keys(up).length)ch.push([s,up])}
+  const newA=A.filter(a=>!S.accts.some(x=>x.k===a.k));
+  if(!ch.length&&!newA.length){toast("檔案跟雲端一模一樣，不用合併 ✧");return}
+  IMPEND={ch,newA};
+  $("imCMsg").textContent=`會更新 ${ch.length} 隻式神${newA.length?`、新增 ${newA.length} 個帳號`:""}（檔案裡的帳號會以檔案為準）。確定寫入雲端？`;
+  $("imConfirm").hidden=false;
+}
+$("imCNo").onclick=()=>{IMPEND=null;$("imConfirm").hidden=true};
+$("imCYes").onclick=async()=>{
+  const P=IMPEND;if(!P||!S.db)return;IMPEND=null;$("imConfirm").hidden=true;
+  try{
+    if(P.newA.length){S.accts=[...S.accts,...P.newA.map(a=>({k:a.k,name:a.name}))];await S.db.doc("meta/accounts").set({list:S.accts});syncSrv()}
+    let i=0;for(const[s,up]of P.ch){await S.db.doc("shiki/"+s.id).update(up);Object.assign(s,up);i++;if(i%10===0)toast(`寫入中… ${i}/${P.ch.length}`)}
+    renderShiki();renderEggs();toast(`已合併 ${P.ch.length} 隻式神的紀錄 ✧٩(ˊᗜˋ*)و`);
+  }catch(e){toast("合併到一半失敗："+(e.code||e.message||"錯誤")+"，可以再匯入一次")}
+};
+
+/* day/night toggle: 跟隨系統 → 日間 → 夜間 (per device) */
+const HOST_THEME=document.documentElement.getAttribute("data-theme");
+const THEMES=[["auto","🌓","跟隨系統"],["light","☀️","日間模式"],["dark","🌙","夜間模式"]];
+function applyTheme(m,announce){
+  const R0=document.documentElement;
+  if(m==="auto"){if(HOST_THEME)R0.setAttribute("data-theme",HOST_THEME);else R0.removeAttribute("data-theme")}else R0.setAttribute("data-theme",m);
+  const t=THEMES.find(x=>x[0]===m)||THEMES[0];$("themeFab").textContent=t[1];$("themeFab").setAttribute("aria-label",`日夜模式：${t[2]}（點一下切換）`);$("themeFab").title=`現在：${t[2]}`;
+  if(announce)toast(`切換成${t[2]} ${t[1]}`);
+}
+let THEME=pref("theme")||"auto";if(!THEMES.some(x=>x[0]===THEME))THEME="auto";applyTheme(THEME);
+$("themeFab").onclick=()=>{const i=THEMES.findIndex(x=>x[0]===THEME);THEME=THEMES[(i+1)%THEMES.length][0];pref("theme",THEME);applyTheme(THEME,true)};
+
+renderShiki();renderEggs();
+
+(async()=>{
+  if(window.STATIC_DB){$("staticTag").textContent=` ・免登入版（名單更新於 ${STATIC_DB.built||"?"}）`;S.isStatic=true;S.owner=false;S.shiki=STATIC_DB.shiki||[];if(STATIC_DB.personal&&STATIC_DB.mine){S.personal=true;applyPack(STATIC_DB.mine);$("staticTag").textContent=` ・我的免登入版（紀錄截至 ${STATIC_DB.built||"?"}）`}syncSrv();renderIO();renderShiki();renderEggs();return}
+  if(!window.claude||!claude.use){notice("這個頁面要在 claude.ai 裡打開才能儲存紀錄。");return}
+  const db=await claude.use("db");
+  if(!db){notice("目前連不上儲存（可能未登入），紀錄暫時不會保存。");return}
+  S.db=db;
+  let own=false;try{const u=await claude.use("user");if(u)own=!!(await u.isOwner())}catch(_){}
+  S.owner=own;renderIO();
+  if(own)claude.use("assets").then(a=>{S.assets=a;$("bulkLbl").hidden=!a||S.owner!==true}).catch(()=>{});
+  syncSrv();
+  if(own)db.doc("meta/accounts").onSnapshot(d=>{const L=d.exists&&d.data().list;if(Array.isArray(L)&&L.length){S.accts=L;syncSrv();renderShiki();renderEggs();if(!$("aScrim").hidden)drawAccts()}},()=>{});
+  if(own)db.collection("pending").onSnapshot(snap=>{S.pending=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.img);renderPending()},()=>{});
+  db.collection("shiki").onSnapshot(snap=>{
+    S.shiki=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderShiki();
+    const a=document.activeElement;if(!(a&&a.classList.contains("cur")))renderEggs();
+  },e=>notice("資料讀取失敗："+(e.code||"")));
+})();
+</script>
