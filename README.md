@@ -14,6 +14,6 @@
 	•	The shikigami list and skill values are compiled manually by players and may differ from the actual in-game content. The in-game information always prevails.
 	•	Records exist only on the page you have open and do not change anyone else's data. Closing the page clears them, so please export before leaving and import next time to continue. To use offline or without logging in, you can click 📦 Export standalone version to download a separate file and open it directly in your browser.
 
-Source use: Claude
+Materials: Onmyoji Game / AI for creating tools
 
-Tool site: https://revolcs.github.io/yys_dimsum/
+Site: https://revolcs.github.io/yys_dimsum/
