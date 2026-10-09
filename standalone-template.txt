@@ -75,6 +75,7 @@ h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:
 .wkli{list-style:none;font-size:.75rem;font-weight:900;color:var(--ink-soft);background:var(--paper);padding:5px 12px;border-bottom:1px solid var(--line)}
 .cnmini{align-self:center;font:inherit;font-size:.72rem;font-weight:900;border:2px solid #2fb8ff;color:var(--cnink);background:var(--sheet);border-radius:99px;padding:2px 9px;cursor:pointer;white-space:nowrap}
 .cnmini[aria-pressed="true"]{background:#2fb8ff;color:#fff}
+.ghpanel{margin:10px auto 0;max-width:420px;text-align:left;display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:2px dashed var(--line);border-radius:16px;background:var(--sheet);color:var(--ink);font-size:.85rem}
 .themefab{flex:none;height:32px;padding:0 11px;border-radius:99px;font:inherit;font-size:.8rem;font-weight:900;color:var(--ink);white-space:nowrap;line-height:1;border:2px solid var(--ink);background:var(--sheet);box-shadow:3px 3px 0 var(--tshadow);cursor:pointer;display:grid;place-items:center}
 .cnfab{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:25;font:inherit;font-size:.8rem;font-weight:900;border:2px solid #0b2e5c;color:#fff;background:#2fb8ff;border-radius:99px;padding:8px 14px;box-shadow:3px 3px 0 #0b2e5c;cursor:pointer}
 .cnfab[aria-pressed="true"]{background:var(--sheet);color:var(--cnink)}
@@ -351,6 +352,15 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
   <footer class="foot">
     <div id="copyLine">遊戲角色、圖示等美術版權歸網易《陰陽師》所有</div>
     <div><button id="ghKey" class="btn ghost" type="button" hidden style="margin:6px auto 0;font-size:.75rem;padding:4px 12px">🔑 擁有者登入</button></div>
+    <div id="ghPanel" class="ghpanel" hidden>
+      <b>☁️ GitHub 擁有者登入</b>
+      <p class="sub" style="margin:2px 0 4px">通行證只會存喺呢部機；朋友冇通行證就乜都改唔到。</p>
+      <div class="ghsync" hidden style="font-weight:900"></div>
+      <label class="fld">公開倉庫（用戶名/倉庫名）<input id="ghPubIn" type="text" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+      <label class="fld">私人倉庫（用戶名/倉庫名）<input id="ghPrivIn" type="text" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+      <label class="fld">通行證 Token（只存喺呢部機）<input id="ghTokIn" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="github_pat_…"></label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ghLogin" type="button" style="flex:1">登入</button><button class="btn ghost" id="ghLogout" type="button" hidden style="flex:1">登出</button></div>
+    </div>
     <div>點心紙＆黑蛋地獄企劃 ver 1.0<span id="staticTag"></span></div>
   </footer>
 </div>
@@ -1001,7 +1011,7 @@ function renderIO(){
     ?(S.dirty?'<span class="dirty">有未匯出的變更</span>':"")
     :g
     ?`${S.previewing?'<span class="pvtag">預覽中・只有你看得到</span><br>':""}<b>訪客模式</b>：你的點亮和技能紀錄只存在這次打開的頁面，關掉就會清空。離開前按「匯出」存檔，下次按「匯入紀錄」選回同一個檔案就能接續。${S.dirty?'<span class="dirty">有未匯出的變更</span>':""}`
-    :S.isGH?`<b>擁有者模式（GitHub）</b>：改動會自動存去你的倉庫，約一分鐘後朋友那邊就會更新。匯出可以當備份。`
+    :S.isGH?`<b>擁有者模式（GitHub）</b>：改動會自動存去你的倉庫，約一分鐘後朋友那邊就會更新。匯出可以當備份。<br><span class="ghsync" style="font-weight:900">${ghSyncText()}</span>`
     :`<b>擁有者模式</b>：你的紀錄自動存在雲端。匯出可以當備份；「我的免登入版」帶著你的紀錄，在外面改完匯出 MD，回來按「匯入改動」就能合併回雲端。`;
   const own=S.owner===true;$("editBtn").hidden=!own;$("addShiki").hidden=!own;$("ownerHint").hidden=!own;if(!own){$("bulkLbl").hidden=true;$("pendBar").hidden=true;S.edit=false}else{$("bulkLbl").hidden=!S.assets;if(typeof renderPending==="function"&&S.pending)renderPending()}
 }
@@ -1193,14 +1203,16 @@ const GH={tok:null,sha:{},q:Promise.resolve(),timer:null,busy:0,lastPub:"",lastP
 const PUBK=["name","rarity","max","order","img","cn","work","shrine","shop"];
 function b64enc(str){const b=new TextEncoder().encode(str);let s="";for(let i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(s)}
 function b64dec(b64){const bin=atob(String(b64||"").replace(/\s/g,""));const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new TextDecoder().decode(u)}
-function ghStatus(t){if(!S.isGH)return;$("staticTag").textContent=" ・GitHub 版"+(S.owner===true?"（擁有者）":"")+(t?"・"+t:"")}
+function ghSyncText(){if(GH.busy)return"☁️ 同步中…";if(GH.timer)return"☁️ 有改動，一陣自動同步…";if(GH.fail)return"⚠️ 同步失敗，15 秒後自動重試";const at=GH.lastAt||pref("ghLastAt");return at?"☁️ 已自動同步到 GitHub ✓・上次 "+at:"☁️ 已連接 GitHub，改動會自動同步"}
+function ghStatus(t){if(!S.isGH)return;$("staticTag").textContent=" ・GitHub 版"+(S.owner===true?"（擁有者）":"")+(t?"・"+t:"");if(S.owner===true)document.querySelectorAll(".ghsync").forEach(e=>{e.textContent=ghSyncText();e.hidden=false})}
 async function ghApi(method,path,body,allow404){
   const r=await fetch("https://api.github.com"+path,{method,cache:"no-store",headers:{"Authorization":"Bearer "+GH.tok,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});
   if(r.status===404&&allow404)return null;
   if(!r.ok){const e=new Error("GitHub "+r.status);e.code="github_"+r.status;throw e}
   return r.status===204?{}:r.json();
 }
-const ghPath=(repo,p)=>`/repos/${encodeURIComponent(GH_CFG.owner)}/${encodeURIComponent(repo)}/contents/${p.split("/").map(encodeURIComponent).join("/")}`;
+const ghRepo=full=>"/repos/"+String(full).split("/").map(encodeURIComponent).join("/");
+const ghPath=(repo,p)=>`${ghRepo(repo)}/contents/${p.split("/").map(encodeURIComponent).join("/")}`;
 async function ghGet(repo,p){const j=await ghApi("GET",ghPath(repo,p)+"?ref="+encodeURIComponent(GH_CFG.branch),null,true);const key=repo+"/"+p;if(!j){delete GH.sha[key];return null}GH.sha[key]=j.sha;return j}
 async function ghPut(repo,p,b64,msg){
   const key=repo+"/"+p;
@@ -1230,10 +1242,10 @@ const ghAssets={
     const id=[...crypto.getRandomValues(new Uint8Array(16))].map(b=>b.toString(16).padStart(2,"0")).join("")+"."+ext;
     const b64=String(await toDataURL(blob)).split(",")[1];
     GH.busy++;ghStatus("上傳頭像中…");
-    try{await ghPut(GH_CFG.pub,"img/"+id,b64,"新增頭像")}finally{GH.busy--;ghStatus(GH.timer?"未同步…":"")}
+    try{await ghPut(GH.PUB,"img/"+id,b64,"新增頭像")}finally{GH.busy--;ghStatus(GH.timer?"未同步…":"")}
     const url=URL.createObjectURL(blob);window.STATIC_IMG=window.STATIC_IMG||{};STATIC_IMG[id]=url;return{id,url};
   },
-  async delete(id){if(!id||Object.values(RIMG).includes(id)||id===DARUMA_ID)return;await ghDel(GH_CFG.pub,ghImgPath(id),"刪除舊頭像")}
+  async delete(id){if(!id||Object.values(RIMG).includes(id)||id===DARUMA_ID)return;await ghDel(GH.PUB,ghImgPath(id),"刪除舊頭像")}
 };
 function ghPack(){
   const A=S.accts,list=[...GH.store.M.values()];
@@ -1248,33 +1260,39 @@ function ghQueue(){if(!S.isGH||!GH.store)return;clearTimeout(GH.timer);ghStatus(
 async function ghFlush(){
   const pk=ghPack();GH.busy++;ghStatus("同步中…");
   try{
-    if(pk.pubStr!==GH.lastPub){await ghPut(GH_CFG.pub,"data/shiki.json",b64enc(pk.pubFile()),"更新式神名單");GH.lastPub=pk.pubStr}
-    if(pk.privStr!==GH.lastPriv){await ghPut(GH_CFG.priv,"records.json",b64enc(pk.privFile()),"更新紀錄");GH.lastPriv=pk.privStr}
-    GH.busy--;ghStatus(GH.timer?"未同步…":"已同步 ✓");
-  }catch(e){GH.busy--;ghStatus("同步失敗，稍後自動重試");toast("同步失敗："+(e.code==="github_401"?"通行證過期或錯誤":e.code==="github_403"||e.code==="github_404"?"通行證沒有寫入權限":(e.code||e.message||"網絡問題")));setTimeout(ghQueue,15000)}
+    if(pk.pubStr!==GH.lastPub){await ghPut(GH.PUB,"data/shiki.json",b64enc(pk.pubFile()),"更新式神名單");GH.lastPub=pk.pubStr}
+    if(pk.privStr!==GH.lastPriv){await ghPut(GH.PRIV,"records.json",b64enc(pk.privFile()),"更新紀錄");GH.lastPriv=pk.privStr}
+    GH.busy--;GH.fail=false;const d=new Date();GH.lastAt=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");pref("ghLastAt",GH.lastAt);ghStatus(GH.timer?"未同步…":"已同步 ✓");if(!GH.timer)toast("☁️ 已幫你自動同步到 GitHub ✓");
+  }catch(e){GH.busy--;GH.fail=true;ghStatus("同步失敗，稍後自動重試");toast("同步失敗："+(e.code==="github_401"?"通行證過期或錯誤":e.code==="github_403"||e.code==="github_404"?"通行證沒有寫入權限":(e.code||e.message||"網絡問題")));setTimeout(ghQueue,15000)}
 }
-$("ghKey").onclick=()=>{
-  if(GH.tok){
-    if(GH.timer||GH.busy){toast("還在同步，等一下再登出");return}
-    if(confirm("登出擁有者？這部裝置會忘記通行證，之後要重新貼上。")){try{localStorage.removeItem("ghTok")}catch(e){}location.reload()}
-    return;
-  }
-  const t=(prompt("貼上你的 GitHub 通行證（github_pat_ 開頭）")||"").trim();if(!t)return;
-  if(!/^(github_pat_|ghp_)/.test(t)){toast("看起來不是通行證喔，再檢查一下");return}
-  pref("ghTok",t);location.reload();
+function ghFill(){$("ghPubIn").value=GH.PUB||"";$("ghPrivIn").value=GH.PRIV||"";$("ghTokIn").value="";$("ghTokIn").placeholder=GH.tok?"已儲存（想換先再貼）":"github_pat_…";$("ghLogin").textContent=GH.tok?"儲存並重新載入":"登入";$("ghLogout").hidden=!GH.tok;$("ghLogout").textContent="登出";GH.outArm=false}
+$("ghKey").onclick=()=>{const p=$("ghPanel");p.hidden=!p.hidden;if(!p.hidden){ghFill();p.scrollIntoView({block:"nearest",behavior:"smooth"})}};
+$("ghLogin").onclick=()=>{
+  const rp=/^[^\/\s]+\/[^\/\s]+$/;const pub=$("ghPubIn").value.trim(),priv=$("ghPrivIn").value.trim(),t=$("ghTokIn").value.trim();
+  if(!rp.test(pub)||!rp.test(priv)){toast("倉庫要寫成「用戶名/倉庫名」喔");return}
+  if(!t&&!GH.tok){toast("記得貼上通行證");return}
+  if(t&&!/^(github_pat_|ghp_)/.test(t)){toast("看起來不是通行證喔，再檢查一下");return}
+  if(GH.timer||GH.busy){toast("還在同步，等一下再試");return}
+  pref("ghPub",pub);pref("ghPriv",priv);if(t)pref("ghTok",t);location.reload();
+};
+$("ghLogout").onclick=()=>{
+  if(GH.timer||GH.busy){toast("還在同步，等一下再登出");return}
+  if(!GH.outArm){GH.outArm=true;$("ghLogout").textContent="再撳一次確認登出";return}
+  try{localStorage.removeItem("ghTok")}catch(e){}location.reload();
 };
 addEventListener("beforeunload",e=>{if(S.isGH&&(GH.timer||GH.busy)){e.preventDefault();e.returnValue=""}});
 async function ghBoot(){
   S.isGH=true;ghStatus("載入中…");$("ghKey").hidden=false;
+  GH.PUB=pref("ghPub")||GH_CFG.owner+"/"+GH_CFG.pub;GH.PRIV=pref("ghPriv")||GH_CFG.owner+"/"+GH_CFG.priv;
   let pub=null;try{const r=await fetch("data/shiki.json?t="+Date.now(),{cache:"no-store"});if(r.ok)pub=await r.json()}catch(e){}
   const base=(pub&&Array.isArray(pub.shiki)&&pub.shiki)||(window.STATIC_DB&&STATIC_DB.shiki)||[];
   GH.tok=pref("ghTok")||null;
   if(GH.tok){
     try{
-      await ghApi("GET",`/repos/${encodeURIComponent(GH_CFG.owner)}/${encodeURIComponent(GH_CFG.priv)}`);
-      const pj=await ghGet(GH_CFG.pub,"data/shiki.json");
+      await ghApi("GET",ghRepo(GH.PRIV));
+      const pj=await ghGet(GH.PUB,"data/shiki.json");
       const list=pj?(JSON.parse(b64dec(pj.content)).shiki||[]):base;
-      const rj=await ghGet(GH_CFG.priv,"records.json");
+      const rj=await ghGet(GH.PRIV,"records.json");
       const rec=rj?JSON.parse(b64dec(rj.content)):null;
       S.accts=(rec&&Array.isArray(rec.a)&&rec.a.length)?rec.a.filter(a=>a&&a.k&&a.name).map(a=>({k:String(a.k),name:String(a.name)})):DEFACC.map(a=>({...a}));
       const st=ghStore();GH.store=st;
@@ -1283,7 +1301,7 @@ async function ghBoot(){
         st.M.set(s.id,o)}
       const pk=ghPack();GH.lastPub=pj?pk.pubStr:"";GH.lastPriv=rj?pk.privStr:"";
       S.db=st;S.assets=ghAssets;S.owner=true;S.isStatic=false;
-      $("ghKey").textContent="🔓 登出擁有者";
+      $("ghKey").textContent="🔓 擁有者設定";
       syncSrv();renderIO();ghStatus(pj&&rj?"":"首次使用，改動後會自動建立檔案");
       st.collection("shiki").onSnapshot(snap=>{S.shiki=snap.docs.map(d=>({id:d.id,...d.data()}));renderShiki();const a=document.activeElement;if(!(a&&a.classList.contains("cur")))renderEggs()});
       toast("擁有者模式 ✧ 改動會自動存去 GitHub");
@@ -1291,6 +1309,7 @@ async function ghBoot(){
     }catch(e){
       if(e.code==="github_401"||e.code==="github_404"){try{localStorage.removeItem("ghTok")}catch(_){}GH.tok=null}
       toast("通行證用不到："+(e.code==="github_401"?"錯誤或已過期":e.code==="github_404"?"找不到倉庫，或通行證沒有揀這兩個倉庫":(e.code||e.message||"網絡問題")));
+      $("ghPanel").hidden=false;ghFill();
     }
   }
   S.isStatic=true;S.owner=false;S.shiki=base;S.db=null;S.assets=null;

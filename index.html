@@ -355,6 +355,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div id="ghPanel" class="ghpanel" hidden>
       <b>☁️ GitHub 擁有者登入</b>
       <p class="sub" style="margin:2px 0 4px">通行證只會存喺呢部機；朋友冇通行證就乜都改唔到。</p>
+      <div class="ghsync" hidden style="font-weight:900"></div>
       <label class="fld">公開倉庫（用戶名/倉庫名）<input id="ghPubIn" type="text" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
       <label class="fld">私人倉庫（用戶名/倉庫名）<input id="ghPrivIn" type="text" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
       <label class="fld">通行證 Token（只存喺呢部機）<input id="ghTokIn" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="github_pat_…"></label>
@@ -1010,7 +1011,7 @@ function renderIO(){
     ?(S.dirty?'<span class="dirty">有未匯出的變更</span>':"")
     :g
     ?`${S.previewing?'<span class="pvtag">預覽中・只有你看得到</span><br>':""}<b>訪客模式</b>：你的點亮和技能紀錄只存在這次打開的頁面，關掉就會清空。離開前按「匯出」存檔，下次按「匯入紀錄」選回同一個檔案就能接續。${S.dirty?'<span class="dirty">有未匯出的變更</span>':""}`
-    :S.isGH?`<b>擁有者模式（GitHub）</b>：改動會自動存去你的倉庫，約一分鐘後朋友那邊就會更新。匯出可以當備份。`
+    :S.isGH?`<b>擁有者模式（GitHub）</b>：改動會自動存去你的倉庫，約一分鐘後朋友那邊就會更新。匯出可以當備份。<br><span class="ghsync" style="font-weight:900">${ghSyncText()}</span>`
     :`<b>擁有者模式</b>：你的紀錄自動存在雲端。匯出可以當備份；「我的免登入版」帶著你的紀錄，在外面改完匯出 MD，回來按「匯入改動」就能合併回雲端。`;
   const own=S.owner===true;$("editBtn").hidden=!own;$("addShiki").hidden=!own;$("ownerHint").hidden=!own;if(!own){$("bulkLbl").hidden=true;$("pendBar").hidden=true;S.edit=false}else{$("bulkLbl").hidden=!S.assets;if(typeof renderPending==="function"&&S.pending)renderPending()}
 }
@@ -1202,7 +1203,8 @@ const GH={tok:null,sha:{},q:Promise.resolve(),timer:null,busy:0,lastPub:"",lastP
 const PUBK=["name","rarity","max","order","img","cn","work","shrine","shop"];
 function b64enc(str){const b=new TextEncoder().encode(str);let s="";for(let i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(s)}
 function b64dec(b64){const bin=atob(String(b64||"").replace(/\s/g,""));const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new TextDecoder().decode(u)}
-function ghStatus(t){if(!S.isGH)return;$("staticTag").textContent=" ・GitHub 版"+(S.owner===true?"（擁有者）":"")+(t?"・"+t:"")}
+function ghSyncText(){if(GH.busy)return"☁️ 同步中…";if(GH.timer)return"☁️ 有改動，一陣自動同步…";if(GH.fail)return"⚠️ 同步失敗，15 秒後自動重試";const at=GH.lastAt||pref("ghLastAt");return at?"☁️ 已自動同步到 GitHub ✓・上次 "+at:"☁️ 已連接 GitHub，改動會自動同步"}
+function ghStatus(t){if(!S.isGH)return;$("staticTag").textContent=" ・GitHub 版"+(S.owner===true?"（擁有者）":"")+(t?"・"+t:"");if(S.owner===true)document.querySelectorAll(".ghsync").forEach(e=>{e.textContent=ghSyncText();e.hidden=false})}
 async function ghApi(method,path,body,allow404){
   const r=await fetch("https://api.github.com"+path,{method,cache:"no-store",headers:{"Authorization":"Bearer "+GH.tok,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});
   if(r.status===404&&allow404)return null;
@@ -1260,8 +1262,8 @@ async function ghFlush(){
   try{
     if(pk.pubStr!==GH.lastPub){await ghPut(GH.PUB,"data/shiki.json",b64enc(pk.pubFile()),"更新式神名單");GH.lastPub=pk.pubStr}
     if(pk.privStr!==GH.lastPriv){await ghPut(GH.PRIV,"records.json",b64enc(pk.privFile()),"更新紀錄");GH.lastPriv=pk.privStr}
-    GH.busy--;ghStatus(GH.timer?"未同步…":"已同步 ✓");
-  }catch(e){GH.busy--;ghStatus("同步失敗，稍後自動重試");toast("同步失敗："+(e.code==="github_401"?"通行證過期或錯誤":e.code==="github_403"||e.code==="github_404"?"通行證沒有寫入權限":(e.code||e.message||"網絡問題")));setTimeout(ghQueue,15000)}
+    GH.busy--;GH.fail=false;const d=new Date();GH.lastAt=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");pref("ghLastAt",GH.lastAt);ghStatus(GH.timer?"未同步…":"已同步 ✓");if(!GH.timer)toast("☁️ 已幫你自動同步到 GitHub ✓");
+  }catch(e){GH.busy--;GH.fail=true;ghStatus("同步失敗，稍後自動重試");toast("同步失敗："+(e.code==="github_401"?"通行證過期或錯誤":e.code==="github_403"||e.code==="github_404"?"通行證沒有寫入權限":(e.code||e.message||"網絡問題")));setTimeout(ghQueue,15000)}
 }
 function ghFill(){$("ghPubIn").value=GH.PUB||"";$("ghPrivIn").value=GH.PRIV||"";$("ghTokIn").value="";$("ghTokIn").placeholder=GH.tok?"已儲存（想換先再貼）":"github_pat_…";$("ghLogin").textContent=GH.tok?"儲存並重新載入":"登入";$("ghLogout").hidden=!GH.tok;$("ghLogout").textContent="登出";GH.outArm=false}
 $("ghKey").onclick=()=>{const p=$("ghPanel");p.hidden=!p.hidden;if(!p.hidden){ghFill();p.scrollIntoView({block:"nearest",behavior:"smooth"})}};
