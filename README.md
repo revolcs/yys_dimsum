@@ -1,19 +1,21 @@
-# About yys_dimsum：
+# 式神點心紙 ＋ 黑蛋地獄
 
-⚠️ 免責聲明（請先看我）⚠️
+陰陽師式神收集進度表（個人收藏用途，非官方網站）。
 
-	•本頁為玩家自製的非官方工具，與網易及《陰陽師》官方沒有任何關係。
-	•遊戲角色頭像、稀有度圖示等美術版權屬網易所有，此處僅作個人紀錄用途，不作任何商業用途。
-	•式神名單、技能數值為玩家手動整理，可能與遊戲實際內容有出入，一切以遊戲內為準。
-	•紀錄只存在自己打開的頁面，不會改到任何人的資料；關掉頁面就會清空，離開前記得匯出、下次匯入接續。想離線用或不想登入，可以按 📦 匯出免登入版 下載一個單獨的檔案，直接用瀏覽器打開。
+🔗 網頁入口：https://revolcs.github.io/yys_dsp_pub/
 
-⚠️ Disclaimer (please read first) ⚠️
+## 點用
 
-	•This page is a fan-made, unofficial tool. It has no affiliation with NetEase or the official Onmyoji game.
-	•Character portraits, rarity icons and other artwork copyrights belong to NetEase. They are used here for personal record-keeping only, with no commercial use.
-	•The shikigami list and skill values are compiled manually by players and may differ from the actual in-game content. The in-game information always prevails.
-	•Records exist only on the page you have open and do not change anyone else's data. Closing the page clears them, so please export before leaving and import next time to continue. To use offline or without logging in, you can click 📦 Export standalone version to download a separate file and open it directly in your browser.
+- **式神圖鑑**：列出所有式神，點一下就可以標記已入手
+- **帳號 1 / 帳號 2**：可以分開記錄兩個帳號嘅進度
+- **黑蛋地獄**：記錄每隻式神嘅黑蛋技能完成情況
+- **隱藏陸服限定**：預設隱藏，撳一下就可以顯示
 
-Materials: Onmyoji Game / AI for creating tools
+## 注意
 
-Site: https://revolcs.github.io/yys_dimsum/
+- 你喺訪客模式嘅點亮紀錄，只會保留喺呢個頁面，關咗就會消失。想保留可以先按「匯出」存檔，下次再用「匯入紀錄」接續。
+- 呢個頁面係唯讀嘅，式神名單同頭像由擁有者更新。
+
+## 免責
+
+遊戲角色、圖示等美術版權歸網易《陰陽師》所有，此頁面僅作個人收藏紀錄用途，不作任何商業用途。
