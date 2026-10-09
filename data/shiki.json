@@ -1,4 +1,4 @@
-{"built":"2026/10/09 10:09","shiki":[
+{"built":"2026/10/09 14:06","shiki":[
 {"id":"col003","name":"阿香","rarity":"合作","max":"515","order":10,"img":"a35dd50ebda6bc5c7aac6099c44b478b","work":"鬼燈的冷徹"},
 {"id":"col004","name":"蜜桃&芥子","rarity":"合作","max":"515","order":3,"img":"8560184a96b6270c21f6688a38f4db34","work":"鬼燈的冷徹","shrine":true},
 {"id":"col010","name":"朽木露琪亞","rarity":"合作","max":"555","order":9,"img":"e035fc8a7bc6cefa4299006325f60f6e","work":"BLEACH 死神","shrine":true},
@@ -276,5 +276,6 @@
 {"id":"ssrn041","name":"鈴鹿御前","rarity":"SSR","max":"555","order":29,"img":"aed02dd353789761fc2cc876791f780c"},
 {"id":"ssrn042","name":"緣結神","rarity":"SSR","max":"515","order":28,"img":"79daa6212b3bc510a5a77bf4c4693643"},
 {"id":"ssrn068","name":"兩面佛","rarity":"SSR","max":"555","order":5,"img":"684da89814b624923c84169ffc4a37fa","shop":"榮譽商店"},
-{"id":"ur001","name":"妖刀姬·緋夜獵刃","rarity":"UR","max":"555","order":1,"img":"81ee25d5a47f58c69bbe88daf9102c31"}
+{"id":"ur001","name":"妖刀姬·緋夜獵刃","rarity":"UR","max":"555","order":1,"img":"81ee25d5a47f58c69bbe88daf9102c31"},
+{"id":"ghmv0kazt089o9","name":"大天狗·？？","rarity":"UR","order":1791525967811}
 ]}
