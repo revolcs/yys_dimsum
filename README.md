@@ -2,7 +2,7 @@
 
 陰陽師式神收集進度表（個人收藏用途，非官方網站）。
 
-🔗 網頁入口：[https://revolcs.github.io/yys_dsp_pub/](https://revolcs.github.io/yys_dimsum/)
+🔗 網頁入口：https://revolcs.github.io/yys_dimsum/
 
 ## 點用
 
