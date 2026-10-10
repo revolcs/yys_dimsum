@@ -1,4 +1,4 @@
-{"built":"2026/10/09 14:06","shiki":[
+{"built":"2026/10/10 21:58","shiki":[
 {"id":"col003","name":"阿香","rarity":"合作","max":"515","order":10,"img":"a35dd50ebda6bc5c7aac6099c44b478b","work":"鬼燈的冷徹"},
 {"id":"col004","name":"蜜桃&芥子","rarity":"合作","max":"515","order":3,"img":"8560184a96b6270c21f6688a38f4db34","work":"鬼燈的冷徹","shrine":true},
 {"id":"col010","name":"朽木露琪亞","rarity":"合作","max":"555","order":9,"img":"e035fc8a7bc6cefa4299006325f60f6e","work":"BLEACH 死神","shrine":true},
@@ -217,7 +217,7 @@
 {"id":"ssr049","name":"龍珏","rarity":"SSR","max":"555","order":49,"img":"112b5c913f411f7df852a654e98c6721"},
 {"id":"ssr05","name":"小鹿男","rarity":"SSR","max":"555","order":6,"img":"c5624938dec939df992434c6a1acc9b7"},
 {"id":"ssr06","name":"茨木童子","rarity":"SSR","max":"515","order":7,"img":"92083d955b6a8e2e002b78b11e3e12e0"},
-{"id":"ssr064","name":"咲那","rarity":"SSR","max":"555","order":64},
+{"id":"ssr064","name":"咲那","rarity":"SSR","max":"555","order":64,"img":"fef19383c3c876acdc2ba8c271c44ff5.webp"},
 {"id":"ssr07","name":"青行燈","rarity":"SSR","max":"555","order":8,"img":"c703509a0a8affd7b677f3d15d1457ba"},
 {"id":"ssr08","name":"妖刀姬","rarity":"SSR","max":"555","order":9,"img":"2c6aeba0a72f171e5ed31dc89186be01"},
 {"id":"ssr09","name":"一目連","rarity":"SSR","max":"555","order":10,"img":"7875eaaa9bb938be2488783bef328667"},
