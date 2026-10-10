@@ -76,6 +76,7 @@ h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:
 .cnmini{align-self:center;font:inherit;font-size:.72rem;font-weight:900;border:2px solid #2fb8ff;color:var(--cnink);background:var(--sheet);border-radius:99px;padding:2px 9px;cursor:pointer;white-space:nowrap}
 .cnmini[aria-pressed="true"]{background:#2fb8ff;color:#fff}
 .ghpanel{margin:10px auto 0;max-width:420px;text-align:left;display:flex;flex-direction:column;gap:8px;padding:12px 14px;border:2px dashed var(--line);border-radius:16px;background:var(--sheet);color:var(--ink);font-size:.85rem}
+.gtools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .themefab{flex:none;height:32px;padding:0 11px;border-radius:99px;font:inherit;font-size:.8rem;font-weight:900;color:var(--ink);white-space:nowrap;line-height:1;border:2px solid var(--ink);background:var(--sheet);box-shadow:3px 3px 0 var(--tshadow);cursor:pointer;display:grid;place-items:center}
 .cnfab{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:25;font:inherit;font-size:.8rem;font-weight:900;border:2px solid #0b2e5c;color:#fff;background:#2fb8ff;border-radius:99px;padding:8px 14px;box-shadow:3px 3px 0 #0b2e5c;cursor:pointer}
 .cnfab[aria-pressed="true"]{background:var(--sheet);color:var(--cnink)}
@@ -424,12 +425,24 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 <div id="gScrim" class="scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="gTitle">
     <h2 id="gTitle">切格子</h2>
-    <p class="sub" style="margin:0">把圖鑑截圖切成一格一格。對不準的話調整欄數、列數。</p>
-    <div style="overflow:auto;border-radius:12px;border:2px solid var(--ink)"><canvas id="gCanvas" style="display:block;width:100%;height:auto"></canvas></div>
+    <p class="sub" style="margin:0">把圖鑑截圖切成一格一格。<b>🔲 移動框</b>：拖框內＝整組移位，拖右下角圓點＝縮放範圍。<b>✋ 移動圖</b>：放大後拖動睇細節。</p>
+    <div class="gtools">
+      <button class="chip" type="button" data-gm="box" aria-pressed="true">🔲 移動框</button>
+      <button class="chip" type="button" data-gm="pan" aria-pressed="false">✋ 移動圖</button>
+      <span style="flex:1"></span>
+      <button class="chip" type="button" id="gZoomOut" aria-label="縮小">－</button><span id="gZoomLbl" class="sub" style="min-width:3.2em;text-align:center">100%</span><button class="chip" type="button" id="gZoomIn" aria-label="放大">＋</button>
+      <button class="chip" type="button" id="gReset">重設</button>
+    </div>
+    <div id="gWrap" style="overflow:auto;max-height:52vh;border-radius:12px;border:2px solid var(--ink);padding:16px;background:var(--paper);touch-action:none"><canvas id="gCanvas" style="display:block;width:100%;height:auto;touch-action:none"></canvas></div>
+    <div class="gtools" id="gNav" hidden><button class="chip" type="button" id="gPrev">◀ 上一張</button><span class="sub" id="gNavLbl" style="flex:1;text-align:center"></span><button class="chip" type="button" id="gNext">下一張 ▶</button></div>
     <div class="two">
       <label class="fld">每行幾格<input id="gCols" type="number" inputmode="numeric" min="1" max="10" value="4"></label>
       <label class="fld">共幾列<input id="gRows" type="number" inputmode="numeric" min="1" max="20" value="4"></label>
       <label class="fld" style="justify-content:flex-end"><span class="check"><input id="gSingle" type="checkbox"> 單張頭像</span></label>
+    </div>
+    <div class="two" style="grid-template-columns:1fr 1fr">
+      <label class="fld">框大小<input id="gK" type="range" min="40" max="100" value="80" style="padding:0"></label>
+      <label class="fld">框上下<input id="gV" type="range" min="-20" max="40" value="6" style="padding:0"></label>
     </div>
     <div class="sub" id="gInfo"></div>
     <div class="row">
@@ -869,37 +882,73 @@ $("pvYes").onclick=async()=>{
 
 /* bulk icon assign */
 /* grid split: one screenshot of the in-game 圖鑑 grid -> one image per cell */
-const G={imgs:[]};
+const G={imgs:[],st:[],idx:0,k:.8,v:.06,zoom:1,mode:"box",drag:null,raf:0};
 const loadImg=f=>new Promise((res,rej)=>{const u=URL.createObjectURL(f);const i=new Image();i.onload=()=>{res(i)};i.onerror=rej;i.src=u});
+const gFull=img=>({x:0,y:0,w:img.width,h:img.height});
 $("bulkFile").onchange=async e=>{
   const files=[...e.target.files];e.target.value="";if(!files.length)return;
   try{G.imgs=await Promise.all(files.map(loadImg))}catch(err){toast("有圖片讀不到，換一張試試");return}
-  const f=G.imgs[0];$("gCols").value=4;$("gRows").value=Math.max(1,Math.round(f.height/(f.width/4)));
+  G.st=G.imgs.map(im=>({area:gFull(im),rows:Math.max(1,Math.round(im.height/(im.width/4)))}));
+  G.idx=0;G.k=.8;G.v=.06;G.zoom=1;$("gK").value=80;$("gV").value=6;
+  const f=G.imgs[0];$("gCols").value=4;$("gRows").value=G.st[0].rows;
   $("gSingle").checked=f.width<220&&Math.abs(f.width-f.height)<f.width*.15;
-  drawGrid();$("gScrim").hidden=false;
+  gSetMode("box");gApplyZoom();drawGrid();$("gScrim").hidden=false;
 };
+const gSt=img=>G.st[G.imgs.indexOf(img)]||{area:gFull(img),rows:1};
 function gridOf(img){
   if($("gSingle").checked)return{c:1,r:1};
   const c=Math.max(1,Math.min(10,+$("gCols").value||4));
-  const r=img===G.imgs[0]?Math.max(1,Math.min(20,+$("gRows").value||1)):Math.max(1,Math.round(img.height/(img.width/c)));
+  const r=Math.max(1,Math.min(20,+gSt(img).rows||1));
   return{c,r};
 }
 function cellBox(img,c,r,i,j){
-  const cw=img.width/c,ch=img.height/r;
-  if(c===1&&r===1)return[0,0,img.width,img.height];
-  const x=i*cw+cw*.10,y=j*ch+ch*.06,w=cw*.80,h=Math.min(cw*.80,ch*.70);
-  const s=Math.min(w,h);return[x+(w-s)/2,y,s,s];
+  const A=gSt(img).area;
+  if(c===1&&r===1&&$("gSingle").checked)return[A.x,A.y,A.w,A.h];
+  const cw=A.w/c,ch=A.h/r,s=Math.min(cw*G.k,ch*G.k*.875);
+  return[A.x+i*cw+(cw-s)/2,A.y+j*ch+ch*G.v,s,s];
 }
 function drawGrid(){
-  const img=G.imgs[0];if(!img)return;const cv=$("gCanvas"),ctx=cv.getContext("2d");
-  cv.width=img.width;cv.height=img.height;ctx.drawImage(img,0,0);
-  const{c,r}=gridOf(img);const lw=Math.max(2,img.width/150);
+  const img=G.imgs[G.idx];if(!img)return;const cv=$("gCanvas"),ctx=cv.getContext("2d");
+  if(cv.width!==img.width||cv.height!==img.height){cv.width=img.width;cv.height=img.height}
+  ctx.drawImage(img,0,0);
+  const{c,r}=gridOf(img);const sc=cv.width/Math.max(1,cv.getBoundingClientRect().width||cv.width);const lw=Math.max(2,2*sc);
+  const A=gSt(img).area;
+  ctx.setLineDash([8*sc,6*sc]);ctx.lineWidth=lw;ctx.strokeStyle="#ff4fb8";ctx.strokeRect(A.x,A.y,A.w,A.h);ctx.setLineDash([]);
   ctx.lineWidth=lw;ctx.strokeStyle="#d9ff1f";
   for(let j=0;j<r;j++)for(let i=0;i<c;i++){const[x,y,w,h]=cellBox(img,c,r,i,j);ctx.strokeRect(x,y,w,h)}
+  const hr=Math.max(10,13*sc);ctx.beginPath();ctx.arc(A.x+A.w,A.y+A.h,hr,0,Math.PI*2);ctx.fillStyle="#ff4fb8";ctx.fill();ctx.lineWidth=Math.max(2,2*sc);ctx.strokeStyle="#fff";ctx.stroke();
   const n=G.imgs.reduce((t,im)=>{const g=gridOf(im);return t+g.c*g.r},0);
-  $("gInfo").textContent=`${G.imgs.length} 張圖，會切出 ${n} 個頭像（螢光框＝會被裁下來的範圍）`;
+  $("gInfo").textContent=`${G.imgs.length} 張圖，會切出 ${n} 個頭像（螢光框＝會被裁下來的範圍；粉紅虛線＝格仔範圍）`;
+  $("gNav").hidden=G.imgs.length<2;$("gNavLbl").textContent=`第 ${G.idx+1} / ${G.imgs.length} 張`;
 }
-["gCols","gRows","gSingle"].forEach(id=>$(id).oninput=drawGrid);
+const gRedraw=()=>{if(!G.raf)G.raf=requestAnimationFrame(()=>{G.raf=0;drawGrid()})};
+function gSetMode(m){G.mode=m;document.querySelectorAll("[data-gm]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.gm===m));$("gCanvas").style.touchAction=$("gWrap").style.touchAction=m==="box"?"none":"auto";$("gCanvas").style.cursor=$("gWrap").style.cursor=m==="box"?"move":"grab"}
+function gApplyZoom(){$("gCanvas").style.width=Math.round(G.zoom*100)+"%";$("gZoomLbl").textContent=Math.round(G.zoom*100)+"%";gRedraw()}
+document.querySelectorAll("[data-gm]").forEach(b=>b.onclick=()=>gSetMode(b.dataset.gm));
+$("gZoomIn").onclick=()=>{G.zoom=Math.min(4,G.zoom+.5);gApplyZoom()};
+$("gZoomOut").onclick=()=>{G.zoom=Math.max(1,G.zoom-.5);gApplyZoom()};
+$("gReset").onclick=()=>{const img=G.imgs[G.idx];if(!img)return;gSt(img).area=gFull(img);G.k=.8;G.v=.06;$("gK").value=80;$("gV").value=6;G.zoom=1;gApplyZoom()};
+$("gPrev").onclick=()=>{if(G.idx>0){G.idx--;$("gRows").value=G.st[G.idx].rows;drawGrid()}};
+$("gNext").onclick=()=>{if(G.idx<G.imgs.length-1){G.idx++;$("gRows").value=G.st[G.idx].rows;drawGrid()}};
+$("gK").oninput=()=>{G.k=(+$("gK").value||80)/100;gRedraw()};
+$("gV").oninput=()=>{G.v=(+$("gV").value||0)/100;gRedraw()};
+$("gRows").oninput=()=>{const s=G.st[G.idx];if(s)s.rows=Math.max(1,Math.min(20,+$("gRows").value||1));drawGrid()};
+["gCols","gSingle"].forEach(id=>$(id).oninput=drawGrid);
+(()=>{const cv=$("gCanvas"),wr=$("gWrap");
+  const pt=e=>{const r=cv.getBoundingClientRect(),sc=cv.width/r.width;return{x:(e.clientX-r.left)*sc,y:(e.clientY-r.top)*sc,sc}};
+  wr.addEventListener("pointerdown",e=>{
+    if(G.mode!=="box")return;const img=G.imgs[G.idx];if(!img)return;const p=pt(e),A=gSt(img).area;
+    const hr=Math.max(26,30*p.sc);const nearBR=Math.hypot(p.x-(A.x+A.w),p.y-(A.y+A.h))<hr;
+    G.drag={m:nearBR?"size":"move",x0:p.x,y0:p.y,a:{...A}};wr.setPointerCapture(e.pointerId);e.preventDefault();
+  });
+  wr.addEventListener("pointermove",e=>{
+    const D=G.drag;if(!D)return;const img=G.imgs[G.idx];const p=pt(e),dx=p.x-D.x0,dy=p.y-D.y0,A=gSt(img).area,min=Math.max(20,img.width*.05);
+    if(D.m==="move"){A.x=Math.min(img.width-A.w*.2,Math.max(-A.w*.8,D.a.x+dx));A.y=Math.min(img.height-A.h*.2,Math.max(-A.h*.8,D.a.y+dy))}
+    else{A.w=Math.max(min,D.a.w+dx);A.h=Math.max(min,D.a.h+dy)}
+    gRedraw();e.preventDefault();
+  });
+  const end=()=>{G.drag=null};wr.addEventListener("pointerup",end);wr.addEventListener("pointercancel",end);
+})();
 $("gCancel").onclick=()=>{$("gScrim").hidden=true;G.imgs=[]};
 $("gGo").onclick=async()=>{
   $("gGo").disabled=true;const blobs=[];
