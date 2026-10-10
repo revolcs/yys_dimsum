@@ -235,7 +235,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .chip .rar{font-size:1rem}
 
 .pickh{position:sticky;top:0;background:var(--sheet);border-bottom:2px solid var(--acc);font-size:1rem;padding:3px 12px;z-index:1}
-.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:99px;font-size:.85rem;z-index:30;max-width:calc(100% - 32px);text-align:center}
+.toast{pointer-events:none;position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:99px;font-size:.85rem;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 
@@ -425,7 +425,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 <div id="gScrim" class="scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="gTitle">
     <h2 id="gTitle">切格子</h2>
-    <p class="sub" style="margin:0">把圖鑑截圖切成一格一格。<b>🔲 移動框</b>：拖框內＝整組移位，拖右下角圓點＝縮放範圍。<b>✋ 移動圖</b>：放大後拖動睇細節。</p>
+    <p class="sub" style="margin:0">把圖鑑截圖切成一格一格。<b>🔲 移動框</b>：拖框內＝整組移位，拖右下角粉紅圓點＝變大變細（剔「單張頭像」就係郁嗰個正方框）。<b>✋ 移動圖</b>：放大後拖動睇細節。</p>
     <div class="gtools">
       <button class="chip" type="button" data-gm="box" aria-pressed="true">🔲 移動框</button>
       <button class="chip" type="button" data-gm="pan" aria-pressed="false">✋ 移動圖</button>
@@ -433,7 +433,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="chip" type="button" id="gZoomOut" aria-label="縮小">－</button><span id="gZoomLbl" class="sub" style="min-width:3.2em;text-align:center">100%</span><button class="chip" type="button" id="gZoomIn" aria-label="放大">＋</button>
       <button class="chip" type="button" id="gReset">重設</button>
     </div>
-    <div id="gWrap" style="overflow:auto;max-height:52vh;border-radius:12px;border:2px solid var(--ink);padding:16px;background:var(--paper);touch-action:none"><canvas id="gCanvas" style="display:block;width:100%;height:auto;touch-action:none"></canvas></div>
+    <div id="gWrap" style="flex:none;overflow:auto;max-height:min(46vh,380px);border-radius:12px;border:2px solid var(--ink);padding:16px;background:var(--paper);touch-action:none"><canvas id="gCanvas" style="display:block;width:100%;height:auto;max-width:none;touch-action:none"></canvas></div>
     <div class="gtools" id="gNav" hidden><button class="chip" type="button" id="gPrev">◀ 上一張</button><span class="sub" id="gNavLbl" style="flex:1;text-align:center"></span><button class="chip" type="button" id="gNext">下一張 ▶</button></div>
     <div class="two">
       <label class="fld">每行幾格<input id="gCols" type="number" inputmode="numeric" min="1" max="10" value="4"></label>
@@ -882,69 +882,94 @@ $("pvYes").onclick=async()=>{
 
 /* bulk icon assign */
 /* grid split: one screenshot of the in-game 圖鑑 grid -> one image per cell */
-const G={imgs:[],st:[],idx:0,k:.8,v:.06,zoom:1,mode:"box",drag:null,raf:0};
+const G={imgs:[],st:[],idx:0,k:.8,v:.06,zoom:1,mode:"box",drag:null,raf:0,panHint:false};
 const loadImg=f=>new Promise((res,rej)=>{const u=URL.createObjectURL(f);const i=new Image();i.onload=()=>{res(i)};i.onerror=rej;i.src=u});
 const gFull=img=>({x:0,y:0,w:img.width,h:img.height});
+/* single-icon crop square: starts centred, 70% of the short side (whole image if it is already a small square icon) */
+const gSq0=img=>{const small=img.width<220&&Math.abs(img.width-img.height)<img.width*.15;const s=Math.round(Math.min(img.width,img.height)*(small?1:.7));return{x:Math.round((img.width-s)/2),y:Math.round((img.height-s)/2),s}};
 $("bulkFile").onchange=async e=>{
   const files=[...e.target.files];e.target.value="";if(!files.length)return;
   try{G.imgs=await Promise.all(files.map(loadImg))}catch(err){toast("有圖片讀不到，換一張試試");return}
-  G.st=G.imgs.map(im=>({area:gFull(im),rows:Math.max(1,Math.round(im.height/(im.width/4)))}));
+  G.st=G.imgs.map(im=>({area:gFull(im),sq:gSq0(im),rows:Math.max(1,Math.round(im.height/(im.width/4)))}));
   G.idx=0;G.k=.8;G.v=.06;G.zoom=1;$("gK").value=80;$("gV").value=6;
   const f=G.imgs[0];$("gCols").value=4;$("gRows").value=G.st[0].rows;
   $("gSingle").checked=f.width<220&&Math.abs(f.width-f.height)<f.width*.15;
-  gSetMode("box");gApplyZoom();drawGrid();$("gScrim").hidden=false;
+  $("gScrim").hidden=false;gSetMode("box");gSyncSingle();gApplyZoom();
 };
-const gSt=img=>G.st[G.imgs.indexOf(img)]||{area:gFull(img),rows:1};
+const gSt=img=>G.st[G.imgs.indexOf(img)]||{area:gFull(img),sq:gSq0(img),rows:1};
+const gIsSingle=()=>$("gSingle").checked;
 function gridOf(img){
-  if($("gSingle").checked)return{c:1,r:1};
+  if(gIsSingle())return{c:1,r:1};
   const c=Math.max(1,Math.min(10,+$("gCols").value||4));
   const r=Math.max(1,Math.min(20,+gSt(img).rows||1));
   return{c,r};
 }
 function cellBox(img,c,r,i,j){
+  if(gIsSingle()){const q=gSt(img).sq;return[q.x,q.y,q.s,q.s]}
   const A=gSt(img).area;
-  if(c===1&&r===1&&$("gSingle").checked)return[A.x,A.y,A.w,A.h];
   const cw=A.w/c,ch=A.h/r,s=Math.min(cw*G.k,ch*G.k*.875);
   return[A.x+i*cw+(cw-s)/2,A.y+j*ch+ch*G.v,s,s];
 }
+/* the box the finger moves / resizes: the crop square in single mode, otherwise the pink grid area */
+function gBox(img){const st=gSt(img);if(gIsSingle()){const q=st.sq;return{x:q.x,y:q.y,w:q.s,h:q.s}}return st.area}
 function drawGrid(){
   const img=G.imgs[G.idx];if(!img)return;const cv=$("gCanvas"),ctx=cv.getContext("2d");
   if(cv.width!==img.width||cv.height!==img.height){cv.width=img.width;cv.height=img.height}
   ctx.drawImage(img,0,0);
   const{c,r}=gridOf(img);const sc=cv.width/Math.max(1,cv.getBoundingClientRect().width||cv.width);const lw=Math.max(2,2*sc);
-  const A=gSt(img).area;
-  ctx.setLineDash([8*sc,6*sc]);ctx.lineWidth=lw;ctx.strokeStyle="#ff4fb8";ctx.strokeRect(A.x,A.y,A.w,A.h);ctx.setLineDash([]);
+  const B=gBox(img);
+  if(gIsSingle()){ctx.fillStyle="rgba(0,0,0,.45)";ctx.beginPath();ctx.rect(0,0,img.width,img.height);ctx.rect(B.x+B.w,B.y,-B.w,B.h);ctx.fill("evenodd")}
+  else{ctx.setLineDash([8*sc,6*sc]);ctx.lineWidth=lw;ctx.strokeStyle="#ff4fb8";ctx.strokeRect(B.x,B.y,B.w,B.h);ctx.setLineDash([])}
   ctx.lineWidth=lw;ctx.strokeStyle="#d9ff1f";
   for(let j=0;j<r;j++)for(let i=0;i<c;i++){const[x,y,w,h]=cellBox(img,c,r,i,j);ctx.strokeRect(x,y,w,h)}
-  const hr=Math.max(10,13*sc);ctx.beginPath();ctx.arc(A.x+A.w,A.y+A.h,hr,0,Math.PI*2);ctx.fillStyle="#ff4fb8";ctx.fill();ctx.lineWidth=Math.max(2,2*sc);ctx.strokeStyle="#fff";ctx.stroke();
+  const hr=Math.max(10,13*sc);ctx.beginPath();ctx.arc(B.x+B.w,B.y+B.h,hr,0,Math.PI*2);ctx.fillStyle="#ff4fb8";ctx.fill();ctx.lineWidth=Math.max(2,2*sc);ctx.strokeStyle="#fff";ctx.stroke();
   const n=G.imgs.reduce((t,im)=>{const g=gridOf(im);return t+g.c*g.r},0);
-  $("gInfo").textContent=`${G.imgs.length} 張圖，會切出 ${n} 個頭像（螢光框＝會被裁下來的範圍；粉紅虛線＝格仔範圍）`;
+  $("gInfo").textContent=gIsSingle()?`${G.imgs.length} 張圖，會切出 ${n} 個頭像（螢光框＝會被裁下來的範圍；拖框內移位，拖右下角圓點變大變細）`:`${G.imgs.length} 張圖，會切出 ${n} 個頭像（螢光框＝會被裁下來的範圍；粉紅虛線＝格仔範圍）`;
   $("gNav").hidden=G.imgs.length<2;$("gNavLbl").textContent=`第 ${G.idx+1} / ${G.imgs.length} 張`;
 }
 const gRedraw=()=>{if(!G.raf)G.raf=requestAnimationFrame(()=>{G.raf=0;drawGrid()})};
 function gSetMode(m){G.mode=m;document.querySelectorAll("[data-gm]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.gm===m));$("gCanvas").style.touchAction=$("gWrap").style.touchAction=m==="box"?"none":"auto";$("gCanvas").style.cursor=$("gWrap").style.cursor=m==="box"?"move":"grab"}
-function gApplyZoom(){$("gCanvas").style.width=Math.round(G.zoom*100)+"%";$("gZoomLbl").textContent=Math.round(G.zoom*100)+"%";gRedraw()}
+/* 100% = whole picture fits inside the window, so every corner (and the resize dot) is visible */
+function gApplyZoom(){
+  const img=G.imgs[G.idx],wr=$("gWrap"),cv=$("gCanvas");
+  $("gZoomLbl").textContent=Math.round(G.zoom*100)+"%";
+  if(img&&wr.clientWidth){const cs=getComputedStyle(wr),padX=parseFloat(cs.paddingLeft)+parseFloat(cs.paddingRight),padY=parseFloat(cs.paddingTop)+parseFloat(cs.paddingBottom);
+    const maxH=Math.min(innerHeight*.46,380)-padY,fit=Math.max(60,Math.min(wr.clientWidth-padX,maxH*img.width/img.height));
+    cv.style.width=Math.round(fit*G.zoom)+"px";cv.style.maxWidth="none";cv.style.margin=G.zoom<1?"0 auto":"0"}
+  gRedraw();
+}
+function gZoom(d){G.zoom=Math.round(Math.min(4,Math.max(.5,G.zoom+d))*10)/10;gApplyZoom()}
+function gSyncSingle(){const s=gIsSingle();$("gCols").disabled=$("gRows").disabled=$("gK").disabled=$("gV").disabled=s;gSetMode("box");drawGrid()}
 document.querySelectorAll("[data-gm]").forEach(b=>b.onclick=()=>gSetMode(b.dataset.gm));
-$("gZoomIn").onclick=()=>{G.zoom=Math.min(4,G.zoom+.5);gApplyZoom()};
-$("gZoomOut").onclick=()=>{G.zoom=Math.max(1,G.zoom-.5);gApplyZoom()};
-$("gReset").onclick=()=>{const img=G.imgs[G.idx];if(!img)return;gSt(img).area=gFull(img);G.k=.8;G.v=.06;$("gK").value=80;$("gV").value=6;G.zoom=1;gApplyZoom()};
-$("gPrev").onclick=()=>{if(G.idx>0){G.idx--;$("gRows").value=G.st[G.idx].rows;drawGrid()}};
-$("gNext").onclick=()=>{if(G.idx<G.imgs.length-1){G.idx++;$("gRows").value=G.st[G.idx].rows;drawGrid()}};
+$("gZoomIn").onclick=()=>gZoom(.1);
+$("gZoomOut").onclick=()=>gZoom(-.1);
+$("gReset").onclick=()=>{const img=G.imgs[G.idx];if(!img)return;const st=gSt(img);st.area=gFull(img);st.sq=gSq0(img);G.k=.8;G.v=.06;$("gK").value=80;$("gV").value=6;G.zoom=1;gApplyZoom()};
+$("gPrev").onclick=()=>{if(G.idx>0){G.idx--;$("gRows").value=G.st[G.idx].rows;gApplyZoom()}};
+$("gNext").onclick=()=>{if(G.idx<G.imgs.length-1){G.idx++;$("gRows").value=G.st[G.idx].rows;gApplyZoom()}};
 $("gK").oninput=()=>{G.k=(+$("gK").value||80)/100;gRedraw()};
 $("gV").oninput=()=>{G.v=(+$("gV").value||0)/100;gRedraw()};
 $("gRows").oninput=()=>{const s=G.st[G.idx];if(s)s.rows=Math.max(1,Math.min(20,+$("gRows").value||1));drawGrid()};
-["gCols","gSingle"].forEach(id=>$(id).oninput=drawGrid);
+$("gCols").oninput=drawGrid;
+$("gSingle").onchange=gSyncSingle;
+addEventListener("resize",()=>{if(!$("gScrim").hidden)gApplyZoom()});
 (()=>{const cv=$("gCanvas"),wr=$("gWrap");
   const pt=e=>{const r=cv.getBoundingClientRect(),sc=cv.width/r.width;return{x:(e.clientX-r.left)*sc,y:(e.clientY-r.top)*sc,sc}};
   wr.addEventListener("pointerdown",e=>{
-    if(G.mode!=="box")return;const img=G.imgs[G.idx];if(!img)return;const p=pt(e),A=gSt(img).area;
-    const hr=Math.max(26,30*p.sc);const nearBR=Math.hypot(p.x-(A.x+A.w),p.y-(A.y+A.h))<hr;
-    G.drag={m:nearBR?"size":"move",x0:p.x,y0:p.y,a:{...A}};wr.setPointerCapture(e.pointerId);e.preventDefault();
+    const img=G.imgs[G.idx];if(!img)return;
+    if(G.mode!=="box"){if(!G.panHint){G.panHint=true;toast("想郁個框？先撳上面「🔲 移動框」")}return}
+    const p=pt(e),B=gBox(img);
+    const hr=Math.max(34*p.sc,B.w*.12);const nearBR=Math.hypot(p.x-(B.x+B.w),p.y-(B.y+B.h))<hr;
+    G.drag={m:nearBR?"size":"move",x0:p.x,y0:p.y,a:{...B}};
+    try{wr.setPointerCapture(e.pointerId)}catch(_){}e.preventDefault();
   });
   wr.addEventListener("pointermove",e=>{
-    const D=G.drag;if(!D)return;const img=G.imgs[G.idx];const p=pt(e),dx=p.x-D.x0,dy=p.y-D.y0,A=gSt(img).area,min=Math.max(20,img.width*.05);
-    if(D.m==="move"){A.x=Math.min(img.width-A.w*.2,Math.max(-A.w*.8,D.a.x+dx));A.y=Math.min(img.height-A.h*.2,Math.max(-A.h*.8,D.a.y+dy))}
-    else{A.w=Math.max(min,D.a.w+dx);A.h=Math.max(min,D.a.h+dy)}
+    const D=G.drag;if(!D)return;const img=G.imgs[G.idx];if(!img)return;const p=pt(e),dx=p.x-D.x0,dy=p.y-D.y0,st=gSt(img);
+    if(gIsSingle()){const q=st.sq,min=Math.max(24,Math.min(img.width,img.height)*.08),maxS=Math.min(img.width,img.height);
+      if(D.m==="move"){q.x=Math.min(img.width-q.s,Math.max(0,D.a.x+dx));q.y=Math.min(img.height-q.s,Math.max(0,D.a.y+dy))}
+      else{const s=Math.max(min,Math.min(D.a.w+Math.max(dx,dy),maxS,img.width-D.a.x,img.height-D.a.y));q.s=s}}
+    else{const A=st.area,min=Math.max(20,img.width*.05);
+      if(D.m==="move"){A.x=Math.min(img.width-A.w*.2,Math.max(-A.w*.8,D.a.x+dx));A.y=Math.min(img.height-A.h*.2,Math.max(-A.h*.8,D.a.y+dy))}
+      else{A.w=Math.max(min,D.a.w+dx);A.h=Math.max(min,D.a.h+dy)}}
     gRedraw();e.preventDefault();
   });
   const end=()=>{G.drag=null};wr.addEventListener("pointerup",end);wr.addEventListener("pointercancel",end);
