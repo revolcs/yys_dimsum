@@ -425,6 +425,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
         <label class="fld">分類<select id="rfCat"><option value="d">每日</option><option value="w">每週</option><option value="m">每月</option><option value="o">一次性</option><option value="r">機率</option><option value="x">不定期</option></select></label>
         <label class="fld" id="rfPerL">重置週期<select id="rfPer"><option value="d">每日</option><option value="w">每週</option><option value="m">每月</option><option value="o">不重置</option></select></label>
       </div>
+      <label class="fld">自訂重置時間（+8，逗號分隔，留空＝照上面週期）<input id="rfT" type="text" placeholder="例如 05:59, 17:59"></label>
       <div class="two" style="grid-template-columns:1fr 1fr">
         <label class="fld">勾玉<input id="rfG" type="text" placeholder="例如 20 或 若干"></label>
         <label class="fld">黑蛋／黑碎<input id="rfE" type="text" placeholder="例如 1 個黑蛋"></label>
@@ -435,7 +436,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       </div>
       <div class="row"><button class="btn ghost" id="rfCancel" type="button">取消</button><button class="btn" id="rfSave" type="button">儲存項目</button></div>
     </div>
-    <div class="rfoot"><button class="btn ghost" id="rEditBtn" type="button" hidden>✏️ 編輯清單</button><button class="btn ghost" id="rPrevBtn" type="button" hidden>👀 預覽擁有者模式</button><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置時間</label><select id="rHour"></select></div>
+    <div class="rfoot"><button class="btn ghost" id="rEditBtn" type="button" hidden>✏️ 編輯清單</button><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置（+8 GMT，預設 00:00）</label><select id="rHour"></select></div>
   </section>
   <footer class="foot">
     <div id="copyLine">遊戲角色、圖示等美術版權歸網易《陰陽師》所有</div>
@@ -1413,7 +1414,7 @@ const RES=[
 {id:"r7",c:"r",p:"d",n:"逢魔答題",g:"10"},
 {id:"r8",c:"r",p:"d",n:"逢魔小鬼王",x:"每天 1 次，機率很低",e:"黑蛋"},
 {id:"r9",c:"r",p:"d",n:"探索副本・小紙人獎勵",g:"數個"},
-{id:"r10",c:"r",p:"d",n:"懸賞封印",x:"機率出現勾玉任務",g:"若干"},
+{id:"r10",c:"r",p:"d",t:["05:59","17:59"],n:"懸賞封印",x:"機率出現勾玉任務",g:"若干"},
 {id:"r11",c:"r",p:"d",n:"地域鬼王：極地鬼／每日懸賞鬼王",e:"黑蛋"},
 {id:"r12",c:"r",p:"d",n:"祝福好友 20 次",g:"若干"},
 {id:"r13",c:"r",p:"d",n:"重複掉落真蛇框",g:"每個 100"},
@@ -1453,6 +1454,13 @@ function rKey(p,now){
   if(p==="b")return `b${y}-${Math.floor(mo/2)}`;
   return "o";
 }
+/* 自訂重置時間（HK +8，例如 05:59、17:59）：以最近已過嘅重置點為週期 */
+function tKey(ts,now){
+  const n=now??Date.now(),HK=8*36e5,DAY=864e5,dd=Math.floor((n+HK)/DAY);let best=null;
+  for(const di of[dd-1,dd])for(const z of ts){const[h,m]=z.split(":").map(Number);const b=di*DAY+h*36e5+m*6e4-HK;if(b<=n&&(best===null||b>best))best=b}
+  return best===null?"t0":"t"+best;
+}
+function rKeyOf(it,now){return it.t&&it.t.length?tKey(it.t,now):rKey(rPer(it),now)}
 function rNext(p){
   const off=(8-rHour())*36e5,t=new Date(Date.now()+off);const y=t.getUTCFullYear(),mo=t.getUTCMonth(),d=t.getUTCDate();
   const b=p==="d"?Date.UTC(y,mo,d+1):p==="w"?Date.UTC(y,mo,d-(t.getUTCDay()+6)%7+7):p==="m"?Date.UTC(y,mo+1,1):null;
@@ -1476,24 +1484,25 @@ S.rCat=pref("rCat")||"d";if(!RCAT.some(c=>c[0]===S.rCat))S.rCat="d";
 S.rT=pref("rT")||"all";if(!["all","g","e"].includes(S.rT))S.rT="all";
 S.rHide=pref("rHide")==="1";S.rArm=false;S.rEdit=false;S.rDelArm=null;S.rfEdit=null;
 let rDelT=0;
-function rGet(it,acct){const e=(S.res[acct??S.srv]||{})[it.id];if(!Array.isArray(e))return 0;const p=rPer(it);return (p==="o"||e[0]===rKey(p))?Math.min(+e[1]||0,rMax(it)):0}
-function rPut(it,c){const a=S.srv;const m=S.res[a]=S.res[a]||{};if(c>0)m[it.id]=[rKey(rPer(it)),c];else delete m[it.id];if(!Object.keys(m).length)delete S.res[a]}
+function rGet(it,acct){const e=(S.res[acct??S.srv]||{})[it.id];if(!Array.isArray(e))return 0;return e[0]===rKeyOf(it)?Math.min(+e[1]||0,rMax(it)):0}
+function rPut(it,c){const a=S.srv;const m=S.res[a]=S.res[a]||{};if(c>0)m[it.id]=[rKeyOf(it),c];else delete m[it.id];if(!Object.keys(m).length)delete S.res[a]}
 /* 只保留仲有效嘅勾選（過咗期或者項目已刪除嘅自動清走），檔案唔會越嚟越大 */
 function rPrune(r,A){const ok=new Set((A||ACC()).map(a=>a.k)),out={};
   for(const[a,m]of Object.entries(r||{})){if(!ok.has(a)||!m||typeof m!=="object")continue;
-    for(const[id,e]of Object.entries(m)){if(!Array.isArray(e)||!(+e[1]>0))continue;const it=RESM[id];if(!it)continue;const p=rPer(it);if(p!=="o"&&e[0]!==rKey(p))continue;(out[a]=out[a]||{})[id]=[String(e[0]),+e[1]]}}
+    for(const[id,e]of Object.entries(m)){if(!Array.isArray(e)||!(+e[1]>0))continue;const it=RESM[id];if(!it)continue;if(e[0]!==rKeyOf(it))continue;(out[a]=out[a]||{})[id]=[String(e[0]),+e[1]]}}
   return out}
 function rSave(){if(S.isGH&&S.owner===true&&GH.store)ghQueue();else pref("res_v1",JSON.stringify(rPrune(S.res)))}
 /* 清單改動（擁有者）：存去公開倉庫 data/resources.json */
-function saveRes(){if(S.isGH&&S.owner===true&&GH.store)ghQueue()}
-/* 擁有者功能可見（真擁有者，或者 artifact 預覽）；預覽時唔會儲存 */
-const ROWN=()=>(S.owner===true&&S.isGH===true)||S.rPrev===true;
+/* artifact 擁有者：清單改動存喺呢部機嘅 localStorage（artifact 只有擁有者睇得到） */
+function saveRes(){if(S.isGH&&S.owner===true&&GH.store)ghQueue();else if(!S.isGH&&S.owner===true)pref("res_list_v1",JSON.stringify(RES))}
+/* 擁有者功能可見（GitHub 擁有者，或者 artifact 嘅擁有者） */
+const ROWN=()=>S.owner===true;
 const rDone=it=>rGet(it)>=rMax(it);
 const rItems=c=>RES.filter(it=>it.c===c&&(S.rT==="all"||(S.rT==="g"?it.g:it.e)));
 function rRow(it){
   const c=rGet(it),n=rMax(it),st=c>=n?"true":c>0?"mixed":"false";
   const box=n>1?`<span class="rck cnt">${c}/${n}</span>`:`<span class="rck">${c>=n?"✓":""}</span>`;
-  const per=it.p&&it.c!=="r"?`<span class="rw p">${RPER[it.p]}</span>`:"";
+  const per=it.t?`<span class="rw p">每日 ${esc(it.t.join("・"))}</span>`:it.p&&it.c!=="r"?`<span class="rw p">${RPER[it.p]}</span>`:"";
   const rw=(it.g?`<span class="rw g">勾玉 ${esc(it.g)}</span>`:"")+(it.e?`<span class="rw e">${esc(it.e)}</span>`:"")+per;
   const minus=n>1&&c>0?`<button class="rminus" type="button" data-rmin="${it.id}" aria-label="${esc(it.n)} 減一次">−</button>`:"";
   const edit=(ROWN()?`<button class="rdel" type="button" data-redit="${it.id}" aria-label="修改${esc(it.n)}">⚙️ 改</button>`:"")+(S.rEdit&&ROWN()?`<button class="rdel danger" type="button" data-rdel="${it.id}" aria-label="刪除${esc(it.n)}">${S.rDelArm===it.id?"確定刪除":"刪"}</button>`:"");
@@ -1533,7 +1542,7 @@ function renderRes(){
   });
   const cl=$("rClr");cl.textContent=S.rArm?"再按一次確認清除":"清除這頁勾選";cl.classList.toggle("danger",S.rArm);cl.classList.toggle("ghost",!S.rArm);cl.disabled=!L.some(it=>rGet(it)>0);
   $("rHour").value=String(rHour());
-  $("rEditBtn").hidden=!own;$("rPrevBtn").hidden=!!(window.GH_CFG||window.STATIC_DB);$("rPrevBtn").textContent=S.rPrev?"👀 關閉預覽":"👀 預覽擁有者模式";$("rPrevBtn").setAttribute("aria-pressed",!!S.rPrev);$("rEditBtn").textContent=S.rEdit?"✓ 完成編輯":"✏️ 編輯清單";$("rEditBtn").setAttribute("aria-pressed",S.rEdit);
+  $("rEditBtn").hidden=!own;$("rEditBtn").textContent=S.rEdit?"✓ 完成編輯":"✏️ 編輯清單";$("rEditBtn").setAttribute("aria-pressed",S.rEdit);
   $("rAddBtn").hidden=!S.rEdit;if(!S.rEdit)$("rForm").hidden=true;
 }
 document.querySelectorAll("[data-rt]").forEach(b=>b.onclick=()=>{S.rT=b.dataset.rt;pref("rT",S.rT);renderRes()});
@@ -1546,7 +1555,6 @@ $("rClr").onclick=()=>{
 $("rHour").innerHTML=[0,1,2,3,4,5,6].map(h=>`<option value="${h}">${String(h).padStart(2,"0")}:00</option>`).join("");
 $("rHour").onchange=()=>{pref("rHour",$("rHour").value);renderRes();toast("重置時間改成 "+String(rHour()).padStart(2,"0")+":00")};
 /* 擁有者編輯清單 */
-$("rPrevBtn").onclick=()=>{S.rPrev=!S.rPrev;S.rEdit=false;S.rDelArm=null;renderRes()};
 $("rEditBtn").onclick=()=>{S.rEdit=!S.rEdit;S.rDelArm=null;$("rForm").hidden=true;renderRes()};
 $("rAddBtn").onclick=()=>rfOpen(null);
 function rfSyncPer(){$("rfPerL").hidden=!["r","x"].includes($("rfCat").value)}
@@ -1554,7 +1562,7 @@ $("rfCat").onchange=rfSyncPer;
 function rfOpen(it){
   S.rfEdit=it?it.id:null;$("rFormTitle").textContent=it?"修改項目":"新增項目";
   $("rfName").value=it?it.n:"";$("rfCat").value=it?it.c:(S.rCat==="o"||S.rCat==="x"?S.rCat:S.rCat);
-  $("rfPer").value=it&&it.p?it.p:"d";
+  $("rfPer").value=it&&it.p?it.p:"d";$("rfT").value=it&&it.t?it.t.join(", "):"";
   $("rfG").value=it?(it.g||""):"";$("rfE").value=it?(it.e||""):"";$("rfX").value=it?(it.x||""):"";$("rfK").value=it?(it.k||1):1;
   rfSyncPer();$("rForm").hidden=false;$("rForm").scrollIntoView({block:"nearest",behavior:"smooth"});
 }
@@ -1566,6 +1574,9 @@ $("rfSave").onclick=()=>{
   if(c==="r"||c==="x")it.p=(c==="r"&&per==="o")?"d":per;
   const x=$("rfX").value.trim(),g=$("rfG").value.trim(),e=$("rfE").value.trim(),k=Math.max(1,Math.min(30,+$("rfK").value||1));
   if(x)it.x=x;if(g)it.g=g;if(e)it.e=e;if(k>1)it.k=k;
+  const tr=$("rfT").value.trim();
+  if(tr){const ts=[...new Set(tr.split(/[,，、\s]+/).filter(Boolean).map(x=>{const m=x.match(/^(\d{1,2}):(\d{2})$/);return m&&+m[1]<24&&+m[2]<60?String(+m[1]).padStart(2,"0")+":"+m[2]:null}))];
+    if(ts.includes(null)){toast("時間格式唔啱，例如 05:59, 17:59");return}it.t=ts.sort()}
   const L=RES.slice(),i=L.findIndex(v=>v.id===it.id);if(i>=0)L[i]=it;else L.push(it);
   setRes(L);S.rfEdit=null;$("rForm").hidden=true;S.rCat=c;pref("rCat",c);saveRes();renderRes();toast(`已儲存「${n}」✧`);
 };
@@ -1766,6 +1777,7 @@ async function ghBoot(){
 (async()=>{
   if(window.GH_CFG){await ghBoot();return}
   if(window.STATIC_DB){if(Array.isArray(STATIC_DB.res)){const RL=cleanRes(STATIC_DB.res);if(RL)setRes(RL)}$("staticTag").textContent=` ・免登入版（名單更新於 ${STATIC_DB.built||"?"}）`;S.isStatic=true;S.owner=false;S.shiki=STATIC_DB.shiki||[];if(STATIC_DB.personal&&STATIC_DB.mine){S.personal=true;applyPack(STATIC_DB.mine);$("staticTag").textContent=` ・我的免登入版（紀錄截至 ${STATIC_DB.built||"?"}）`}syncSrv();renderIO();renderShiki();renderEggs();renderRes();return}
+  try{const L=JSON.parse(pref("res_list_v1")||"null");if(Array.isArray(L)){const RL=cleanRes(L);if(RL)setRes(RL)}}catch(e){}
   if(!window.claude||!claude.use){notice("這個頁面要在 claude.ai 裡打開才能儲存紀錄。");return}
   const db=await claude.use("db");
   if(!db){notice("目前連不上儲存（可能未登入），紀錄暫時不會保存。");return}
