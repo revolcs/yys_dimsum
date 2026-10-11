@@ -238,7 +238,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .toast{pointer-events:none;position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:99px;font-size:.85rem;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* 資源獲取 */
-.rcats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:14px;position:sticky;top:var(--hdr,150px);z-index:5;background:var(--paper);padding:6px 0 4px}
+.rcats{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:14px;position:sticky;top:var(--hdr,150px);z-index:5;background:var(--paper);padding:6px 0 4px}
 .rcat{font:inherit;font-weight:900;font-size:.85rem;padding:6px 2px 5px;border-radius:14px;border:2px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.25;min-width:0;white-space:nowrap}
 .rcat small{font-family:var(--f-num);font-size:.7rem;color:var(--ink-soft)}
 .rcat.alldone small{color:var(--ok)}
@@ -420,7 +420,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div class="rfoot"><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置（+8 GMT，預設 00:00）</label><select id="rHour"></select></div>
   </section>
   <footer class="foot">
-    <div id="copyLine">遊戲角色、圖示等美術版權歸網易《陰陽師》所有</div>
+    <div id="copyLine">本頁為玩家自製的非官方工具，與網易及《陰陽師》官方沒有任何關係。<br>遊戲角色頭像、稀有度圖示等美術版權屬網易所有，此處僅作個人收藏紀錄用途，不作任何商業用途。<br>式神名單、技能數值為玩家手動整理，可能與遊戲實際內容有出入，一切以遊戲內為準。</div>
     <div><button id="ghKey" class="btn ghost" type="button" hidden style="margin:6px auto 0;font-size:.75rem;padding:4px 12px">🔑 擁有者登入</button></div>
     <div id="ghPanel" class="ghpanel" hidden>
       <b>☁️ GitHub 擁有者登入</b>
@@ -1481,7 +1481,7 @@ function cleanRes(list){
 }
 function setRes(list){const L=list.slice();RES.length=0;RES.push(...L);RESM=Object.fromEntries(RES.map(it=>[it.id,it]))}
 S.res={};try{const v=JSON.parse(pref("res_v1")||"{}");if(v&&typeof v==="object"&&!Array.isArray(v))S.res=v}catch(_){}
-S.rCat=pref("rCat")||"d";if(!RCAT.some(c=>c[0]===S.rCat))S.rCat="d";
+S.rCat=pref("rCat")||"d";if(!RCAT.some(c=>c[0]===S.rCat)&&S.rCat!=="a")S.rCat="d";
 S.rT=pref("rT")||"all";if(!["all","g","e"].includes(S.rT))S.rT="all";
 S.rHide=pref("rHide")==="1";S.rArm=false;S.rEdit=false;S.rDelArm=null;S.rfEdit=null;
 let rDelT=0;
@@ -1499,7 +1499,7 @@ function saveRes(){if(S.isGH&&S.owner===true&&GH.store)ghQueue();else if(!S.isGH
 /* 擁有者功能可見（GitHub 擁有者，或者 artifact 嘅擁有者） */
 const ROWN=()=>S.owner===true;
 const rDone=it=>rGet(it)>=rMax(it);
-const rItems=c=>RES.filter(it=>it.c===c&&(S.rT==="all"||(S.rT==="g"?it.g:it.e)));
+const rItems=c=>RES.filter(it=>(c==="a"||it.c===c)&&(S.rT==="all"||(S.rT==="g"?it.g:it.e)));
 function rRow(it){
   const c=rGet(it),n=rMax(it),st=c>=n?"true":c>0?"mixed":"false";
   const box=n>1?`<span class="rck cnt">${c}/${n}</span>`:`<span class="rck">${c>=n?"✓":""}</span>`;
@@ -1512,22 +1512,23 @@ function rRow(it){
 function renderRes(){
   if(!$("pane-res"))return;
   const own=ROWN();if(!own)S.rEdit=false;
-  $("rCats").innerHTML=RCAT.map(([c,l])=>{const L=rItems(c),dn=L.filter(rDone).length;return `<button class="rcat${L.length&&dn===L.length?" alldone":""}" type="button" role="tab" data-rc="${c}" aria-selected="${c===S.rCat}">${l}<small>${dn}/${L.length}</small></button>`}).join("");
+  $("rCats").innerHTML=[["a","全部"],...RCAT].map(([c,l])=>{const L=rItems(c),dn=L.filter(rDone).length;return `<button class="rcat${L.length&&dn===L.length?" alldone":""}" type="button" role="tab" data-rc="${c}" aria-selected="${c===S.rCat}">${l}<small>${dn}/${L.length}</small></button>`}).join("");
   $("rCats").querySelectorAll("[data-rc]").forEach(b=>b.onclick=()=>{S.rCat=b.dataset.rc;S.rArm=false;S.rDelArm=null;pref("rCat",S.rCat);renderRes()});
   document.querySelectorAll("[data-rt]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.rt===S.rT));
   $("rHide").setAttribute("aria-pressed",S.rHide);
   $("rSub").textContent={all:"📋 目前顯示：全部項目（勾玉＋黑蛋・黑碎）",g:"🪙 目前顯示：勾玉獲取（只看有勾玉的項目）",e:"🥚 目前顯示：黑蛋・黑碎獲取（只看有黑蛋／黑碎的項目）"}[S.rT]+(ROWN()?"　✏️ 長按一項＝修改（可改分類，移去其他清單）；長按後拖曳＝同一清單內換位置":"");
   const c=S.rCat,L=rItems(c),dn=L.filter(rDone).length,pct=L.length?Math.round(dn/L.length*100):0;
-  const lbl={d:"今日完成",w:"本週完成",m:"本月完成",o:"一次性完成",r:"機率項目已做",x:"不定期完成"}[c];
+  const lbl={a:"全部分類完成",d:"今日完成",w:"本週完成",m:"本月完成",o:"一次性完成",r:"機率項目已做",x:"不定期完成"}[c];
   const TY={all:"全部獲取",g:"勾玉獲取",e:"黑蛋・黑碎獲取"}[S.rT];
   const nx=rNext(c);const hh=String(rHour()).padStart(2,"0")+":00";
-  const when=c==="o"?"一次性項目不會重置，完成就一直保留。":c==="x"?"不定期項目按各自標籤的週期重置，時間以遊戲為準。":c==="r"?`每項按自己的週期重置（每日／每週／每月，${hh}）。`:`⏰ 距離重置還有 <b>${rLeft(nx-Date.now())}</b>（${c==="d"?"每日":c==="w"?"每週一":"每月 1 號"} ${hh}）`;
+  const when=c==="a"?"每項按自己嘅週期各自重置，一齊睇晒所有分類。":c==="o"?"一次性項目不會重置，完成就一直保留。":c==="x"?"不定期項目按各自標籤的週期重置，時間以遊戲為準。":c==="r"?`每項按自己的週期重置（每日／每週／每月，${hh}）。`:`⏰ 距離重置還有 <b>${rLeft(nx-Date.now())}</b>（${c==="d"?"每日":c==="w"?"每週一":"每月 1 號"} ${hh}）`;
   const where=own?"☁️ 勾選同清單改動會自動同步到 GitHub":"📱 勾選只存在這部裝置的瀏覽器";
   $("rSum").innerHTML=`<div class="lbl">${esc(ANAME(S.srv))}・${lbl}・${TY}</div><div class="progress"><div class="count">${dn}<small> / ${L.length}</small></div><div class="bar"><i style="width:${pct}%"></i></div></div>${L.length&&dn===L.length?`<div class="rall">全部完成 ✧ 辛苦了！</div>`:""}<div class="meta"><span>${when}</span><span>${where}</span></div>`;
   const vis=S.rHide?L.filter(it=>!rDone(it)):L;
   let html="";
   if(!L.length)html=`<div class="empty">這個分類沒有${S.rT==="g"?"勾玉":"黑蛋／黑碎"}的項目</div>`;
   else if(!vis.length)html=`<div class="empty">這頁都完成了 ✧ 按「隱藏已完成」可以再看到</div>`;
+  else if(c==="a"){for(const[k,l]of RCAT){const G=vis.filter(it=>it.c===k);if(G.length)html+=`<ul class="rows rres"><li class="wkli">${l}</li>${G.map(rRow).join("")}</ul>`}}
   else if(c==="r"){for(const p of["d","w","m"]){const G=vis.filter(it=>rPer(it)===p);if(G.length)html+=`<ul class="rows rres"><li class="wkli">${RPER[p]}重置</li>${G.map(rRow).join("")}</ul>`}}
   else html=`<ul class="rows rres">${vis.map(rRow).join("")}</ul>`;
   $("rList").innerHTML=html;
@@ -1562,7 +1563,7 @@ function rfSyncPer(){$("rfPerL").hidden=!["r","x"].includes($("rfCat").value)}
 $("rfCat").onchange=rfSyncPer;
 function rfOpen(it){
   S.rfEdit=it?it.id:null;$("rFormTitle").textContent=it?"修改項目":"新增項目";
-  $("rfName").value=it?it.n:"";$("rfCat").value=it?it.c:(S.rCat==="o"||S.rCat==="x"?S.rCat:S.rCat);
+  $("rfName").value=it?it.n:"";$("rfCat").value=it?it.c:(S.rCat==="a"?"d":S.rCat);
   $("rfPer").value=it&&it.p?it.p:"d";$("rfT").value=it&&it.t?it.t.join(", "):"";
   $("rfG").value=it?(it.g||""):"";$("rfE").value=it?(it.e||""):"";$("rfX").value=it?(it.x||""):"";$("rfK").value=it?(it.k||1):1;
   rfSyncPer();$("rScrim").hidden=false;
