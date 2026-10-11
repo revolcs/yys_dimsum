@@ -560,7 +560,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
         <label class="fld">備註<input id="rfX" type="text"></label>
         <label class="fld">次數<input id="rfK" type="number" min="1" max="30" value="1" inputmode="numeric"></label>
       </div>
-      <div class="row"><button class="btn ghost" id="rfCancel" type="button">取消</button><button class="btn" id="rfSave" type="button">儲存項目</button></div>
+      <div class="row"><button class="btn danger" id="rfDel" type="button" hidden>刪除</button><button class="btn ghost" id="rfCancel" type="button">取消</button><button class="btn" id="rfSave" type="button">儲存項目</button></div>
   </div>
 </div>
 <button id="cnFab" class="cnfab" type="button" hidden aria-pressed="false" aria-label="顯示或隱藏陸服限定">±陸限</button>
@@ -1566,9 +1566,15 @@ function rfOpen(it){
   $("rfName").value=it?it.n:"";$("rfCat").value=it?it.c:(S.rCat==="a"?"d":S.rCat);
   $("rfPer").value=it&&it.p?it.p:"d";$("rfT").value=it&&it.t?it.t.join(", "):"";
   $("rfG").value=it?(it.g||""):"";$("rfE").value=it?(it.e||""):"";$("rfX").value=it?(it.x||""):"";$("rfK").value=it?(it.k||1):1;
-  rfSyncPer();$("rScrim").hidden=false;
+  rfSyncPer();$("rfDel").hidden=!(it&&ROWN());$("rfDel").textContent="刪除";S.rDelArm=null;$("rScrim").hidden=false;
 }
-$("rfCancel").onclick=()=>{S.rfEdit=null;$("rScrim").hidden=true};
+$("rfCancel").onclick=()=>{S.rfEdit=null;S.rDelArm=null;$("rScrim").hidden=true};
+$("rfDel").onclick=()=>{
+  const id=S.rfEdit;if(!id)return;
+  if(S.rDelArm!==id){S.rDelArm=id;$("rfDel").textContent="確定刪除";clearTimeout(rDelT);rDelT=setTimeout(()=>{S.rDelArm=null;$("rfDel").textContent="刪除"},4000);return}
+  clearTimeout(rDelT);const it=RESM[id];S.rDelArm=null;
+  setRes(RES.filter(v=>v.id!==id));S.rfEdit=null;$("rScrim").hidden=true;saveRes();renderRes();toast(`已刪除「${it?it.n:""}」`);
+};
 $("rfSave").onclick=()=>{
   const n=$("rfName").value.trim();if(!n){toast("先打項目名稱喔");return}
   const c=$("rfCat").value,per=$("rfPer").value;
