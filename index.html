@@ -237,6 +237,47 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .pickh{position:sticky;top:0;background:var(--sheet);border-bottom:2px solid var(--acc);font-size:1rem;padding:3px 12px;z-index:1}
 .toast{pointer-events:none;position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:99px;font-size:.85rem;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+/* 資源獲取 */
+.rcats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:14px}
+.rcat{font:inherit;font-weight:900;font-size:.85rem;padding:6px 2px 5px;border-radius:14px;border:2px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.25;min-width:0;white-space:nowrap}
+.rcat small{font-family:var(--f-num);font-size:.7rem;color:var(--ink-soft)}
+.rcat.alldone small{color:var(--ok)}
+.rcat[aria-selected="true"]{border-color:var(--ink);background:var(--acc);color:var(--acc-ink);box-shadow:3px 3px 0 var(--shadow)}
+.rcat[aria-selected="true"] small{color:var(--acc-ink)}
+.rsum{margin:14px 0 12px;background:var(--sheet);border:2px solid var(--ink);box-shadow:4px 4px 0 var(--shadow);border-radius:18px;padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.rsum .lbl{color:var(--ink-soft);font-size:.85rem;font-weight:700}
+.rsum .progress{margin:0}
+.rsum .meta{font-size:.8rem;color:var(--ink-soft);display:flex;flex-direction:column;gap:2px}
+.rsum .meta b{color:var(--ink);font-variant-numeric:tabular-nums}
+.rall{font-weight:900;color:var(--ok);font-size:.9rem}
+.rres{margin-bottom:12px}
+.rli{display:flex;align-items:stretch;border-bottom:1px solid var(--line)}
+.rli:last-child{border-bottom:0}
+.rrow{flex:1;min-width:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;align-items:center;padding:10px 12px;border:0;background:none;color:inherit;font:inherit;text-align:left;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.rck{width:30px;height:30px;border-radius:9px;border:2px solid var(--ink);background:var(--sheet);display:grid;place-items:center;font-weight:900;font-size:1rem;line-height:1;color:var(--acc-ink)}
+.rck.cnt{width:auto;min-width:44px;padding:0 6px;font-family:var(--f-num);font-size:.78rem;color:var(--ink)}
+.rrow[aria-checked="mixed"] .rck{background:color-mix(in srgb,var(--acc) 45%,var(--sheet))}
+.rrow[aria-checked="true"] .rck{background:var(--acc);color:var(--acc-ink);box-shadow:2px 2px 0 var(--shadow)}
+.rnm{min-width:0}
+.rnm b{display:block;font-weight:700;font-size:.92rem;overflow-wrap:anywhere}
+.rnm small{display:block;color:var(--ink-soft);font-size:.75rem;line-height:1.35}
+.rli.done .rnm{opacity:.55}
+.rli.done .rnm b{text-decoration:line-through;text-decoration-thickness:2px}
+.rws{display:flex;flex-wrap:wrap;gap:4px;margin-top:4px}
+.rw{font-size:.72rem;font-weight:700;border-radius:99px;padding:1px 8px;white-space:nowrap}
+.rw.g{background:color-mix(in srgb,var(--indigo) 16%,var(--sheet));color:var(--indigo)}
+.rw.e{background:var(--ink);color:var(--paper)}
+.rw.p{border:1px solid var(--line);color:var(--ink-soft)}
+.rminus{flex:none;width:46px;border:0;border-left:1px dashed var(--line);background:none;color:var(--ink-soft);font:inherit;font-weight:900;font-size:1.15rem;cursor:pointer}
+.rfoot{margin-top:12px;font-size:.8rem;color:var(--ink-soft);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.rfoot select{width:auto;padding:4px 8px;font-size:.85rem}
+.btn:disabled{opacity:.4;cursor:default}
+.rsub{font-size:.8rem;color:var(--ink-soft);margin:8px 2px 0}
+.rfull{width:100%;margin-top:10px}
+.rdel{flex:none;border:0;border-left:1px dashed var(--line);background:none;color:var(--ink-soft);font:inherit;font-size:.78rem;font-weight:900;padding:0 9px;cursor:pointer}
+.rdel.danger{color:var(--seal)}
+.rform{margin-top:12px;background:var(--sheet);border:2px solid var(--ink);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.rform>b{font-family:var(--f-display);font-size:1rem}
 </style>
 
 <div class="wrap">
@@ -245,6 +286,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <nav class="tabs" role="tablist">
       <button class="tab" id="tab-shiki" role="tab" aria-selected="true">式神圖鑑</button>
       <button class="tab" id="tab-egg" role="tab" aria-selected="false">黑蛋地獄</button>
+      <button class="tab" id="tab-res" role="tab" aria-selected="false">資源獲取</button>
     </nav>
     <div class="acctwrap topacct"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button></div>
     <div class="jump" id="jump" aria-label="跳到稀有度"></div>
@@ -349,6 +391,51 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     </div>
     <div class="acctsum" id="acctSum"></div>
     <div id="eggGroups"></div>
+  </section>
+  <section id="pane-res" hidden>
+    <p class="sub" style="margin-top:12px">勾玉、黑蛋、黑碎的獲取清單，做完就勾，到時間會自動重置～</p>
+    <details class="disc help">
+      <summary>📖 資源獲取使用說明</summary>
+      <ul>
+        <li>上面選<b>每日／每週／每月／一次性／機率</b>，按鈕下面的數字是完成了幾項。</li>
+        <li><b>點一下項目</b>＝完成，再點一次取消。</li>
+        <li>有次數的項目（例如永久勾玉卡 <b>0/4</b>）每點一下加 1，滿了再點會歸零；右邊的 <b>−</b> 可以減回一次。</li>
+        <li><b>每日</b> 00:00、<b>每週一</b> 00:00、<b>每月 1 號</b> 00:00（香港時間）自動重置；<b>一次性</b>不會重置。重置時間可以在這頁最下面改。</li>
+        <li><b>機率</b>項目的勾＝今天／這週已經做了（不代表一定出貨），每項按自己的週期重置。</li>
+        <li>上面的帳號列可以切換帳號，<b>每個帳號分開勾</b>。</li>
+        <li>擁有者登入後會自動同步到 GitHub；朋友（訪客）的勾選只會存在自己這部裝置。</li>
+        <li>清單由玩家整理，可能和遊戲實際有出入，一切以遊戲內為準。</li>
+      </ul>
+    </details>
+    <div class="rcats" id="rCats" role="tablist" aria-label="資源分類"></div>
+    <div class="rsum" id="rSum"></div>
+    <div class="toolbar">
+      <button class="chip" type="button" data-rt="all" aria-pressed="true">全部</button>
+      <button class="chip" type="button" data-rt="g" aria-pressed="false">勾玉</button>
+      <button class="chip" type="button" data-rt="e" aria-pressed="false">黑蛋／黑碎</button>
+      <button class="chip" type="button" id="rHide" aria-pressed="false">隱藏已完成</button>
+    </div>
+    <p class="rsub" id="rSub"></p>
+    <div id="rList" style="margin-top:12px"></div>
+    <button class="btn ghost rfull" id="rAddBtn" type="button" hidden>＋ 新增項目</button>
+    <div class="rform" id="rForm" hidden>
+      <b id="rFormTitle">新增項目</b>
+      <label class="fld">名稱<input id="rfName" type="text" maxlength="40"></label>
+      <div class="two" style="grid-template-columns:1fr 1fr">
+        <label class="fld">分類<select id="rfCat"><option value="d">每日</option><option value="w">每週</option><option value="m">每月</option><option value="o">一次性</option><option value="r">機率</option><option value="x">不定期</option></select></label>
+        <label class="fld" id="rfPerL">重置週期<select id="rfPer"><option value="d">每日</option><option value="w">每週</option><option value="m">每月</option><option value="o">不重置</option></select></label>
+      </div>
+      <div class="two" style="grid-template-columns:1fr 1fr">
+        <label class="fld">勾玉<input id="rfG" type="text" placeholder="例如 20 或 若干"></label>
+        <label class="fld">黑蛋／黑碎<input id="rfE" type="text" placeholder="例如 1 個黑蛋"></label>
+      </div>
+      <div class="two" style="grid-template-columns:2fr 1fr">
+        <label class="fld">備註<input id="rfX" type="text"></label>
+        <label class="fld">次數<input id="rfK" type="number" min="1" max="30" value="1" inputmode="numeric"></label>
+      </div>
+      <div class="row"><button class="btn ghost" id="rfCancel" type="button">取消</button><button class="btn" id="rfSave" type="button">儲存項目</button></div>
+    </div>
+    <div class="rfoot"><button class="btn ghost" id="rEditBtn" type="button" hidden>✏️ 編輯清單</button><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置時間</label><select id="rHour"></select></div>
   </section>
   <footer class="foot">
     <div id="copyLine">遊戲角色、圖示等美術版權歸網易《陰陽師》所有</div>
@@ -514,12 +601,13 @@ function owe(max,cur){
 
 /* tabs */
 function showTab(k){
+  if(!["shiki","egg","res"].includes(k))k="shiki";
   $("acctBtn").textContent=k==="egg"?"±N號機記錄用":"±小號記錄";setTimeout(()=>{if(typeof syncSrv==="function")syncSrv()},0);
-  $("tab-shiki").setAttribute("aria-selected",k==="shiki");$("tab-egg").setAttribute("aria-selected",k==="egg");
-  $("pane-shiki").hidden=k!=="shiki";$("pane-egg").hidden=k!=="egg";pref("tab",k);
+  for(const t of["shiki","egg","res"]){$("tab-"+t).setAttribute("aria-selected",k===t);$("pane-"+t).hidden=k!==t}
+  $("jump").hidden=k==="res";if(k==="res")$("cnFab").hidden=true;pref("tab",k);if(k==="res")setTimeout(()=>renderRes(),0);
 }
-$("tab-shiki").onclick=()=>{showTab("shiki");buildJump()};$("tab-egg").onclick=()=>{showTab("egg");buildJump()};
-function activePane(){return $("pane-egg").hidden?$("pane-shiki"):$("pane-egg")}
+$("tab-shiki").onclick=()=>{showTab("shiki");buildJump()};$("tab-egg").onclick=()=>{showTab("egg");buildJump()};$("tab-res").onclick=()=>{showTab("res");buildJump()};
+function activePane(){return ["egg","res"].map(k=>$("pane-"+k)).find(p=>!p.hidden)||$("pane-shiki")}
 function buildJump(){
   const hs=[...activePane().querySelectorAll(".group-h[data-r]")];
   $("jump").innerHTML=`<button class="jb" type="button" data-r="" aria-label="回到最上面，看全部">${RB("全部")}</button>`+hs.map(x=>`<button class="jb" type="button" data-r="${esc(x.dataset.r)}" aria-label="跳到 ${esc(x.dataset.r)}">${RB(x.dataset.r)}</button>`).join("");
@@ -535,7 +623,7 @@ function buildJump(){
 let nowR=null,nowRaf=0,nowLock=null,nowLockT=0;
 function updateNow(force){
   const hs=[...activePane().querySelectorAll(".group-h[data-r]")];
-  if(!hs.length){$("nowRar").innerHTML="";nowR=null;return}
+  if(!hs.length){$("nowRar").innerHTML="";nowR=null;$("cnFab").hidden=true;return}
   const tb=$("top").getBoundingClientRect().bottom,lim=tb+Math.min((innerHeight-tb)*.3,90);let cur=null;
   for(const x of hs){if(x.getBoundingClientRect().top<=lim)cur=x;else break}
   if(innerHeight+scrollY>=document.documentElement.scrollHeight-4){for(const x of hs)if(x.getBoundingClientRect().top<innerHeight-80)cur=x}
@@ -551,11 +639,11 @@ function updateNow(force){
 addEventListener("scroll",()=>{if(nowLock){clearTimeout(nowLockT);nowLockT=setTimeout(()=>{nowLock=null;updateNow()},180)}if(nowRaf)return;nowRaf=requestAnimationFrame(()=>{nowRaf=0;updateNow()})},{passive:true});
 function setHdr(){document.documentElement.style.setProperty("--hdr",$("top").offsetHeight+"px")}
 try{new ResizeObserver(setHdr).observe($("top"))}catch(_){addEventListener("resize",setHdr)}
-if(pref("tab")==="egg"||location.hash==="#egg")showTab("egg");
+{const h=location.hash.slice(1),t0=pref("tab");if(h==="egg"||h==="res")showTab(h);else if(t0==="egg"||t0==="res")showTab(t0)}
 function syncSrv(){
   const A=ACC();if(!A.some(a=>a.k===S.srv))S.srv=A[0].k;
   document.querySelectorAll(".acctseg").forEach(g=>{g.innerHTML=A.map(a=>`<button type="button" data-srv="${esc(a.k)}" aria-pressed="${a.k===S.srv}">${esc(DN(a))}</button>`).join("");
-    g.querySelectorAll("[data-srv]").forEach(b=>b.onclick=()=>{S.srv=b.dataset.srv;pref("srv",S.srv);syncSrv();renderShiki();renderEggs()})});
+    g.querySelectorAll("[data-srv]").forEach(b=>b.onclick=()=>{S.srv=b.dataset.srv;pref("srv",S.srv);syncSrv();renderShiki();renderEggs();renderRes()})});
 }
 S.srv=pref("srv")||"asia";syncSrv();
 document.querySelectorAll(".acctbtn").forEach(b=>b.onclick=openAccts);
@@ -571,7 +659,7 @@ function drawAccts(){
 async function saveAccts(list){
   if(S.owner===false){S.gAccts=list;markDirty()}
   else{S.accts=list;if(S.db){try{await S.db.doc("meta/accounts").set({list})}catch(e){toast("帳號沒存到："+(e.code||"錯誤"))}}}
-  syncSrv();drawAccts();renderShiki();renderEggs();
+  syncSrv();drawAccts();renderShiki();renderEggs();renderRes();
 }
 $("aAdd").onclick=()=>{const v=$("aNew").value.trim();if(!v){toast("先打帳號名稱喔");return}
   const k="x"+Date.now().toString(36);$("aNew").value="";S.srv=k;pref("srv",k);saveAccts([...ACC(),{k,name:v}]);toast(`已新增「${v}」✧`)};
@@ -1059,7 +1147,7 @@ async function exportStatic(personal){
     const ids=[...new Set([...shiki.filter(s=>s.img).map(s=>s.img),...Object.values(RIMG),DARUMA_ID])];
     const IMG={};let n=0;
     for(const id of ids){const isIcon=!Object.values(RIMG).includes(id)&&id!==DARUMA_ID;const d=await shrinkData(BLOB(id),isIcon?160:256);if(d)IMG[id]=d;n++;if(n%20===0)toast(`打包頭像中… ${n}/${ids.length}`)}
-    const sdb={shiki,built:stamp().txt};if(personal){sdb.mine=packData();sdb.personal=true}
+    const sdb={shiki,res:RES,built:stamp().txt};if(personal){sdb.mine=packData();sdb.personal=true}
     const js=`window.STATIC_DB=${JSON.stringify(sdb)};window.STATIC_IMG=${JSON.stringify(IMG)};`.replace(/<\/script/gi,"<\\/script");
     const SLOT='<script id="static-data"><'+'/script>';const html=tpl.replace(SLOT,'<script id="static-data">'+js+'<'+'/script>');
     const fn=`點心紙-${personal?"我的":""}免登入版-${stamp().file}.html`;
@@ -1259,6 +1347,228 @@ $("imCYes").onclick=async()=>{
 };
 
 /* day/night toggle: 跟隨系統 → 日間 → 夜間 (per device) */
+/* 資源獲取：每日／每週／每月／一次性／機率／不定期；清單擁有者可以增減修改（存去 GitHub），記錄按週期自動重置（香港時間） */
+const RES=[
+{id:"d1",c:"d",n:"結界寄養",x:"每日 3～4 次",g:"約 300"},
+{id:"d2",c:"d",n:"地域鬼王挑戰",x:"可打 1 級",g:"20～60"},
+{id:"d3",c:"d",n:"協戰式神被使用 50 次",x:"需要小號",g:"50"},
+{id:"d4",c:"d",n:"花合戰滿 100 活躍度",g:"20"},
+{id:"d5",c:"d",n:"個人結界突破一輪",g:"15"},
+{id:"d6",c:"d",n:"3 級秋田犬協戰",g:"約 15"},
+{id:"d7",c:"d",n:"永久勾玉卡",x:"每 6 小時領一次",g:"每次 20",k:4},
+{id:"d8",c:"d",n:"月卡（禮包屋）",g:"20"},
+{id:"d9",c:"d",n:"每日簽到",x:"固定輪次；大吉在「機率」",g:"若干"},
+{id:"d10",c:"d",n:"禮包屋每日免費禮包",x:"雜貨舖－禮包屋",g:"週期獲得",e:"黑蛋／黑碎"},
+{id:"d11",c:"d",n:"逢魔 BOSS 戰鬥",e:"1～2 個黑碎"},
+{id:"w1",c:"w",n:"通關競速／百戰",g:"385"},
+{id:"w2",c:"w",n:"競速／百戰通關分享",g:"20"},
+{id:"w3",c:"w",n:"地鬼通關分享",g:"20"},
+{id:"w4",c:"w",n:"百鬼奕＋百鬼棋局",g:"若干"},
+{id:"w5",c:"w",n:"協同對弈",g:"30～150"},
+{id:"w6",c:"w",n:"鬥技段位",g:"若干"},
+{id:"w7",c:"w",n:"雜貨舖－勳章商店",e:"1 個黑蛋"},
+{id:"w8",c:"w",n:"鬥技勝利 5 次",e:"1 個黑碎",k:5},
+{id:"w9",c:"w",n:"網易大神簽到 7 天",e:"1 個黑碎",k:7},
+{id:"w10",c:"w",n:"珍旅居－千物寶庫購買／友伴同行",e:"1～2 個黑碎"},
+{id:"w11",c:"w",n:"雜貨舖－鬥技榮譽商店",e:"2 個黑碎"},
+{id:"w12",c:"w",n:"神秘商人：買滿 10 次後買金幣商品",x:"週三、週六各一次",e:"每次 1 個黑碎",k:2},
+{id:"w13",c:"w",n:"陰陽寮功勳商店－黑碎禮包",e:"3～5 個黑碎"},
+{id:"w14",c:"w",n:"陰界之門 50 層",x:"每週 3 次，可組隊",e:"共 9 個黑碎",k:3},
+{id:"w15",c:"x",n:"寮辦情報屋",x:"庭院右側燈籠第一個・週期性，以遊戲為準",g:"20",p:"w"},
+{id:"m1",c:"m",n:"大型活動商店：直接購買",e:"1 個黑蛋、4 個黑碎"},
+{id:"m2",c:"m",n:"花合戰禮包",x:"需課金",e:"1 個黑蛋＋9 個黑碎"},
+{id:"m3",c:"m",n:"大大小小的活動",x:"勤快參與活動即可",e:"黑蛋／黑碎"},
+{id:"m5",c:"m",n:"召喚：騙票抽卡 40 抽、新式神 200 抽",x:"每次召喚活動",e:"2 個黑蛋"},
+{id:"m4",c:"m",n:"召喚屋－神龕",x:"每半個月更新 1 次",e:"1 個黑蛋",p:"h"},
+{id:"m6",c:"m",n:"尋契心緣：直接購買",e:"5 個黑碎"},
+{id:"m7",c:"m",n:"綁定手機號碼",x:"每 2 個月一次",g:"50",p:"b"},
+{id:"m8",c:"m",n:"花合戰禮盒選中間",x:"更推薦選體力",g:"若干"},
+{id:"m9",c:"m",n:"大型爬塔活動商店、禮盒",g:"若干"},
+{id:"m10",c:"m",n:"新式神召喚活動免費禮包",g:"若干"},
+{id:"m11",c:"m",n:"珍旅居友伴同行進度獎勵",g:"若干"},
+{id:"m12",c:"m",n:"個別活動分享",g:"若干"},
+{id:"m13",c:"m",n:"提交繪卷道具",g:"若干"},
+{id:"o1",c:"o",n:"成就系統",g:"大量",e:"黑蛋／黑碎若干"},
+{id:"o2",c:"o",n:"秘聞副本",x:"首次通關第 9 層有黑蛋，可借式神",g:"大量",e:"34 個黑蛋"},
+{id:"o3",c:"o",n:"平安百物語",x:"入口：點擊庭院大樹",g:"450"},
+{id:"o4",c:"o",n:"八岐大蛇追憶繪卷",x:"入口：點擊庭院大樹",g:"120"},
+{id:"o5",c:"o",n:"地域收集（圖鑑）",x:"式神詳情查看右邊",g:"若干",e:"14 個黑蛋"},
+{id:"o6",c:"o",n:"六道之門",x:"達成特評分／通關評分【優】",g:"每個 100",e:"90 個黑碎"},
+{id:"o7",c:"o",n:"召回親友",x:"僅限前 2 次",g:"每次 500",k:2},
+{id:"o8",c:"o",n:"空間朧車印記分享",g:"80"},
+{id:"o9",c:"o",n:"真蛇首次通關 10 層分享",g:"100"},
+{id:"o10",c:"o",n:"好友羈絆提升分享",x:"限 1 次",g:"20"},
+{id:"o11",c:"o",n:"簽到 500／999／1000… 天分享",g:"100"},
+{id:"o12",c:"o",n:"新皮膚分享",x:"不含 SP 染色皮膚，每個新皮膚各一次",g:"每個 20"},
+{id:"o13",c:"o",n:"式神傳記",x:"每個 10 勾",g:"若干"},
+{id:"o14",c:"o",n:"式神傳記解鎖",x:"神龕兌換／萬年竹、人面樹、天井下、海忍、兔丸／湊碎片／朽木露琪亞（聯動）",e:"6 個黑蛋"},
+{id:"o15",c:"o",n:"委派：蟲之印系列任務",x:"每個帳號只有 1 次機會",e:"1 個黑蛋"},
+{id:"o16",c:"o",n:"開啟推送權限",g:"50"},
+{id:"r1",c:"r",p:"d",n:"每日簽到大吉",g:"100"},
+{id:"r2",c:"r",p:"d",n:"999 天簽到・每日庭院禮包",x:"庭院領取",g:"若干",e:"黑蛋／黑碎"},
+{id:"r3",c:"r",p:"d",n:"陰陽寮每日禮包（寮包）",x:"每日 10 個",g:"每個 50",e:"黑蛋",k:10},
+{id:"r4",c:"r",p:"d",n:"完美完成式神委派",x:"各類委派都有可能",g:"若干",e:"黑碎／黑蛋"},
+{id:"r5",c:"r",p:"d",n:"御魂奉納",x:"5～6 星御魂",g:"若干",e:"黑碎／黑蛋"},
+{id:"r6",c:"r",p:"d",n:"逢魔 BOSS 小紙人／撿垃圾",g:"數個"},
+{id:"r7",c:"r",p:"d",n:"逢魔答題",g:"10"},
+{id:"r8",c:"r",p:"d",n:"逢魔小鬼王",x:"每天 1 次，機率很低",e:"黑蛋"},
+{id:"r9",c:"r",p:"d",n:"探索副本・小紙人獎勵",g:"數個"},
+{id:"r10",c:"r",p:"d",n:"懸賞封印",x:"機率出現勾玉任務",g:"若干"},
+{id:"r11",c:"r",p:"d",n:"地域鬼王：極地鬼／每日懸賞鬼王",e:"黑蛋"},
+{id:"r12",c:"r",p:"d",n:"祝福好友 20 次",g:"若干"},
+{id:"r13",c:"r",p:"d",n:"重複掉落真蛇框",g:"每個 100"},
+{id:"r14",c:"r",p:"d",n:"購買寵物配飾福袋",g:"50"},
+{id:"r15",c:"r",p:"d",n:"陰陽寮搶御祝",g:"若干"},
+{id:"r16",c:"r",p:"d",n:"陰陽寮同心抽獎",g:"50／100"},
+{id:"r17",c:"r",p:"d",n:"師徒協同任務",g:"若干"},
+{id:"r18",c:"r",p:"d",n:"商店－福氣賞",x:"勾玉抽 10 次，每日更新；福氣幣可購買",e:"黑蛋／黑碎"},
+{id:"r19",c:"r",p:"d",n:"好友組隊：同心之蘭禮包",x:"機率低",e:"黑碎"},
+{id:"r20",c:"r",p:"d",n:"寮麒麟",x:"週一～週四",e:"黑蛋"},
+{id:"r21",c:"r",p:"d",n:"道館助戰達 2 貢獻",e:"1 個黑碎"},
+{id:"r22",c:"r",p:"w",n:"週末憤怒的石距",g:"數個"},
+{id:"r23",c:"r",p:"w",n:"退治／競速／麒麟排名",g:"若干"},
+{id:"r24",c:"r",p:"w",n:"寮抽獎箱",x:"每週 3 次",e:"黑蛋／黑碎",k:3},
+{id:"r25",c:"r",p:"w",n:"狹間暗域",e:"黑蛋／黑碎"},
+{id:"r26",c:"r",p:"w",n:"寮宴會",x:"每週 2 次",e:"黑碎",k:2},
+{id:"r27",c:"r",p:"w",n:"首領退治",x:"週六",e:"黑碎／黑蛋"},
+{id:"r28",c:"r",p:"w",n:"神秘商人：直接購買",x:"週三、週六，用勾玉買",e:"黑碎／黑蛋",k:2},
+{id:"r29",c:"r",p:"m",n:"大型活動商店：達摩結界卡寶箱",e:"黑蛋、約 10 個以上黑碎"},
+{id:"r30",c:"r",p:"m",n:"繪卷：捐獻繪卷碎片",x:"前 100 名必有黑蛋",e:"黑蛋／黑碎"}
+];
+let RESM=Object.fromEntries(RES.map(it=>[it.id,it]));
+const RCATS_OK=["d","w","m","o","r","x"];
+const RCAT=[["d","每日"],["w","每週"],["m","每月"],["o","一次性"],["r","機率"],["x","不定期"]];
+const RPER={d:"每日",w:"每週",m:"每月",h:"半個月",b:"每 2 個月",o:"一次性"};
+const rPer=it=>it.p||(it.c==="r"?"d":it.c);
+const rMax=it=>it.k||1;
+const rHour=()=>{const h=parseInt(pref("rHour"),10);return h>=0&&h<=6?h:0};
+/* 用香港時間（UTC+8）計週期，唔理部機設咗咩時區 */
+function rKey(p,now){
+  if(p==="o")return "o";
+  const t=new Date((now??Date.now())+(8-rHour())*36e5);const y=t.getUTCFullYear(),mo=t.getUTCMonth(),d=t.getUTCDate();
+  if(p==="d")return `d${y}-${mo+1}-${d}`;
+  if(p==="w"){const m=new Date(Date.UTC(y,mo,d-(t.getUTCDay()+6)%7));return `w${m.getUTCFullYear()}-${m.getUTCMonth()+1}-${m.getUTCDate()}`}
+  if(p==="m")return `m${y}-${mo+1}`;
+  if(p==="h")return `h${y}-${mo+1}-${d<=15?1:2}`;
+  if(p==="b")return `b${y}-${Math.floor(mo/2)}`;
+  return "o";
+}
+function rNext(p){
+  const off=(8-rHour())*36e5,t=new Date(Date.now()+off);const y=t.getUTCFullYear(),mo=t.getUTCMonth(),d=t.getUTCDate();
+  const b=p==="d"?Date.UTC(y,mo,d+1):p==="w"?Date.UTC(y,mo,d-(t.getUTCDay()+6)%7+7):p==="m"?Date.UTC(y,mo+1,1):null;
+  return b===null?null:b-off;
+}
+function rLeft(ms){const m=Math.max(1,Math.ceil(ms/6e4)),D=Math.floor(m/1440),H=Math.floor(m%1440/60),M=m%60;return D?`${D} 天 ${H} 小時`:H?`${H} 小時 ${M} 分`:`${M} 分鐘`}
+/* 清單：檢查格式（壞嘅項目略過），改寫時換晒 RES 同 RESM */
+function cleanRes(list){
+  if(!Array.isArray(list))return null;const out=[],seen=new Set();
+  for(const it of list){
+    if(!it||typeof it.id!=="string"||typeof it.n!=="string"||!RCATS_OK.includes(it.c)||seen.has(it.id)||!it.n.trim())continue;
+    seen.add(it.id);const o={id:it.id,c:it.c,n:it.n.trim()};
+    for(const k of["x","g","e","p"])if(it[k]!=null&&String(it[k]).trim()!=="")o[k]=String(it[k]).trim();
+    if(+it.k>1)o.k=Math.min(30,+it.k);out.push(o);
+  }
+  return out;
+}
+function setRes(list){const L=list.slice();RES.length=0;RES.push(...L);RESM=Object.fromEntries(RES.map(it=>[it.id,it]))}
+S.res={};try{const v=JSON.parse(pref("res_v1")||"{}");if(v&&typeof v==="object"&&!Array.isArray(v))S.res=v}catch(_){}
+S.rCat=pref("rCat")||"d";if(!RCAT.some(c=>c[0]===S.rCat))S.rCat="d";
+S.rT=pref("rT")||"all";if(!["all","g","e"].includes(S.rT))S.rT="all";
+S.rHide=pref("rHide")==="1";S.rArm=false;S.rEdit=false;S.rDelArm=null;S.rfEdit=null;
+let rDelT=0;
+function rGet(it,acct){const e=(S.res[acct??S.srv]||{})[it.id];if(!Array.isArray(e))return 0;const p=rPer(it);return (p==="o"||e[0]===rKey(p))?Math.min(+e[1]||0,rMax(it)):0}
+function rPut(it,c){const a=S.srv;const m=S.res[a]=S.res[a]||{};if(c>0)m[it.id]=[rKey(rPer(it)),c];else delete m[it.id];if(!Object.keys(m).length)delete S.res[a]}
+/* 只保留仲有效嘅勾選（過咗期或者項目已刪除嘅自動清走），檔案唔會越嚟越大 */
+function rPrune(r,A){const ok=new Set((A||ACC()).map(a=>a.k)),out={};
+  for(const[a,m]of Object.entries(r||{})){if(!ok.has(a)||!m||typeof m!=="object")continue;
+    for(const[id,e]of Object.entries(m)){if(!Array.isArray(e)||!(+e[1]>0))continue;const it=RESM[id];if(!it)continue;const p=rPer(it);if(p!=="o"&&e[0]!==rKey(p))continue;(out[a]=out[a]||{})[id]=[String(e[0]),+e[1]]}}
+  return out}
+function rSave(){if(S.isGH&&S.owner===true&&GH.store)ghQueue();else pref("res_v1",JSON.stringify(rPrune(S.res)))}
+/* 清單改動（擁有者）：存去公開倉庫 data/resources.json */
+function saveRes(){if(S.isGH&&S.owner===true&&GH.store)ghQueue()}
+const rDone=it=>rGet(it)>=rMax(it);
+const rItems=c=>RES.filter(it=>it.c===c&&(S.rT==="all"||(S.rT==="g"?it.g:it.e)));
+function rRow(it){
+  const c=rGet(it),n=rMax(it),st=c>=n?"true":c>0?"mixed":"false";
+  const box=n>1?`<span class="rck cnt">${c}/${n}</span>`:`<span class="rck">${c>=n?"✓":""}</span>`;
+  const per=it.p&&it.c!=="r"?`<span class="rw p">${RPER[it.p]}</span>`:"";
+  const rw=(it.g?`<span class="rw g">勾玉 ${esc(it.g)}</span>`:"")+(it.e?`<span class="rw e">${esc(it.e)}</span>`:"")+per;
+  const minus=n>1&&c>0?`<button class="rminus" type="button" data-rmin="${it.id}" aria-label="${esc(it.n)} 減一次">−</button>`:"";
+  const edit=S.rEdit?`<button class="rdel" type="button" data-redit="${it.id}" aria-label="修改${esc(it.n)}">改</button><button class="rdel danger" type="button" data-rdel="${it.id}" aria-label="刪除${esc(it.n)}">${S.rDelArm===it.id?"確定刪除":"刪"}</button>`:"";
+  return `<li class="rli${st==="true"?" done":""}"><button class="rrow" type="button" role="checkbox" aria-checked="${st}" data-rid="${it.id}">${box}<span class="rnm"><b>${esc(it.n)}</b>${it.x?`<small>${esc(it.x)}</small>`:""}<span class="rws">${rw}</span></span></button>${minus}${edit}</li>`;
+}
+function renderRes(){
+  if(!$("pane-res"))return;
+  const own=S.owner===true&&S.isGH===true;if(!own)S.rEdit=false;
+  $("rCats").innerHTML=RCAT.map(([c,l])=>{const L=rItems(c),dn=L.filter(rDone).length;return `<button class="rcat${L.length&&dn===L.length?" alldone":""}" type="button" role="tab" data-rc="${c}" aria-selected="${c===S.rCat}">${l}<small>${dn}/${L.length}</small></button>`}).join("");
+  $("rCats").querySelectorAll("[data-rc]").forEach(b=>b.onclick=()=>{S.rCat=b.dataset.rc;S.rArm=false;S.rDelArm=null;pref("rCat",S.rCat);renderRes()});
+  document.querySelectorAll("[data-rt]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.rt===S.rT));
+  $("rHide").setAttribute("aria-pressed",S.rHide);
+  $("rSub").textContent={all:"📋 目前顯示：全部項目（勾玉＋黑蛋・黑碎）",g:"🪙 目前顯示：勾玉獲取（只看有勾玉的項目）",e:"🥚 目前顯示：黑蛋・黑碎獲取（只看有黑蛋／黑碎的項目）"}[S.rT];
+  const c=S.rCat,L=rItems(c),dn=L.filter(rDone).length,pct=L.length?Math.round(dn/L.length*100):0;
+  const lbl={d:"今日完成",w:"本週完成",m:"本月完成",o:"一次性完成",r:"機率項目已做",x:"不定期完成"}[c];
+  const TY={all:"全部獲取",g:"勾玉獲取",e:"黑蛋・黑碎獲取"}[S.rT];
+  const nx=rNext(c);const hh=String(rHour()).padStart(2,"0")+":00";
+  const when=c==="o"?"一次性項目不會重置，完成就一直保留。":c==="x"?"不定期項目按各自標籤的週期重置，時間以遊戲為準。":c==="r"?`每項按自己的週期重置（每日／每週／每月，${hh}）。`:`⏰ 距離重置還有 <b>${rLeft(nx-Date.now())}</b>（${c==="d"?"每日":c==="w"?"每週一":"每月 1 號"} ${hh}）`;
+  const where=own?"☁️ 勾選同清單改動會自動同步到 GitHub":"📱 勾選只存在這部裝置的瀏覽器";
+  $("rSum").innerHTML=`<div class="lbl">${esc(ANAME(S.srv))}・${lbl}・${TY}</div><div class="progress"><div class="count">${dn}<small> / ${L.length}</small></div><div class="bar"><i style="width:${pct}%"></i></div></div>${L.length&&dn===L.length?`<div class="rall">全部完成 ✧ 辛苦了！</div>`:""}<div class="meta"><span>${when}</span><span>${where}</span></div>`;
+  const vis=S.rHide?L.filter(it=>!rDone(it)):L;
+  let html="";
+  if(!L.length)html=`<div class="empty">這個分類沒有${S.rT==="g"?"勾玉":"黑蛋／黑碎"}的項目</div>`;
+  else if(!vis.length)html=`<div class="empty">這頁都完成了 ✧ 按「隱藏已完成」可以再看到</div>`;
+  else if(c==="r"){for(const p of["d","w","m"]){const G=vis.filter(it=>rPer(it)===p);if(G.length)html+=`<ul class="rows rres"><li class="wkli">${RPER[p]}重置</li>${G.map(rRow).join("")}</ul>`}}
+  else html=`<ul class="rows rres">${vis.map(rRow).join("")}</ul>`;
+  $("rList").innerHTML=html;
+  $("rList").querySelectorAll("[data-rid]").forEach(b=>b.onclick=()=>{const it=RESM[b.dataset.rid];const v=rGet(it),n=rMax(it);rPut(it,v>=n?0:v+1);S.rArm=false;rSave();renderRes();
+    if(v+1===n){const L2=rItems(S.rCat);if(L2.length&&L2.every(rDone))toast("這頁全部完成 ✧ 辛苦了！")}});
+  $("rList").querySelectorAll("[data-rmin]").forEach(b=>b.onclick=()=>{const it=RESM[b.dataset.rmin];rPut(it,rGet(it)-1);rSave();renderRes()});
+  $("rList").querySelectorAll("[data-redit]").forEach(b=>b.onclick=()=>rfOpen(RESM[b.dataset.redit]));
+  $("rList").querySelectorAll("[data-rdel]").forEach(b=>b.onclick=()=>{
+    const id=b.dataset.rdel;
+    if(S.rDelArm!==id){S.rDelArm=id;renderRes();clearTimeout(rDelT);rDelT=setTimeout(()=>{S.rDelArm=null;renderRes()},4000);return}
+    clearTimeout(rDelT);const it=RESM[id];S.rDelArm=null;
+    setRes(RES.filter(v=>v.id!==id));saveRes();renderRes();toast(`已刪除「${it?it.n:""}」`);
+  });
+  const cl=$("rClr");cl.textContent=S.rArm?"再按一次確認清除":"清除這頁勾選";cl.classList.toggle("danger",S.rArm);cl.classList.toggle("ghost",!S.rArm);cl.disabled=!L.some(it=>rGet(it)>0);
+  $("rHour").value=String(rHour());
+  $("rEditBtn").hidden=!own;$("rEditBtn").textContent=S.rEdit?"✓ 完成編輯":"✏️ 編輯清單";$("rEditBtn").setAttribute("aria-pressed",S.rEdit);
+  $("rAddBtn").hidden=!S.rEdit;if(!S.rEdit)$("rForm").hidden=true;
+}
+document.querySelectorAll("[data-rt]").forEach(b=>b.onclick=()=>{S.rT=b.dataset.rt;pref("rT",S.rT);renderRes()});
+$("rHide").onclick=()=>{S.rHide=!S.rHide;pref("rHide",S.rHide?"1":"0");renderRes()};
+let rArmT=0;
+$("rClr").onclick=()=>{
+  if(!S.rArm){S.rArm=true;renderRes();clearTimeout(rArmT);rArmT=setTimeout(()=>{S.rArm=false;renderRes()},4000);return}
+  clearTimeout(rArmT);S.rArm=false;rItems(S.rCat).forEach(it=>rPut(it,0));rSave();renderRes();toast("已清除這頁勾選");
+};
+$("rHour").innerHTML=[0,1,2,3,4,5,6].map(h=>`<option value="${h}">${String(h).padStart(2,"0")}:00</option>`).join("");
+$("rHour").onchange=()=>{pref("rHour",$("rHour").value);renderRes();toast("重置時間改成 "+String(rHour()).padStart(2,"0")+":00")};
+/* 擁有者編輯清單 */
+$("rEditBtn").onclick=()=>{S.rEdit=!S.rEdit;S.rDelArm=null;$("rForm").hidden=true;renderRes()};
+$("rAddBtn").onclick=()=>rfOpen(null);
+function rfSyncPer(){$("rfPerL").hidden=!["r","x"].includes($("rfCat").value)}
+$("rfCat").onchange=rfSyncPer;
+function rfOpen(it){
+  S.rfEdit=it?it.id:null;$("rFormTitle").textContent=it?"修改項目":"新增項目";
+  $("rfName").value=it?it.n:"";$("rfCat").value=it?it.c:(S.rCat==="o"||S.rCat==="x"?S.rCat:S.rCat);
+  $("rfPer").value=it&&it.p?it.p:"d";
+  $("rfG").value=it?(it.g||""):"";$("rfE").value=it?(it.e||""):"";$("rfX").value=it?(it.x||""):"";$("rfK").value=it?(it.k||1):1;
+  rfSyncPer();$("rForm").hidden=false;$("rForm").scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+$("rfCancel").onclick=()=>{S.rfEdit=null;$("rForm").hidden=true};
+$("rfSave").onclick=()=>{
+  const n=$("rfName").value.trim();if(!n){toast("先打項目名稱喔");return}
+  const c=$("rfCat").value,per=$("rfPer").value;
+  const it={id:S.rfEdit||("u"+Date.now().toString(36)+Math.random().toString(36).slice(2,5)),c,n};
+  if(c==="r"||c==="x")it.p=(c==="r"&&per==="o")?"d":per;
+  const x=$("rfX").value.trim(),g=$("rfG").value.trim(),e=$("rfE").value.trim(),k=Math.max(1,Math.min(30,+$("rfK").value||1));
+  if(x)it.x=x;if(g)it.g=g;if(e)it.e=e;if(k>1)it.k=k;
+  const L=RES.slice(),i=L.findIndex(v=>v.id===it.id);if(i>=0)L[i]=it;else L.push(it);
+  setRes(L);S.rfEdit=null;$("rForm").hidden=true;S.rCat=c;pref("rCat",c);saveRes();renderRes();toast(`已儲存「${n}」✧`);
+};
+setInterval(()=>{if(!$("pane-res").hidden&&!document.hidden&&$("rForm").hidden)renderRes()},30000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!$("pane-res").hidden&&$("rForm").hidden)renderRes()});
+
 const HOST_THEME=document.documentElement.getAttribute("data-theme");
 const THEMES=[["auto","🌓","跟隨系統","自動"],["light","☀️","日間模式","日間"],["dark","🌙","夜間模式","夜間"]];
 function applyTheme(m,announce){
@@ -1270,7 +1580,7 @@ function applyTheme(m,announce){
 let THEME=pref("theme")||"auto";if(!THEMES.some(x=>x[0]===THEME))THEME="auto";applyTheme(THEME);
 $("themeFab").onclick=()=>{const i=THEMES.findIndex(x=>x[0]===THEME);THEME=THEMES[(i+1)%THEMES.length][0];pref("theme",THEME);applyTheme(THEME,true)};
 
-renderShiki();renderEggs();
+renderShiki();renderEggs();renderRes();
 
 /* GitHub 版：名單＋頭像存在公開倉庫（data/shiki.json、img/），個人紀錄存在私人倉庫（records.json）；通行證只存在這部裝置 */
 const GH={tok:null,sha:{},q:Promise.resolve(),timer:null,busy:0,lastPub:"",lastPriv:"",store:null};
@@ -1326,9 +1636,12 @@ function ghPack(){
   const pub=list.map(s=>{const o={id:s.id};PUBK.forEach(k=>{if(s[k]!==undefined&&s[k]!==null&&s[k]!==false&&s[k]!=="")o[k]=s[k]});return o});
   const d={};for(const s of list){const e={};for(const a of A){const o=(a.k==="test"&&s.ownedT===undefined)?!!s.test:!!s[OKEY(a.k)];const v=s[a.k]||"";if(o||v)e[a.k]=[o?1:0,v]}if(Object.keys(e).length)d[s.id]=[s.name,e]}
   const pubStr=pub.map(o=>JSON.stringify(o)).join(",\n"),dStr=Object.entries(d).map(([k,v])=>JSON.stringify(k)+":"+JSON.stringify(v)).join(",\n");
-  return{pubStr,privStr:JSON.stringify(A)+"\n"+dStr,
+  const rStr=JSON.stringify(rPrune(S.res,A));
+  return{pubStr,privStr:JSON.stringify(A)+"\n"+dStr+"\n"+rStr,
     pubFile:()=>`{"built":${JSON.stringify(stamp().txt)},"shiki":[\n${pubStr}\n]}\n`,
-    privFile:()=>`{"v":2,"a":${JSON.stringify(A)},"d":{\n${dStr}\n}}\n`};
+    resStr:JSON.stringify(RES),
+    resFile:()=>`{"built":${JSON.stringify(stamp().txt)},"items":[\n${RES.map(o=>JSON.stringify(o)).join(",\n")}\n]}\n`,
+    privFile:()=>`{"v":2,"a":${JSON.stringify(A)},"d":{\n${dStr}\n},"r":${JSON.stringify(rPrune(S.res,A))}}\n`};
 }
 function ghQueue(){if(!S.isGH||!GH.store)return;clearTimeout(GH.timer);ghStatus("未同步…");GH.timer=setTimeout(()=>{GH.timer=null;GH.q=GH.q.then(ghFlush)},1200)}
 async function ghFlush(){
@@ -1336,6 +1649,7 @@ async function ghFlush(){
   try{
     if(pk.pubStr!==GH.lastPub){await ghPut(GH.PUB,"data/shiki.json",b64enc(pk.pubFile()),"更新式神名單");GH.lastPub=pk.pubStr}
     if(pk.privStr!==GH.lastPriv){await ghPut(GH.PRIV,"records.json",b64enc(pk.privFile()),"更新紀錄");GH.lastPriv=pk.privStr}
+    if(pk.resStr!==GH.lastRes){await ghPut(GH.PUB,"data/resources.json",b64enc(pk.resFile()),"更新資源清單");GH.lastRes=pk.resStr}
     GH.busy--;GH.fail=false;const d=new Date();GH.lastAt=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");pref("ghLastAt",GH.lastAt);ghStatus(GH.timer?"未同步…":"已同步 ✓");if(!GH.timer)toast("☁️ 已幫你自動同步到 GitHub ✓");
   }catch(e){GH.busy--;GH.fail=true;ghStatus("同步失敗，稍後自動重試");toast("同步失敗："+(e.code==="github_401"?"通行證過期或錯誤":e.code==="github_403"||e.code==="github_404"?"通行證沒有寫入權限":(e.code||e.message||"網絡問題")));setTimeout(ghQueue,15000)}
 }
@@ -1360,6 +1674,7 @@ async function ghBoot(){
   GH.PUB=pref("ghPub")||GH_CFG.owner+"/"+GH_CFG.pub;GH.PRIV=pref("ghPriv")||GH_CFG.owner+"/"+GH_CFG.priv;
   let pub=null;try{const r=await fetch("data/shiki.json?t="+Date.now(),{cache:"no-store"});if(r.ok)pub=await r.json()}catch(e){}
   const base=(pub&&Array.isArray(pub.shiki)&&pub.shiki)||(window.STATIC_DB&&STATIC_DB.shiki)||[];
+  try{const rr=await fetch("data/resources.json?t="+Date.now(),{cache:"no-store"});if(rr.ok){const RL=cleanRes((await rr.json()).items);if(RL)setRes(RL)}}catch(e){}
   GH.tok=pref("ghTok")||null;
   if(GH.tok){
     try{
@@ -1369,14 +1684,17 @@ async function ghBoot(){
       const rj=await ghGet(GH.PRIV,"records.json");
       const rec=rj?JSON.parse(b64dec(rj.content)):null;
       S.accts=(rec&&Array.isArray(rec.a)&&rec.a.length)?rec.a.filter(a=>a&&a.k&&a.name).map(a=>({k:String(a.k),name:String(a.name)})):DEFACC.map(a=>({...a}));
+      if(rec&&rec.r&&typeof rec.r==="object"&&!Array.isArray(rec.r))S.res=rec.r;
+      const resj=await ghGet(GH.PUB,"data/resources.json");const RL=resj?cleanRes(JSON.parse(b64dec(resj.content)).items):null;if(RL)setRes(RL);
       const st=ghStore();GH.store=st;
       for(const s of list){const o={...s};for(const a of S.accts){o[OKEY(a.k)]=false;o[a.k]=null}
         const e=rec&&rec.d&&rec.d[s.id];if(e)for(const[k,v]of Object.entries(e[1]||{})){const[ow,val]=Array.isArray(v)?v:[0,""];o[OKEY(k)]=!!ow;o[k]=val||null}
         st.M.set(s.id,o)}
       const pk=ghPack();GH.lastPub=pj?pk.pubStr:"";GH.lastPriv=rj?pk.privStr:"";
+      GH.lastRes=JSON.stringify(RES);
       S.db=st;S.assets=ghAssets;S.owner=true;S.isStatic=false;
       $("ghKey").textContent="🔓 擁有者設定";
-      syncSrv();renderIO();ghStatus(pj&&rj?"":"首次使用，改動後會自動建立檔案");
+      syncSrv();renderIO();renderRes();ghStatus(pj&&rj?"":"首次使用，改動後會自動建立檔案");
       st.collection("shiki").onSnapshot(snap=>{S.shiki=snap.docs.map(d=>({id:d.id,...d.data()}));renderShiki();const a=document.activeElement;if(!(a&&a.classList.contains("cur")))renderEggs()});
       toast("擁有者模式 ✧ 改動會自動存去 GitHub");
       return;
@@ -1387,12 +1705,12 @@ async function ghBoot(){
     }
   }
   S.isStatic=true;S.owner=false;S.shiki=base;S.db=null;S.assets=null;
-  syncSrv();renderIO();renderShiki();renderEggs();ghStatus(pub&&pub.built?"名單更新於 "+pub.built:"");
+  syncSrv();renderIO();renderShiki();renderEggs();renderRes();ghStatus(pub&&pub.built?"名單更新於 "+pub.built:"");
 }
 
 (async()=>{
   if(window.GH_CFG){await ghBoot();return}
-  if(window.STATIC_DB){$("staticTag").textContent=` ・免登入版（名單更新於 ${STATIC_DB.built||"?"}）`;S.isStatic=true;S.owner=false;S.shiki=STATIC_DB.shiki||[];if(STATIC_DB.personal&&STATIC_DB.mine){S.personal=true;applyPack(STATIC_DB.mine);$("staticTag").textContent=` ・我的免登入版（紀錄截至 ${STATIC_DB.built||"?"}）`}syncSrv();renderIO();renderShiki();renderEggs();return}
+  if(window.STATIC_DB){if(Array.isArray(STATIC_DB.res)){const RL=cleanRes(STATIC_DB.res);if(RL)setRes(RL)}$("staticTag").textContent=` ・免登入版（名單更新於 ${STATIC_DB.built||"?"}）`;S.isStatic=true;S.owner=false;S.shiki=STATIC_DB.shiki||[];if(STATIC_DB.personal&&STATIC_DB.mine){S.personal=true;applyPack(STATIC_DB.mine);$("staticTag").textContent=` ・我的免登入版（紀錄截至 ${STATIC_DB.built||"?"}）`}syncSrv();renderIO();renderShiki();renderEggs();renderRes();return}
   if(!window.claude||!claude.use){notice("這個頁面要在 claude.ai 裡打開才能儲存紀錄。");return}
   const db=await claude.use("db");
   if(!db){notice("目前連不上儲存（可能未登入），紀錄暫時不會保存。");return}
@@ -1401,7 +1719,7 @@ async function ghBoot(){
   S.owner=own;renderIO();
   if(own)claude.use("assets").then(a=>{S.assets=a;$("bulkLbl").hidden=!a||S.owner!==true}).catch(()=>{});
   syncSrv();
-  if(own)db.doc("meta/accounts").onSnapshot(d=>{const L=d.exists&&d.data().list;if(Array.isArray(L)&&L.length){S.accts=L;syncSrv();renderShiki();renderEggs();if(!$("aScrim").hidden)drawAccts()}},()=>{});
+  if(own)db.doc("meta/accounts").onSnapshot(d=>{const L=d.exists&&d.data().list;if(Array.isArray(L)&&L.length){S.accts=L;syncSrv();renderShiki();renderEggs();renderRes();if(!$("aScrim").hidden)drawAccts()}},()=>{});
   if(own)db.collection("pending").onSnapshot(snap=>{S.pending=snap.docs.map(d=>({id:d.id,...d.data()})).filter(p=>p.img);renderPending()},()=>{});
   db.collection("shiki").onSnapshot(snap=>{
     S.shiki=snap.docs.map(d=>({id:d.id,...d.data()}));
