@@ -435,7 +435,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       </div>
       <div class="row"><button class="btn ghost" id="rfCancel" type="button">取消</button><button class="btn" id="rfSave" type="button">儲存項目</button></div>
     </div>
-    <div class="rfoot"><button class="btn ghost" id="rEditBtn" type="button" hidden>✏️ 編輯清單</button><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置時間</label><select id="rHour"></select></div>
+    <div class="rfoot"><button class="btn ghost" id="rEditBtn" type="button" hidden>✏️ 編輯清單</button><button class="btn ghost" id="rPrevBtn" type="button" hidden>👀 預覽擁有者模式</button><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置時間</label><select id="rHour"></select></div>
   </section>
   <footer class="foot">
     <div id="copyLine">遊戲角色、圖示等美術版權歸網易《陰陽師》所有</div>
@@ -1486,6 +1486,8 @@ function rPrune(r,A){const ok=new Set((A||ACC()).map(a=>a.k)),out={};
 function rSave(){if(S.isGH&&S.owner===true&&GH.store)ghQueue();else pref("res_v1",JSON.stringify(rPrune(S.res)))}
 /* 清單改動（擁有者）：存去公開倉庫 data/resources.json */
 function saveRes(){if(S.isGH&&S.owner===true&&GH.store)ghQueue()}
+/* 擁有者功能可見（真擁有者，或者 artifact 預覽）；預覽時唔會儲存 */
+const ROWN=()=>(S.owner===true&&S.isGH===true)||S.rPrev===true;
 const rDone=it=>rGet(it)>=rMax(it);
 const rItems=c=>RES.filter(it=>it.c===c&&(S.rT==="all"||(S.rT==="g"?it.g:it.e)));
 function rRow(it){
@@ -1494,17 +1496,17 @@ function rRow(it){
   const per=it.p&&it.c!=="r"?`<span class="rw p">${RPER[it.p]}</span>`:"";
   const rw=(it.g?`<span class="rw g">勾玉 ${esc(it.g)}</span>`:"")+(it.e?`<span class="rw e">${esc(it.e)}</span>`:"")+per;
   const minus=n>1&&c>0?`<button class="rminus" type="button" data-rmin="${it.id}" aria-label="${esc(it.n)} 減一次">−</button>`:"";
-  const edit=(S.owner===true&&S.isGH===true?`<button class="rdel" type="button" data-redit="${it.id}" aria-label="修改${esc(it.n)}">⚙️ 改</button>`:"")+(S.rEdit&&S.owner===true&&S.isGH===true?`<button class="rdel danger" type="button" data-rdel="${it.id}" aria-label="刪除${esc(it.n)}">${S.rDelArm===it.id?"確定刪除":"刪"}</button>`:"");
+  const edit=(ROWN()?`<button class="rdel" type="button" data-redit="${it.id}" aria-label="修改${esc(it.n)}">⚙️ 改</button>`:"")+(S.rEdit&&ROWN()?`<button class="rdel danger" type="button" data-rdel="${it.id}" aria-label="刪除${esc(it.n)}">${S.rDelArm===it.id?"確定刪除":"刪"}</button>`:"");
   return `<li class="rli${st==="true"?" done":""}" data-li="${it.id}"><button class="rrow" type="button" role="checkbox" aria-checked="${st}" data-rid="${it.id}">${box}<span class="rnm"><b>${esc(it.n)}</b>${it.x?`<small>${esc(it.x)}</small>`:""}<span class="rws">${rw}</span></span></button>${minus}${edit}</li>`;
 }
 function renderRes(){
   if(!$("pane-res"))return;
-  const own=S.owner===true&&S.isGH===true;if(!own)S.rEdit=false;
+  const own=ROWN();if(!own)S.rEdit=false;
   $("rCats").innerHTML=RCAT.map(([c,l])=>{const L=rItems(c),dn=L.filter(rDone).length;return `<button class="rcat${L.length&&dn===L.length?" alldone":""}" type="button" role="tab" data-rc="${c}" aria-selected="${c===S.rCat}">${l}<small>${dn}/${L.length}</small></button>`}).join("");
   $("rCats").querySelectorAll("[data-rc]").forEach(b=>b.onclick=()=>{S.rCat=b.dataset.rc;S.rArm=false;S.rDelArm=null;pref("rCat",S.rCat);renderRes()});
   document.querySelectorAll("[data-rt]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.rt===S.rT));
   $("rHide").setAttribute("aria-pressed",S.rHide);
-  $("rSub").textContent={all:"📋 目前顯示：全部項目（勾玉＋黑蛋・黑碎）",g:"🪙 目前顯示：勾玉獲取（只看有勾玉的項目）",e:"🥚 目前顯示：黑蛋・黑碎獲取（只看有黑蛋／黑碎的項目）"}[S.rT]+(S.owner===true&&S.isGH===true?"　✏️ 長按一項＝修改（可改分類，移去其他清單）；長按後拖曳＝同一清單內換位置":"");
+  $("rSub").textContent={all:"📋 目前顯示：全部項目（勾玉＋黑蛋・黑碎）",g:"🪙 目前顯示：勾玉獲取（只看有勾玉的項目）",e:"🥚 目前顯示：黑蛋・黑碎獲取（只看有黑蛋／黑碎的項目）"}[S.rT]+(ROWN()?"　✏️ 長按一項＝修改（可改分類，移去其他清單）；長按後拖曳＝同一清單內換位置":"");
   const c=S.rCat,L=rItems(c),dn=L.filter(rDone).length,pct=L.length?Math.round(dn/L.length*100):0;
   const lbl={d:"今日完成",w:"本週完成",m:"本月完成",o:"一次性完成",r:"機率項目已做",x:"不定期完成"}[c];
   const TY={all:"全部獲取",g:"勾玉獲取",e:"黑蛋・黑碎獲取"}[S.rT];
@@ -1531,7 +1533,7 @@ function renderRes(){
   });
   const cl=$("rClr");cl.textContent=S.rArm?"再按一次確認清除":"清除這頁勾選";cl.classList.toggle("danger",S.rArm);cl.classList.toggle("ghost",!S.rArm);cl.disabled=!L.some(it=>rGet(it)>0);
   $("rHour").value=String(rHour());
-  $("rEditBtn").hidden=!own;$("rEditBtn").textContent=S.rEdit?"✓ 完成編輯":"✏️ 編輯清單";$("rEditBtn").setAttribute("aria-pressed",S.rEdit);
+  $("rEditBtn").hidden=!own;$("rPrevBtn").hidden=!!(window.GH_CFG||window.STATIC_DB);$("rPrevBtn").textContent=S.rPrev?"👀 關閉預覽":"👀 預覽擁有者模式";$("rPrevBtn").setAttribute("aria-pressed",!!S.rPrev);$("rEditBtn").textContent=S.rEdit?"✓ 完成編輯":"✏️ 編輯清單";$("rEditBtn").setAttribute("aria-pressed",S.rEdit);
   $("rAddBtn").hidden=!S.rEdit;if(!S.rEdit)$("rForm").hidden=true;
 }
 document.querySelectorAll("[data-rt]").forEach(b=>b.onclick=()=>{S.rT=b.dataset.rt;pref("rT",S.rT);renderRes()});
@@ -1544,6 +1546,7 @@ $("rClr").onclick=()=>{
 $("rHour").innerHTML=[0,1,2,3,4,5,6].map(h=>`<option value="${h}">${String(h).padStart(2,"0")}:00</option>`).join("");
 $("rHour").onchange=()=>{pref("rHour",$("rHour").value);renderRes();toast("重置時間改成 "+String(rHour()).padStart(2,"0")+":00")};
 /* 擁有者編輯清單 */
+$("rPrevBtn").onclick=()=>{S.rPrev=!S.rPrev;S.rEdit=false;S.rDelArm=null;renderRes()};
 $("rEditBtn").onclick=()=>{S.rEdit=!S.rEdit;S.rDelArm=null;$("rForm").hidden=true;renderRes()};
 $("rAddBtn").onclick=()=>rfOpen(null);
 function rfSyncPer(){$("rfPerL").hidden=!["r","x"].includes($("rfCat").value)}
@@ -1569,7 +1572,7 @@ $("rfSave").onclick=()=>{
 /* 擁有者：長按一項 → 放開＝修改（表格入面可以改分類，即係移去另一個清單）；長按後拖曳＝同一清單內換位置 */
 const RD={id:null,timer:0,lifted:false,moved:false,x0:0,y0:0,last:null,overCat:null,suppressClick:false};
 function rPressStart(li,x,y){
-  if(!(S.owner===true&&S.isGH===true)||!li||RD.id)return;
+  if(!ROWN()||!li||RD.id)return;
   RD.id=li.dataset.li;RD.lifted=false;RD.moved=false;RD.x0=x;RD.y0=y;RD.last=null;RD.overCat=null;
   RD.timer=setTimeout(()=>{RD.lifted=true;RD.suppressClick=true;document.body.classList.add("dragging");try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}},380);
 }
