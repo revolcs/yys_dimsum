@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>YYS式神點心紙</title>
+<title>YYS式神工具箱</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Huninn&family=Noto+Sans+TC:wght@400;500;700;900&family=Space+Mono:wght@700&display=swap">
 <style>
@@ -282,7 +282,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 
 <div class="wrap">
   <div class="top" id="top">
-    <div class="toprow"><h1>式神<mark>點心紙</mark></h1><button id="themeFab" class="themefab" type="button" aria-label="切換日夜模式">🌓</button><div class="now" id="nowRar"></div></div>
+    <div class="toprow"><h1>式神<mark>工具箱</mark></h1><button id="themeFab" class="themefab" type="button" aria-label="切換日夜模式">🌓</button><div class="now" id="nowRar"></div></div>
     <nav class="tabs" role="tablist">
       <button class="tab" id="tab-shiki" role="tab" aria-selected="true">式神圖鑑</button>
       <button class="tab" id="tab-egg" role="tab" aria-selected="false">黑蛋地獄</button>
@@ -309,8 +309,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="btn ghost" id="exPng" type="button">匯出圖片</button>
       <label class="btn" for="imFile" id="imLbl">匯入紀錄</label>
       <button class="btn ghost" id="pvGuest" type="button" hidden>👀 預覽訪客模式</button>
-      <button class="btn ghost" id="exStatic" type="button" hidden>📦 匯出免登入版</button>
-      <button class="btn ghost" id="exMine" type="button" hidden>📦 匯出我的免登入版</button>
+      <button class="btn ghost" id="exMine" type="button" hidden>📦 匯出免登入版</button><button class="btn ghost" id="rEditBtn" type="button" hidden>✏️ 編輯清單</button>
       <input id="imFile" type="file" accept=".md,.txt,.png,text/markdown,text/plain,image/png" hidden>
     </div>
     <div class="bar2" id="imConfirm" hidden><span id="imCMsg" style="flex:1;min-width:0"></span><button class="btn" id="imCYes" type="button">寫入雲端</button><button class="btn ghost" id="imCNo" type="button">取消</button></div>
@@ -436,7 +435,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       </div>
       <div class="row"><button class="btn ghost" id="rfCancel" type="button">取消</button><button class="btn" id="rfSave" type="button">儲存項目</button></div>
     </div>
-    <div class="rfoot"><button class="btn ghost" id="rEditBtn" type="button" hidden>✏️ 編輯清單</button><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置（+8 GMT，預設 00:00）</label><select id="rHour"></select></div>
+    <div class="rfoot"><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置（+8 GMT，預設 00:00）</label><select id="rHour"></select></div>
   </section>
   <footer class="foot">
     <div id="copyLine">遊戲角色、圖示等美術版權歸網易《陰陽師》所有</div>
@@ -605,7 +604,7 @@ function showTab(k){
   if(!["shiki","egg","res"].includes(k))k="shiki";
   $("acctBtn").textContent=k==="egg"?"±N號機記錄用":"±小號記錄";setTimeout(()=>{if(typeof syncSrv==="function")syncSrv()},0);
   for(const t of["shiki","egg","res"]){$("tab-"+t).setAttribute("aria-selected",k===t);$("pane-"+t).hidden=k!==t}
-  $("jump").hidden=k==="res";if(k==="res")$("cnFab").hidden=true;pref("tab",k);if(k==="res")setTimeout(()=>renderRes(),0);
+  $("rEditBtn").hidden=true;$("jump").hidden=k==="res";if(k==="res")$("cnFab").hidden=true;pref("tab",k);if(k==="res")setTimeout(()=>renderRes(),0);
 }
 $("tab-shiki").onclick=()=>{showTab("shiki");buildJump()};$("tab-egg").onclick=()=>{showTab("egg");buildJump()};$("tab-res").onclick=()=>{showTab("res");buildJump()};
 function activePane(){return ["egg","res"].map(k=>$("pane-"+k)).find(p=>!p.hidden)||$("pane-shiki")}
@@ -1138,7 +1137,7 @@ async function shrinkData(url,max){
   c.getContext("2d").drawImage(im,0,0,c.width,c.height);let d=c.toDataURL("image/webp",.86);if(!d.startsWith("data:image/webp"))d=c.toDataURL("image/png");return d;
 }
 async function exportStatic(personal){
-  const btn=$(personal?"exMine":"exStatic");btn.disabled=true;
+  const btn=$("exMine");btn.disabled=true;
   try{
     toast("打包中…（讀取頁面）");
     const tr=await fetch("standalone-template.txt",{cache:"no-store"});if(!tr.ok)throw new Error("找不到模板，請通知羊");
@@ -1157,8 +1156,7 @@ async function exportStatic(personal){
   }catch(e){toast("打包失敗："+(e.message||e))}
   btn.disabled=false;
 }
-$("exStatic").onclick=()=>exportStatic(false);
-$("exMine").onclick=()=>exportStatic(true);
+$("exMine").onclick=()=>exportStatic(S.owner===true);
 $("pvGuest").onclick=()=>{
   if(S.previewing){S.previewing=false;S.owner=true;S.mine={};S.dirty=false;toast("回到擁有者模式 ✧")}
   else{S.previewing=true;S.owner=false;S.mine={};S.gAccts=DEFACC.map(a=>({...a}));S.dirty=false;S.edit=false;toast("預覽訪客模式：這裡的操作不會動到你的資料 👀")}
@@ -1166,8 +1164,8 @@ $("pvGuest").onclick=()=>{
 };
 function renderIO(){
   const g=S.owner===false;$("io").hidden=S.owner===null;$("io").classList.toggle("guest",g);
-  $("imLbl").hidden=!(g||S.owner===true);$("imLbl").textContent=S.owner===true?"匯入改動":"匯入紀錄";$("exMine").hidden=S.owner!==true;if(S.owner!==true)$("imConfirm").hidden=true;
-  $("pvGuest").hidden=!(S.owner===true||S.previewing);$("exStatic").hidden=S.owner===null||!!S.isStatic;$("pvGuest").textContent=S.previewing?"↩ 結束預覽":"👀 預覽訪客模式";
+  $("imLbl").hidden=!(g||S.owner===true);$("imLbl").textContent=S.owner===true?"匯入改動":"匯入紀錄";$("exMine").hidden=S.owner===null||!!S.isStatic;$("exMine").textContent=S.owner===true?"📦 匯出我的免登入版":"📦 匯出免登入版";if(S.owner!==true)$("imConfirm").hidden=true;
+  $("pvGuest").hidden=!(S.owner===true||S.previewing);$("pvGuest").textContent=S.previewing?"↩ 結束預覽":"👀 預覽訪客模式";
   $("io").classList.toggle("preview",!!S.previewing);
   $("copyLine").hidden=!!S.personal||S.owner===true;
   $("ioMsg").innerHTML=S.personal
@@ -1542,7 +1540,7 @@ function renderRes(){
   });
   const cl=$("rClr");cl.textContent=S.rArm?"再按一次確認清除":"清除這頁勾選";cl.classList.toggle("danger",S.rArm);cl.classList.toggle("ghost",!S.rArm);cl.disabled=!L.some(it=>rGet(it)>0);
   $("rHour").value=String(rHour());
-  $("rEditBtn").hidden=!own;$("rEditBtn").textContent=S.rEdit?"✓ 完成編輯":"✏️ 編輯清單";$("rEditBtn").setAttribute("aria-pressed",S.rEdit);
+  $("rEditBtn").hidden=!own||$("pane-res").hidden;$("rEditBtn").textContent=S.rEdit?"✓ 完成編輯":"✏️ 編輯清單";$("rEditBtn").setAttribute("aria-pressed",S.rEdit);
   $("rAddBtn").hidden=!S.rEdit;if(!S.rEdit)$("rForm").hidden=true;
 }
 document.querySelectorAll("[data-rt]").forEach(b=>b.onclick=()=>{S.rT=b.dataset.rt;pref("rT",S.rT);renderRes()});
