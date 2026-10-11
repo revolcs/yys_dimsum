@@ -238,7 +238,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .toast{pointer-events:none;position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:8px 16px;border-radius:99px;font-size:.85rem;z-index:30;max-width:calc(100% - 32px);text-align:center}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 /* 資源獲取 */
-.rcats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:14px}
+.rcats{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-top:14px;position:sticky;top:var(--hdr,150px);z-index:5;background:var(--paper);padding:6px 0 4px}
 .rcat{font:inherit;font-weight:900;font-size:.85rem;padding:6px 2px 5px;border-radius:14px;border:2px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:1px;line-height:1.25;min-width:0;white-space:nowrap}
 .rcat small{font-family:var(--f-num);font-size:.7rem;color:var(--ink-soft)}
 .rcat.alldone small{color:var(--ok)}
@@ -1494,7 +1494,7 @@ function rRow(it){
   const per=it.p&&it.c!=="r"?`<span class="rw p">${RPER[it.p]}</span>`:"";
   const rw=(it.g?`<span class="rw g">勾玉 ${esc(it.g)}</span>`:"")+(it.e?`<span class="rw e">${esc(it.e)}</span>`:"")+per;
   const minus=n>1&&c>0?`<button class="rminus" type="button" data-rmin="${it.id}" aria-label="${esc(it.n)} 減一次">−</button>`:"";
-  const edit=S.rEdit?`<button class="rdel" type="button" data-redit="${it.id}" aria-label="修改${esc(it.n)}">改</button><button class="rdel danger" type="button" data-rdel="${it.id}" aria-label="刪除${esc(it.n)}">${S.rDelArm===it.id?"確定刪除":"刪"}</button>`:"";
+  const edit=(S.owner===true&&S.isGH===true?`<button class="rdel" type="button" data-redit="${it.id}" aria-label="修改${esc(it.n)}">⚙️ 改</button>`:"")+(S.rEdit&&S.owner===true&&S.isGH===true?`<button class="rdel danger" type="button" data-rdel="${it.id}" aria-label="刪除${esc(it.n)}">${S.rDelArm===it.id?"確定刪除":"刪"}</button>`:"");
   return `<li class="rli${st==="true"?" done":""}" data-li="${it.id}"><button class="rrow" type="button" role="checkbox" aria-checked="${st}" data-rid="${it.id}">${box}<span class="rnm"><b>${esc(it.n)}</b>${it.x?`<small>${esc(it.x)}</small>`:""}<span class="rws">${rw}</span></span></button>${minus}${edit}</li>`;
 }
 function renderRes(){
@@ -1504,7 +1504,7 @@ function renderRes(){
   $("rCats").querySelectorAll("[data-rc]").forEach(b=>b.onclick=()=>{S.rCat=b.dataset.rc;S.rArm=false;S.rDelArm=null;pref("rCat",S.rCat);renderRes()});
   document.querySelectorAll("[data-rt]").forEach(b=>b.setAttribute("aria-pressed",b.dataset.rt===S.rT));
   $("rHide").setAttribute("aria-pressed",S.rHide);
-  $("rSub").textContent={all:"📋 目前顯示：全部項目（勾玉＋黑蛋・黑碎）",g:"🪙 目前顯示：勾玉獲取（只看有勾玉的項目）",e:"🥚 目前顯示：黑蛋・黑碎獲取（只看有黑蛋／黑碎的項目）"}[S.rT]+(S.rEdit?"　✏️ 長按一項＝修改（可改分類，移去其他清單）；長按後拖曳＝同一清單內換位置":"");
+  $("rSub").textContent={all:"📋 目前顯示：全部項目（勾玉＋黑蛋・黑碎）",g:"🪙 目前顯示：勾玉獲取（只看有勾玉的項目）",e:"🥚 目前顯示：黑蛋・黑碎獲取（只看有黑蛋／黑碎的項目）"}[S.rT]+(S.owner===true&&S.isGH===true?"　✏️ 長按一項＝修改（可改分類，移去其他清單）；長按後拖曳＝同一清單內換位置":"");
   const c=S.rCat,L=rItems(c),dn=L.filter(rDone).length,pct=L.length?Math.round(dn/L.length*100):0;
   const lbl={d:"今日完成",w:"本週完成",m:"本月完成",o:"一次性完成",r:"機率項目已做",x:"不定期完成"}[c];
   const TY={all:"全部獲取",g:"勾玉獲取",e:"黑蛋・黑碎獲取"}[S.rT];
@@ -1567,10 +1567,10 @@ $("rfSave").onclick=()=>{
   setRes(L);S.rfEdit=null;$("rForm").hidden=true;S.rCat=c;pref("rCat",c);saveRes();renderRes();toast(`已儲存「${n}」✧`);
 };
 /* 擁有者：長按一項 → 放開＝修改（表格入面可以改分類，即係移去另一個清單）；長按後拖曳＝同一清單內換位置 */
-const RD={id:null,timer:0,lifted:false,moved:false,x0:0,y0:0,last:null,suppressClick:false};
+const RD={id:null,timer:0,lifted:false,moved:false,x0:0,y0:0,last:null,overCat:null,suppressClick:false};
 function rPressStart(li,x,y){
-  if(!S.rEdit||!li||RD.id)return;
-  RD.id=li.dataset.li;RD.lifted=false;RD.moved=false;RD.x0=x;RD.y0=y;RD.last=null;
+  if(!(S.owner===true&&S.isGH===true)||!li||RD.id)return;
+  RD.id=li.dataset.li;RD.lifted=false;RD.moved=false;RD.x0=x;RD.y0=y;RD.last=null;RD.overCat=null;
   RD.timer=setTimeout(()=>{RD.lifted=true;RD.suppressClick=true;document.body.classList.add("dragging");try{navigator.vibrate&&navigator.vibrate(12)}catch(_){}},380);
 }
 function rPressMove(x,y,ev){
@@ -1579,7 +1579,9 @@ function rPressMove(x,y,ev){
   if(ev&&ev.cancelable)ev.preventDefault();
   RD.moved=true;
   const el=document.elementFromPoint(x,y);const over=el&&el.closest?el.closest("#rList .rli[data-li]"):null;
-  if(!over)return;const tid=over.dataset.li;
+  const catEl=el&&el.closest?el.closest(".rcat[data-rc]"):null;
+  RD.overCat=catEl?catEl.dataset.rc:null;
+  if(catEl||!over)return;const tid=over.dataset.li;
   if(tid===RD.id||tid===RD.last)return;
   const me=RESM[RD.id],other=RESM[tid];if(!me||!other||me.c!==other.c)return;
   RD.last=tid;
@@ -1588,12 +1590,23 @@ function rPressMove(x,y,ev){
   const [it]=L.splice(from,1);const t2=L.findIndex(v=>v.id===tid);L.splice(from<to?t2+1:t2,0,it);
   setRes(L);renderRes();
 }
+function moveToCat(id,c){
+  const L=RES.slice(),i=L.findIndex(v=>v.id===id);if(i<0)return;
+  const [x]=L.splice(i,1);x.c=c;
+  if(c==="r"||c==="x")x.p=x.p||"d";else delete x.p;
+  let last=-1;L.forEach((v,j)=>{if(v.c===c)last=j});
+  L.splice(last+1,0,x);
+  setRes(L);S.rCat=c;pref("rCat",c);saveRes();renderRes();
+  toast(`已移去「${RCAT.find(r=>r[0]===c)[1]}」✧`);
+}
 function rPressEnd(){
   if(!RD.id)return;clearTimeout(RD.timer);
   const id=RD.id,lifted=RD.lifted,moved=RD.moved;RD.id=null;RD.lifted=false;RD.moved=false;
   document.body.classList.remove("dragging");
   if(!lifted)return;
   setTimeout(()=>{RD.suppressClick=false},400);
+  if(moved&&RD.overCat&&RESM[id]&&RD.overCat!==RESM[id].c){const c=RD.overCat;RD.overCat=null;moveToCat(id,c);return}
+  RD.overCat=null;
   if(moved){saveRes();toast("順序已更新 ✧");return}
   const it=RESM[id];if(it)rfOpen(it);
 }
