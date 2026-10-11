@@ -417,24 +417,6 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <p class="rsub" id="rSub"></p>
     <div id="rList" style="margin-top:12px"></div>
     <button class="btn ghost rfull" id="rAddBtn" type="button" hidden>＋ 新增項目</button>
-    <div class="rform" id="rForm" hidden>
-      <b id="rFormTitle">新增項目</b>
-      <label class="fld">名稱<input id="rfName" type="text" maxlength="40"></label>
-      <div class="two" style="grid-template-columns:1fr 1fr">
-        <label class="fld">分類<select id="rfCat"><option value="d">每日</option><option value="w">每週</option><option value="m">每月</option><option value="o">一次性</option><option value="r">機率</option><option value="x">不定期</option></select></label>
-        <label class="fld" id="rfPerL">重置週期<select id="rfPer"><option value="d">每日</option><option value="w">每週</option><option value="m">每月</option><option value="o">不重置</option></select></label>
-      </div>
-      <label class="fld">自訂重置時間（+8，逗號分隔，留空＝照上面週期）<input id="rfT" type="text" placeholder="例如 05:59, 17:59"></label>
-      <div class="two" style="grid-template-columns:1fr 1fr">
-        <label class="fld">勾玉<input id="rfG" type="text" placeholder="例如 20 或 若干"></label>
-        <label class="fld">黑蛋／黑碎<input id="rfE" type="text" placeholder="例如 1 個黑蛋"></label>
-      </div>
-      <div class="two" style="grid-template-columns:2fr 1fr">
-        <label class="fld">備註<input id="rfX" type="text"></label>
-        <label class="fld">次數<input id="rfK" type="number" min="1" max="30" value="1" inputmode="numeric"></label>
-      </div>
-      <div class="row"><button class="btn ghost" id="rfCancel" type="button">取消</button><button class="btn" id="rfSave" type="button">儲存項目</button></div>
-    </div>
     <div class="rfoot"><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置（+8 GMT，預設 00:00）</label><select id="rHour"></select></div>
   </section>
   <footer class="foot">
@@ -449,7 +431,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <label class="fld">通行證 Token（只存喺呢部機）<input id="ghTokIn" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="github_pat_…"></label>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ghLogin" type="button" style="flex:1">登入</button><button class="btn ghost" id="ghLogout" type="button" hidden style="flex:1">登出</button></div>
     </div>
-    <div>點心紙＆黑蛋地獄企劃 ver 1.0<span id="staticTag"></span></div>
+    <div>式神工具箱<span id="staticTag"></span></div>
   </footer>
 </div>
 
@@ -558,6 +540,27 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="btn ghost" id="bSkip" type="button">跳過這張</button>
       <button class="btn ghost" id="bDrop" type="button" hidden>丟掉這張</button>
     </div>
+  </div>
+</div>
+<!-- resource edit sheet -->
+<div id="rScrim" class="scrim" hidden>
+  <div class="sheet" id="rForm" role="dialog" aria-modal="true" aria-labelledby="rFormTitle">
+      <h2 id="rFormTitle">新增項目</h2>
+      <label class="fld">名稱<input id="rfName" type="text" maxlength="40"></label>
+      <div class="two" style="grid-template-columns:1fr 1fr">
+        <label class="fld">分類<select id="rfCat"><option value="d">每日</option><option value="w">每週</option><option value="m">每月</option><option value="o">一次性</option><option value="r">機率</option><option value="x">不定期</option></select></label>
+        <label class="fld" id="rfPerL">重置週期<select id="rfPer"><option value="d">每日</option><option value="w">每週</option><option value="m">每月</option><option value="o">不重置</option></select></label>
+      </div>
+      <label class="fld">自訂重置時間（+8，逗號分隔，留空＝照上面週期）<input id="rfT" type="text" placeholder="例如 05:59, 17:59"></label>
+      <div class="two" style="grid-template-columns:1fr 1fr">
+        <label class="fld">勾玉<input id="rfG" type="text" placeholder="例如 20 或 若干"></label>
+        <label class="fld">黑蛋／黑碎<input id="rfE" type="text" placeholder="例如 1 個黑蛋"></label>
+      </div>
+      <div class="two" style="grid-template-columns:2fr 1fr">
+        <label class="fld">備註<input id="rfX" type="text"></label>
+        <label class="fld">次數<input id="rfK" type="number" min="1" max="30" value="1" inputmode="numeric"></label>
+      </div>
+      <div class="row"><button class="btn ghost" id="rfCancel" type="button">取消</button><button class="btn" id="rfSave" type="button">儲存項目</button></div>
   </div>
 </div>
 <button id="cnFab" class="cnfab" type="button" hidden aria-pressed="false" aria-label="顯示或隱藏陸服限定">±陸限</button>
@@ -1541,7 +1544,7 @@ function renderRes(){
   const cl=$("rClr");cl.textContent=S.rArm?"再按一次確認清除":"清除這頁勾選";cl.classList.toggle("danger",S.rArm);cl.classList.toggle("ghost",!S.rArm);cl.disabled=!L.some(it=>rGet(it)>0);
   $("rHour").value=String(rHour());
   $("rEditBtn").hidden=!own||$("pane-res").hidden;$("rEditBtn").textContent=S.rEdit?"✓ 完成編輯":"✏️ 編輯清單";$("rEditBtn").setAttribute("aria-pressed",S.rEdit);
-  $("rAddBtn").hidden=!S.rEdit;if(!S.rEdit)$("rForm").hidden=true;
+  $("rAddBtn").hidden=!S.rEdit;if(!S.rEdit)$("rScrim").hidden=true;
 }
 document.querySelectorAll("[data-rt]").forEach(b=>b.onclick=()=>{S.rT=b.dataset.rt;pref("rT",S.rT);renderRes()});
 $("rHide").onclick=()=>{S.rHide=!S.rHide;pref("rHide",S.rHide?"1":"0");renderRes()};
@@ -1553,7 +1556,7 @@ $("rClr").onclick=()=>{
 $("rHour").innerHTML=[0,1,2,3,4,5,6].map(h=>`<option value="${h}">${String(h).padStart(2,"0")}:00</option>`).join("");
 $("rHour").onchange=()=>{pref("rHour",$("rHour").value);renderRes();toast("重置時間改成 "+String(rHour()).padStart(2,"0")+":00")};
 /* 擁有者編輯清單 */
-$("rEditBtn").onclick=()=>{S.rEdit=!S.rEdit;S.rDelArm=null;$("rForm").hidden=true;renderRes()};
+$("rEditBtn").onclick=()=>{S.rEdit=!S.rEdit;S.rDelArm=null;$("rScrim").hidden=true;renderRes()};
 $("rAddBtn").onclick=()=>rfOpen(null);
 function rfSyncPer(){$("rfPerL").hidden=!["r","x"].includes($("rfCat").value)}
 $("rfCat").onchange=rfSyncPer;
@@ -1562,9 +1565,9 @@ function rfOpen(it){
   $("rfName").value=it?it.n:"";$("rfCat").value=it?it.c:(S.rCat==="o"||S.rCat==="x"?S.rCat:S.rCat);
   $("rfPer").value=it&&it.p?it.p:"d";$("rfT").value=it&&it.t?it.t.join(", "):"";
   $("rfG").value=it?(it.g||""):"";$("rfE").value=it?(it.e||""):"";$("rfX").value=it?(it.x||""):"";$("rfK").value=it?(it.k||1):1;
-  rfSyncPer();$("rForm").hidden=false;$("rForm").scrollIntoView({block:"nearest",behavior:"smooth"});
+  rfSyncPer();$("rScrim").hidden=false;
 }
-$("rfCancel").onclick=()=>{S.rfEdit=null;$("rForm").hidden=true};
+$("rfCancel").onclick=()=>{S.rfEdit=null;$("rScrim").hidden=true};
 $("rfSave").onclick=()=>{
   const n=$("rfName").value.trim();if(!n){toast("先打項目名稱喔");return}
   const c=$("rfCat").value,per=$("rfPer").value;
@@ -1576,7 +1579,7 @@ $("rfSave").onclick=()=>{
   if(tr){const ts=[...new Set(tr.split(/[,，、\s]+/).filter(Boolean).map(x=>{const m=x.match(/^(\d{1,2}):(\d{2})$/);return m&&+m[1]<24&&+m[2]<60?String(+m[1]).padStart(2,"0")+":"+m[2]:null}))];
     if(ts.includes(null)){toast("時間格式唔啱，例如 05:59, 17:59");return}it.t=ts.sort()}
   const L=RES.slice(),i=L.findIndex(v=>v.id===it.id);if(i>=0)L[i]=it;else L.push(it);
-  setRes(L);S.rfEdit=null;$("rForm").hidden=true;S.rCat=c;pref("rCat",c);saveRes();renderRes();toast(`已儲存「${n}」✧`);
+  setRes(L);S.rfEdit=null;$("rScrim").hidden=true;S.rCat=c;pref("rCat",c);saveRes();renderRes();toast(`已儲存「${n}」✧`);
 };
 /* 擁有者：長按一項 → 放開＝修改（表格入面可以改分類，即係移去另一個清單）；長按後拖曳＝同一清單內換位置 */
 const RD={id:null,timer:0,lifted:false,moved:false,x0:0,y0:0,last:null,overCat:null,suppressClick:false};
@@ -1630,8 +1633,8 @@ function rPressEnd(){
   document.addEventListener("pointerup",e=>{if(e.pointerType==="mouse")rPressEnd()});
   document.addEventListener("touchend",rPressEnd);document.addEventListener("touchcancel",rPressEnd);
 })();
-setInterval(()=>{if(!$("pane-res").hidden&&!document.hidden&&$("rForm").hidden)renderRes()},30000);
-document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!$("pane-res").hidden&&$("rForm").hidden)renderRes()});
+setInterval(()=>{if(!$("pane-res").hidden&&!document.hidden&&$("rScrim").hidden)renderRes()},30000);
+document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!$("pane-res").hidden&&$("rScrim").hidden)renderRes()});
 
 const HOST_THEME=document.documentElement.getAttribute("data-theme");
 const THEMES=[["auto","🌓","跟隨系統","自動"],["light","☀️","日間模式","日間"],["dark","🌙","夜間模式","夜間"]];
