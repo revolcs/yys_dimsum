@@ -286,13 +286,13 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .calbar b{font-family:var(--f-num);color:var(--ink)}
 .ctoday{font-weight:900;color:var(--ink)}
 .clegend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0;font-size:.75rem}
-.lg{display:inline-flex;align-items:center;gap:4px;color:var(--ink-soft);font-weight:700}
-.lg::before{content:"";width:12px;height:12px;border-radius:4px;border:2px solid var(--ink);background:var(--kc)}
+.clegend .lg{display:inline-flex;align-items:center;gap:4px;color:var(--ink-soft);font-weight:700}
+.clegend .lg::before{content:"";width:12px;height:12px;border-radius:4px;border:2px solid var(--ink);background:var(--kc)}
 .k-m{--kc:var(--seal)}
 .k-e{--kc:var(--gold)}
 .k-p{--kc:#8e3563}
 .k-p .cband{background:#8e3563;color:#fff}
-.lg.k-p::before{background:#8e3563}
+.clegend .lg.k-p::before{background:#8e3563}
 .k-n{--kc:var(--indigo)}
 .calhead{display:flex;align-items:center;gap:6px;margin:12px 0 10px;flex-wrap:wrap}
 .calhead b{font-family:var(--f-display);font-size:1.15rem;min-width:7em;text-align:center}
@@ -385,9 +385,9 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .k-m .cband i{border-color:#fff}
 .k-e .cband{background:var(--gold);color:#111}
 .k-e .cband i{border-color:#111}
-.lg.k-m::before{background:#b5523b}
-.lg.k-e::before{background:var(--gold)}
-.lg.k-n::before{background:linear-gradient(90deg,#8c6d46 0 25%,#5f7d3a 25% 50%,#2f6f6a 50% 75%,#c96a2b 75%)}
+.clegend .lg.k-m::before{background:#b5523b}
+.clegend .lg.k-e::before{background:var(--gold)}
+.clegend .lg.k-n::before{background:linear-gradient(90deg,#8c6d46 0 25%,#5f7d3a 25% 50%,#2f6f6a 50% 75%,#c96a2b 75%)}
 .calset{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
 .calctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 12px}
 .calctl .calview{margin:0}
