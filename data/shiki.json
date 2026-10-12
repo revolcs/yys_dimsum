@@ -1,4 +1,4 @@
-{"built":"2026/10/12 22:49","shiki":[
+{"built":"2026/10/13 00:00","shiki":[
 {"id":"col003","name":"阿香","rarity":"合作","max":"515","order":3,"img":"a35dd50ebda6bc5c7aac6099c44b478b","work":"鬼燈的冷徹"},
 {"id":"col004","name":"蜜桃&芥子","rarity":"合作","max":"515","order":4,"img":"8560184a96b6270c21f6688a38f4db34","work":"鬼燈的冷徹","shrine":true},
 {"id":"col010","name":"朽木露琪亞","rarity":"合作","max":"555","order":10,"img":"e035fc8a7bc6cefa4299006325f60f6e","work":"BLEACH 死神","shrine":true},
@@ -230,7 +230,7 @@
 {"id":"ssr16","name":"山風","rarity":"SSR","max":"555","order":16,"img":"0eb2d8edd799c4c39a3cfeedaeaccc2b"},
 {"id":"ssr17","name":"御饌津","rarity":"SSR","max":"515","order":18,"img":"e35175faa4e4c7a033bc219bc2ce5d0d"},
 {"id":"ssr18","name":"面靈氣","rarity":"SSR","max":"555","order":19,"img":"f611f8fa08f84f413de98d174a3a0cf6"},
-{"id":"ssr19","name":"鬼切","rarity":"SSR","max":"515","order":20,"img":"593a28d78f7ba30e5f2f81cd563772d2"},
+{"id":"ssr19","name":"鬼切","rarity":"SSR","max":"555","order":20,"img":"593a28d78f7ba30e5f2f81cd563772d2"},
 {"id":"ssr20","name":"白藏主","rarity":"SSR","max":"555","order":21,"img":"1729bf292140d11f75547262d83c5d5b"},
 {"id":"ssr21","name":"八岐大蛇","rarity":"SSR","max":"555","order":22,"img":"83f7b900e1fee7fc7f0b65096dd3b9c3"},
 {"id":"ssr22","name":"不知火","rarity":"SSR","max":"555","order":23,"img":"d76752e917576285294cc5173b600ba1"},
