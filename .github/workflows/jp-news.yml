@@ -1,0 +1,35 @@
+name: 抓取日服更新公告
+
+on:
+  schedule:
+    - cron: "17 1,10 * * *"   # 每日 GMT+8 09:17 同 18:17
+  workflow_dispatch:           # 可以喺 Actions 分頁手動執行
+
+permissions:
+  contents: write
+
+concurrency:
+  group: jp-news
+  cancel-in-progress: false
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: 抓取並整理
+        run: node scripts/jp-news.mjs
+      - name: 有改動先 commit
+        run: |
+          if git diff --quiet -- data/jp_news.json 2>/dev/null && git ls-files --error-unmatch data/jp_news.json >/dev/null 2>&1; then
+            echo "冇新內容"; exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898299+github-actions[bot]@users.noreply.github.com"
+          git add data/jp_news.json
+          git commit -m "更新日服公告參考"
+          git pull --rebase origin main
+          git push
