@@ -539,7 +539,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
         <li>上面選<b>每日／每週／每月／一次性／機率</b>，按鈕下面的數字是完成了幾項。</li>
         <li><b>點一下項目</b>＝完成，再點一次取消。</li>
         <li>有次數的項目（例如永久勾玉卡 <b>0/4</b>）每點一下加 1，滿了再點會歸零；右邊的 <b>−</b> 可以減回一次。</li>
-        <li><b>每日</b> 00:00、<b>每週一</b> 00:00、<b>每月 1 號</b> 00:00（香港時間）自動重置；<b>一次性</b>不會重置。重置時間可以在這頁最下面改。</li>
+        <li><b>每日</b> 00:00、<b>每週一</b> 00:00、<b>每月 1 號</b> 00:00（GMT+8）自動重置；<b>一次性</b>不會重置。重置時間可以在這頁最下面改。</li>
         <li><b>機率</b>項目的勾＝今天／這週已經做了（不代表一定出貨），每項按自己的週期重置。</li>
         <li>上面的帳號列可以切換帳號，<b>每個帳號分開勾</b>。</li>
         <li>擁有者登入後會自動同步到 GitHub；朋友（訪客）的勾選只會存在自己這部裝置。</li>
@@ -562,7 +562,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div class="rfoot"><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置（+8 GMT，預設 00:00）</label><select id="rHour"></select></div>
   </section>
   <section id="pane-cal" hidden>
-    <p class="sub" style="margin-top:12px">式神活動嘅日期一律用<b>香港時間</b>，格仔同橫幅都係跟住日期走～</p>
+    <p class="sub" style="margin-top:12px">式神活動嘅日期一律用<b>GMT+8</b>，格仔同橫幅都係跟住日期走～</p>
     <details class="disc help">
       <summary>📖 行事月曆使用說明</summary>
       <ul>
@@ -1645,7 +1645,7 @@ $("imCYes").onclick=async()=>{
 };
 
 /* day/night toggle: 跟隨系統 → 日間 → 夜間 (per device) */
-/* 資源獲取：每日／每週／每月／一次性／機率／不定期；清單擁有者可以增減修改（存去 GitHub），記錄按週期自動重置（香港時間） */
+/* 資源獲取：每日／每週／每月／一次性／機率／不定期；清單擁有者可以增減修改（存去 GitHub），記錄按週期自動重置（GMT+8） */
 const RES=[
 {id:"d1",c:"d",n:"結界寄養",x:"每日 3～4 次",g:"約 300"},
 {id:"d2",c:"d",n:"地域鬼王挑戰",x:"可打 1 級",g:"20～60"},
@@ -1740,7 +1740,7 @@ const RPER={d:"每日",w:"每週",m:"每月",h:"半個月",b:"每 2 個月",o:"�
 const rPer=it=>it.p||(it.c==="r"?"d":it.c);
 const rMax=it=>it.k||1;
 const rHour=()=>{const h=parseInt(pref("rHour"),10);return h>=0&&h<=6?h:0};
-/* 用香港時間（UTC+8）計週期，唔理部機設咗咩時區 */
+/* 用 GMT+8（UTC+8）計週期，唔理部機設咗咩時區 */
 function rKey(p,now){
   if(p==="o")return "o";
   const t=new Date((now??Date.now())+(8-rHour())*36e5);const y=t.getUTCFullYear(),mo=t.getUTCMonth(),d=t.getUTCDate();
