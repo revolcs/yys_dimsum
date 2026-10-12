@@ -559,23 +559,23 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <button class="btn ghost rfull" id="rAddBtn" type="button" hidden>＋ 新增項目</button>
     <div class="calbottom" id="rBottom" hidden><button class="btn ghost" id="rBatchAdd" type="button">📥 批量新增</button><button class="btn ghost" id="rSelOn" type="button">☑ 批量刪除</button></div>
     <div class="calselbar" id="rSelBar" hidden><span id="rSelN">已選 0 項</span><span class="spacer"></span><button class="btn danger" id="rSelDel" type="button">刪除所選</button><button class="btn ghost" id="rSelOff" type="button">完成</button></div>
-    <div class="rfoot"><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置（+8 GMT，預設 00:00）</label><select id="rHour"></select></div>
+    <div class="rfoot"><button class="btn ghost" id="rClr" type="button">清除這頁勾選</button><span class="spacer"></span><label for="rHour">每日重置（GMT+8，預設 00:00）</label><select id="rHour"></select></div>
   </section>
   <section id="pane-cal" hidden>
-    <p class="sub" style="margin-top:12px">式神活動嘅日期一律用<b>GMT+8</b>，格仔同橫幅都係跟住日期走～</p>
+    <p class="sub" style="margin-top:12px">式神活動的日期一律用<b>GMT+8</b>，格仔同橫幅都是跟著日期走～</p>
     <details class="disc help">
       <summary>📖 行事月曆使用說明</summary>
       <ul>
-        <li>頂部會顯示今日日期，同<b>下次維護</b>、<b>最近結束</b>嘅倒數，一直固定喺度。</li>
-        <li>維護：日期數字嘅底色變成磚紅；活動結束：金色；一般活動：每個一色，月曆上嘅細線同下面列表嘅色條對得返。</li>
-        <li>下面每個活動都有日期範圍（dd/mm - dd/mm）同距離結束嘅時間。</li>
-        <li>撳一個日子，會彈出當日嘅活動；只有擁有者可以新增、修改、刪除，朋友打開只係睇。</li>
+        <li>頂部會顯示今日日期，同<b>下次維護</b>、<b>即將結束</b>的倒數，一直固定在度。</li>
+        <li>維護：日期數字的底色變成磚紅；活動結束：金色；一般活動：每個一色，月曆上的細線同下面列表的色條對得返。</li>
+        <li>下面每個活動都有日期範圍（dd/mm - dd/mm）同距離結束的時間。</li>
+        <li>按一個日子，會彈出當日的活動；只有擁有者可以新增、修改、刪除，朋友打開只是看。</li>
         <li>擁有者可以用<b>📥 批量新增</b>一次貼入多個活動；<b>☑ 批量選取</b>之後可以一次刪除或統一改結束時間。</li>
-        <li>日期可以寫 2026-10-12、1012 或 10/12（跟上面揀嘅日期格式），時間可以用 12 小時或 24 小時，兩個格式都可以喺上面揀。</li>
-        <li>上面可以切換<b>📅 月曆</b>同<b>🗓 日程</b>：日程係遊戲嗰種橫向七日表，今日喺中間，一條條活動橫跨日子，撳一條就開返嗰日。</li>
+        <li>日期可以寫 2026-10-12、1012 或 10/12（跟上面選的日期格式），時間可以用 12 小時或 24 小時，兩個格式都可以在上面選。</li>
+        <li>上面可以切換<b>📅 月曆</b>同<b>🗓 日程</b>：日程是遊戲那種橫向七日表，今日在中間，一條條活動橫跨日子，按一條就開返那日。</li>
       </ul>
     </details>
-    <div class="clegend"><span class="lg k-m">維護（日期數字底色）</span><span class="lg k-e">活動結束（金）</span><span class="lg k-n">一般活動（每個一色）</span><span class="lg k-p">永久上線（酒紅，只喺上線日）</span></div>
+    <div class="clegend"><span class="lg k-m">維護（日期數字底色）</span><span class="lg k-e">活動結束（金）</span><span class="lg k-n">一般活動（每個一色）</span><span class="lg k-p">永久上線（酒紅，只在上線日）</span></div>
     <div class="calset">
       <div class="seg" role="group" aria-label="日期格式"><button type="button" data-df="md">月/日</button><button type="button" data-df="dm">日/月</button></div>
       <div class="seg" role="group" aria-label="時間格式"><button type="button" data-tf="12">12 小時</button><button type="button" data-tf="24">24 小時</button></div>
@@ -618,11 +618,11 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div><button id="ghKey" class="btn ghost" type="button" hidden style="margin:6px auto 0;font-size:.75rem;padding:4px 12px">🔑 擁有者登入</button></div>
     <div id="ghPanel" class="ghpanel" hidden>
       <b>☁️ GitHub 擁有者登入</b>
-      <p class="sub" style="margin:2px 0 4px">通行證只會存喺呢部機；朋友冇通行證就乜都改唔到。</p>
+      <p class="sub" style="margin:2px 0 4px">存取權杖只會存在這台裝置；朋友沒有存取權杖就什麼都改不了。</p>
       <div class="ghsync" hidden style="font-weight:900"></div>
-      <label class="fld">公開倉庫（用戶名/倉庫名）<input id="ghPubIn" type="text" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
-      <label class="fld">私人倉庫（用戶名/倉庫名）<input id="ghPrivIn" type="text" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
-      <label class="fld">通行證 Token（只存喺呢部機）<input id="ghTokIn" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="github_pat_…"></label>
+      <label class="fld">公開儲存庫（使用者名稱/儲存庫名稱）<input id="ghPubIn" type="text" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+      <label class="fld">私人儲存庫（使用者名稱/儲存庫名稱）<input id="ghPrivIn" type="text" autocapitalize="off" autocorrect="off" spellcheck="false"></label>
+      <label class="fld">存取權杖 Token（只存在這台裝置）<input id="ghTokIn" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="github_pat_…"></label>
       <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="ghLogin" type="button" style="flex:1">登入</button><button class="btn ghost" id="ghLogout" type="button" hidden style="flex:1">登出</button></div>
     </div>
     <div>式神工具箱<span id="staticTag"></span></div>
@@ -688,7 +688,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 <div id="gScrim" class="scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="gTitle">
     <h2 id="gTitle">切格子</h2>
-    <p class="sub" style="margin:0">把圖鑑截圖切成一格一格。<b>🔲 移動框</b>：拖框內＝整組移位，拖右下角粉紅圓點＝變大變細（剔「單張頭像」就係郁嗰個正方框）。<b>✋ 移動圖</b>：放大後拖動睇細節。</p>
+    <p class="sub" style="margin:0">把圖鑑截圖切成一格一格。<b>🔲 移動框</b>：拖框內＝整組移位，拖右下角粉紅圓點＝變大變細（剔「單張頭像」就是動那個正方框）。<b>✋ 移動圖</b>：放大後拖動看細節。</p>
     <div class="gtools">
       <button class="chip" type="button" data-gm="box" aria-pressed="true">🔲 移動框</button>
       <button class="chip" type="button" data-gm="pan" aria-pressed="false">✋ 移動圖</button>
@@ -723,7 +723,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <div class="face" id="bFace"></div>
       <div style="min-width:0">
         <div class="sub" id="bProg">第 1 / 1 張</div>
-        <div class="sub">打幾個字找式神，點名字就配對好了</div>
+        <div class="sub">打幾個字找式神，輸入名字就能配對了</div>
       </div>
     </div>
     <div class="toolbar" id="bRar"></div>
@@ -745,7 +745,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
         <label class="fld">分類<select id="rfCat"><option value="d">每日</option><option value="w">每週</option><option value="m">每月</option><option value="o">一次性</option><option value="r">機率</option><option value="x">不定期</option></select></label>
         <label class="fld" id="rfPerL">重置週期<select id="rfPer"><option value="d">每日</option><option value="w">每週</option><option value="m">每月</option><option value="o">不重置</option></select></label>
       </div>
-      <label class="fld">自訂重置時間（+8，逗號分隔，留空＝照上面週期）<input id="rfT" type="text" placeholder="例如 05:59, 17:59"></label>
+      <label class="fld">自訂重置時間（GMT+8，逗號分隔，留空＝照上面週期）<input id="rfT" type="text" placeholder="例如 05:59, 17:59"></label>
       <div class="two" style="grid-template-columns:1fr 1fr">
         <label class="fld">勾玉<input id="rfG" type="text" placeholder="例如 20 或 若干"></label>
         <label class="fld">黑蛋／黑碎<input id="rfE" type="text" placeholder="例如 1 個黑蛋"></label>
@@ -761,7 +761,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="calDayTitle">
     <h2 id="calDayTitle"></h2>
     <div id="calDayList" style="display:flex;flex-direction:column;gap:8px"></div>
-    <button class="btn ghost" id="calDayAdd" type="button" hidden>＋ 新增呢日嘅活動</button>
+    <button class="btn ghost" id="calDayAdd" type="button" hidden>＋ 新增這天的活動</button>
     <button class="btn" id="calDayClose" type="button">關閉</button>
   </div>
 </div>
@@ -778,9 +778,9 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <label class="fld">結束時間<input id="calfEndT" type="text" maxlength="20" placeholder="預設 23:59"></label>
     </div>
     <label class="fld">備註<input id="calfNote" type="text" maxlength="120"></label>
-    <label class="check"><input id="calfPerm" type="checkbox"> ✨ 永久上線（只喺上線日顯示一次，唔使填結束）</label>
+    <label class="check"><input id="calfPerm" type="checkbox"> ✨ 永久上線（只在上線日顯示一次，不用填結束）</label>
     <div id="calfConfirm" class="confirm" hidden>
-      確定刪除呢個活動？
+      確定刪除這個活動？
       <div class="row" style="margin-top:8px"><button class="btn ghost" id="calfNo" type="button">不要</button><button class="btn danger" id="calfYes" type="button">刪除</button></div>
     </div>
     <div class="row">
@@ -794,7 +794,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 <div id="sdScrim" class="scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sdTitle">
     <h2 id="sdTitle">⚠️ 確定刪除？</h2>
-    <p class="sdwarn">刪除之後<b>冇得復原</b>，連同佢哋嘅圖片、點亮同黑蛋紀錄都會一齊消失。</p>
+    <p class="sdwarn">刪除之後<b>無法復原</b>，連同他們的圖片、點亮同黑蛋紀錄都會一起消失。</p>
     <div class="sdlist" id="sdList"></div>
     <div class="row"><button class="btn ghost" id="sdCancel" type="button">取消</button><button class="btn danger" id="sdGo" type="button">確定刪除</button></div>
   </div>
@@ -802,7 +802,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 <div id="sbScrim" class="scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sbTitle">
     <h2 id="sbTitle">統一修改</h2>
-    <p class="sub" style="margin:0">留空或揀「不改」就唔會郁；想清空標準技能或作品就寫 -</p>
+    <p class="sub" style="margin:0">留空或選「不改」就不會動；想清空標準技能或作品就寫 -</p>
     <div class="two" style="grid-template-columns:1fr 1fr">
       <label class="fld">稀有度<select id="sbRar"></select></label>
       <label class="fld">標準技能<input id="sbMax" type="text" inputmode="numeric" placeholder="例如 555"></label>
@@ -952,9 +952,9 @@ S.shSel=false;S.shPicked=new Set();
 $("shSelBtn").onclick=()=>{S.shSel=!S.shSel;S.shPicked.clear();if(S.shSel&&S.edit){S.edit=false;$("editBtn").setAttribute("aria-pressed",false);$("editBtn").textContent="編輯"}renderShiki()};
 $("shSelOff").onclick=()=>{S.shSel=false;S.shPicked.clear();renderShiki()};
 $("shSelAll").onclick=()=>{document.querySelectorAll("#groups .tile[data-id]").forEach(t=>S.shPicked.add(t.dataset.id));renderShiki()};
-$("shSelEdit").onclick=()=>{if(!S.shPicked.size)return toast("未揀任何式神");$("sbRar").innerHTML=`<option value="">（不改）</option>`+RAR.map(r=>`<option>${r}</option>`).join("");$("sbMax").value="";$("sbWork").value="";$("sbShrine").value="";$("sbCn").value="";$("sbTitle").textContent=`統一修改 ${S.shPicked.size} 隻式神`;$("sbScrim").hidden=false};
+$("shSelEdit").onclick=()=>{if(!S.shPicked.size)return toast("未選任何式神");$("sbRar").innerHTML=`<option value="">（不改）</option>`+RAR.map(r=>`<option>${r}</option>`).join("");$("sbMax").value="";$("sbWork").value="";$("sbShrine").value="";$("sbCn").value="";$("sbTitle").textContent=`統一修改 ${S.shPicked.size} 隻式神`;$("sbScrim").hidden=false};
 $("sbCancel").onclick=()=>{$("sbScrim").hidden=true};
-$("shSelDel").onclick=()=>{if(!S.shPicked.size)return toast("未揀任何式神");const L=S.shiki.filter(x=>S.shPicked.has(x.id));$("sdTitle").textContent=`⚠️ 確定刪除 ${L.length} 隻式神？`;$("sdList").innerHTML=L.map(x=>`<span class="pill">${esc(x.name)}</span>`).join("");$("sdScrim").hidden=false};
+$("shSelDel").onclick=()=>{if(!S.shPicked.size)return toast("未選任何式神");const L=S.shiki.filter(x=>S.shPicked.has(x.id));$("sdTitle").textContent=`⚠️ 確定刪除 ${L.length} 隻式神？`;$("sdList").innerHTML=L.map(x=>`<span class="pill">${esc(x.name)}</span>`).join("");$("sdScrim").hidden=false};
 $("sdCancel").onclick=()=>{$("sdScrim").hidden=true};
 $("sdGo").onclick=async()=>{
   if(!S.db||S.owner!==true){toast("只有擁有者可以改");return}
@@ -1144,7 +1144,7 @@ function renderEggs(){
    $("eggFed").innerHTML=`這個帳號已餵 <b>${me.f}</b> 顆`;
    const T=st.reduce((t,x)=>({o:t.o+x.o,f:t.f+x.f}),{o:0,f:0});
    $("acctSum").innerHTML=`<table><thead><tr><th>帳號</th><th>尚欠</th><th>已餵</th></tr></thead><tbody>${st.map(x=>`<tr class="${x.a.k===k?"cur":""}"><td>${esc(DN(x.a,true))}</td><td>${x.o}</td><td>${x.f}</td></tr>`).join("")}<tr class="tot"><td>所有帳號合計</td><td>${T.o}</td><td>${T.f}</td></tr></tbody></table>`;}
-  $("eggGroups").innerHTML=html||`<div class="empty">${S.shiki.length?"全部技能都滿了！黑蛋自由啦 (๑˃ᴗ˂)ﻭ":"還沒有式神資料"}</div>`;
+  $("eggGroups").innerHTML=html||`<div class="empty">${S.shiki.length?"全部技能都滿了！黑蛋自由吧 (๑˃ᴗ˂)ﻭ":"還沒有式神資料"}</div>`;
   document.querySelectorAll(".cur").forEach(inp=>{
     inp.onchange=()=>saveCur(inp);
     inp.onkeydown=e=>{if(e.key==="Enter")inp.blur()};
@@ -1342,7 +1342,7 @@ addEventListener("resize",()=>{if(!$("gScrim").hidden)gApplyZoom()});
   const pt=e=>{const r=cv.getBoundingClientRect(),sc=cv.width/r.width;return{x:(e.clientX-r.left)*sc,y:(e.clientY-r.top)*sc,sc}};
   wr.addEventListener("pointerdown",e=>{
     const img=G.imgs[G.idx];if(!img)return;
-    if(G.mode!=="box"){if(!G.panHint){G.panHint=true;toast("想郁個框？先撳上面「🔲 移動框」")}return}
+    if(G.mode!=="box"){if(!G.panHint){G.panHint=true;toast("想動個框？先按上面「🔲 移動框」")}return}
     const p=pt(e),B=gBox(img);
     const hr=Math.max(34*p.sc,B.w*.12);const nearBR=Math.hypot(p.x-(B.x+B.w),p.y-(B.y+B.h))<hr;
     G.drag={m:nearBR?"size":"move",x0:p.x,y0:p.y,a:{...B}};
@@ -1471,7 +1471,7 @@ function renderIO(){
     ?(S.dirty?'<span class="dirty">有未匯出的變更</span>':"")
     :g
     ?`${S.previewing?'<span class="pvtag">預覽中・只有你看得到</span><br>':""}<b>訪客模式</b>：你的點亮和技能紀錄只存在這次打開的頁面，關掉就會清空。離開前按「匯出」存檔，下次按「匯入紀錄」選回同一個檔案就能接續。${S.dirty?'<span class="dirty">有未匯出的變更</span>':""}`
-    :S.isGH?`<b>擁有者模式（GitHub）</b>：改動會自動存去你的倉庫，約一分鐘後朋友那邊就會更新。匯出可以當備份。<br><span class="ghsync" style="font-weight:900">${ghSyncText()}</span>`
+    :S.isGH?`<b>擁有者模式（GitHub）</b>：改動會自動存去你的儲存庫，約一分鐘後朋友那邊就會更新。匯出可以當備份。<br><span class="ghsync" style="font-weight:900">${ghSyncText()}</span>`
     :`<b>擁有者模式</b>：你的紀錄自動存在雲端。匯出可以當備份；「我的免登入版」帶著你的紀錄，在外面改完匯出 MD，回來按「匯入改動」就能合併回雲端。`;
   const own=S.owner===true;$("editBtn").hidden=!own;$("shSelBtn").hidden=!own;if(!own){S.shSel=false;S.shPicked.clear()}$("addShiki").hidden=!own;$("ownerHint").hidden=!own;if(!own){$("bulkLbl").hidden=true;$("pendBar").hidden=true;S.edit=false}else{$("bulkLbl").hidden=!S.assets;if(typeof renderPending==="function"&&S.pending)renderPending()}
 }
@@ -1688,8 +1688,8 @@ const RES=[
 {id:"m13",c:"m",n:"提交繪卷道具",g:"若干"},
 {id:"o1",c:"o",n:"成就系統",g:"大量",e:"黑蛋／黑碎若干"},
 {id:"o2",c:"o",n:"秘聞副本",x:"首次通關第 9 層有黑蛋，可借式神",g:"大量",e:"34 個黑蛋"},
-{id:"o3",c:"o",n:"平安百物語",x:"入口：點擊庭院大樹",g:"450"},
-{id:"o4",c:"o",n:"八岐大蛇追憶繪卷",x:"入口：點擊庭院大樹",g:"120"},
+{id:"o3",c:"o",n:"平安百物語",x:"入口：點選庭院大樹",g:"450"},
+{id:"o4",c:"o",n:"八岐大蛇追憶繪卷",x:"入口：點選庭院大樹",g:"120"},
 {id:"o5",c:"o",n:"地域收集（圖鑑）",x:"式神詳情查看右邊",g:"若干",e:"14 個黑蛋"},
 {id:"o6",c:"o",n:"六道之門",x:"達成特評分／通關評分【優】",g:"每個 100",e:"90 個黑碎"},
 {id:"o7",c:"o",n:"召回親友",x:"僅限前 2 次",g:"每次 500",k:2},
@@ -1740,7 +1740,7 @@ const RPER={d:"每日",w:"每週",m:"每月",h:"半個月",b:"每 2 個月",o:"�
 const rPer=it=>it.p||(it.c==="r"?"d":it.c);
 const rMax=it=>it.k||1;
 const rHour=()=>{const h=parseInt(pref("rHour"),10);return h>=0&&h<=6?h:0};
-/* 用 GMT+8（UTC+8）計週期，唔理部機設咗咩時區 */
+/* 用 GMT+8（UTC+8）計週期，不管部機設了什麼時區 */
 function rKey(p,now){
   if(p==="o")return "o";
   const t=new Date((now??Date.now())+(8-rHour())*36e5);const y=t.getUTCFullYear(),mo=t.getUTCMonth(),d=t.getUTCDate();
@@ -1751,7 +1751,7 @@ function rKey(p,now){
   if(p==="b")return `b${y}-${Math.floor(mo/2)}`;
   return "o";
 }
-/* 自訂重置時間（HK +8，例如 05:59、17:59）：以最近已過嘅重置點為週期 */
+/* 自訂重置時間（GMT+8，例如 05:59、17:59）：以最近已過的重置點為週期 */
 function tKey(ts,now){
   const n=now??Date.now(),HK=8*36e5,DAY=864e5,dd=Math.floor((n+HK)/DAY);let best=null;
   for(const di of[dd-1,dd])for(const z of ts){const[h,m]=z.split(":").map(Number);const b=di*DAY+h*36e5+m*6e4-HK;if(b<=n&&(best===null||b>best))best=b}
@@ -1764,7 +1764,7 @@ function rNext(p){
   return b===null?null:b-off;
 }
 function rLeft(ms){const m=Math.max(1,Math.ceil(ms/6e4)),D=Math.floor(m/1440),H=Math.floor(m%1440/60),M=m%60;return D?`${D} 天 ${H} 小時`:H?`${H} 小時 ${M} 分`:`${M} 分鐘`}
-/* 清單：檢查格式（壞嘅項目略過），改寫時換晒 RES 同 RESM */
+/* 清單：檢查格式（壞的項目略過），改寫時全部換掉 RES 同 RESM */
 function cleanRes(list){
   if(!Array.isArray(list))return null;const out=[],seen=new Set();
   for(const it of list){
@@ -1783,16 +1783,16 @@ S.rHide=pref("rHide")==="1";S.rArm=false;S.rEdit=false;S.rDelArm=null;S.rfEdit=n
 let rDelT=0;
 function rGet(it,acct){const e=(S.res[acct??S.srv]||{})[it.id];if(!Array.isArray(e))return 0;return e[0]===rKeyOf(it)?Math.min(+e[1]||0,rMax(it)):0}
 function rPut(it,c){const a=S.srv;const m=S.res[a]=S.res[a]||{};if(c>0)m[it.id]=[rKeyOf(it),c];else delete m[it.id];if(!Object.keys(m).length)delete S.res[a]}
-/* 只保留仲有效嘅勾選（過咗期或者項目已刪除嘅自動清走），檔案唔會越嚟越大 */
+/* 只保留仲有效的勾選（過了期或者項目已刪除的自動清走），檔案不會越來越大 */
 function rPrune(r,A){const ok=new Set((A||ACC()).map(a=>a.k)),out={};
   for(const[a,m]of Object.entries(r||{})){if(!ok.has(a)||!m||typeof m!=="object")continue;
     for(const[id,e]of Object.entries(m)){if(!Array.isArray(e)||!(+e[1]>0))continue;const it=RESM[id];if(!it)continue;if(e[0]!==rKeyOf(it))continue;(out[a]=out[a]||{})[id]=[String(e[0]),+e[1]]}}
   return out}
 function rSave(){if(S.isGH&&S.owner===true&&GH.store)ghQueue();else pref("res_v1",JSON.stringify(rPrune(S.res)))}
-/* 清單改動（擁有者）：存去公開倉庫 data/resources.json */
-/* artifact 擁有者：清單改動存喺呢部機嘅 localStorage（artifact 只有擁有者睇得到） */
+/* 清單改動（擁有者）：存去公開儲存庫 data/resources.json */
+/* artifact 擁有者：清單改動存在這台裝置的 localStorage（artifact 只有擁有者看得到） */
 function saveRes(){if(S.isGH&&S.owner===true&&GH.store)ghQueue();else if(!S.isGH&&S.owner===true)pref("res_list_v1",JSON.stringify(RES))}
-/* 擁有者功能可見（GitHub 擁有者，或者 artifact 嘅擁有者） */
+/* 擁有者功能可見（GitHub 擁有者，或者 artifact 的擁有者） */
 const ROWN=()=>S.owner===true;
 const rDone=it=>rGet(it)>=rMax(it);
 const rItems=c=>RES.filter(it=>(c==="a"||it.c===c)&&(S.rT==="all"||(S.rT==="g"?it.g:it.e)));
@@ -1817,7 +1817,7 @@ function renderRes(){
   const lbl={a:"全部分類完成",d:"今日完成",w:"本週完成",m:"本月完成",o:"一次性完成",r:"機率項目已做",x:"不定期完成"}[c];
   const TY={all:"全部獲取",g:"勾玉獲取",e:"黑蛋・黑碎獲取"}[S.rT];
   const nx=rNext(c);const hh=String(rHour()).padStart(2,"0")+":00";
-  const when=c==="a"?"每項按自己嘅週期各自重置，一齊睇晒所有分類。":c==="o"?"一次性項目不會重置，完成就一直保留。":c==="x"?"不定期項目按各自標籤的週期重置，時間以遊戲為準。":c==="r"?`每項按自己的週期重置（每日／每週／每月，${hh}）。`:`⏰ 距離重置還有 <b>${rLeft(nx-Date.now())}</b>（${c==="d"?"每日":c==="w"?"每週一":"每月 1 號"} ${hh}）`;
+  const when=c==="a"?"每項按自己的週期各自重置，一起看全部分類。":c==="o"?"一次性項目不會重置，完成就一直保留。":c==="x"?"不定期項目按各自標籤的週期重置，時間以遊戲為準。":c==="r"?`每項按自己的週期重置（每日／每週／每月，${hh}）。`:`⏰ 距離重置還有 <b>${rLeft(nx-Date.now())}</b>（${c==="d"?"每日":c==="w"?"每週一":"每月 1 號"} ${hh}）`;
   const where=own?"☁️ 勾選同清單改動會自動同步到 GitHub":"📱 勾選只存在這部裝置的瀏覽器";
   $("rSum").innerHTML=`<div class="lbl">${esc(ANAME(S.srv))}・${lbl}・${TY}</div><div class="progress"><div class="count">${dn}<small> / ${L.length}</small></div><div class="bar"><i style="width:${pct}%"></i></div></div>${L.length&&dn===L.length?`<div class="rall">全部完成 ✧ 辛苦了！</div>`:""}<div class="meta"><span>${when}</span><span>${where}</span></div>`;
   const vis=S.rHide?L.filter(it=>!rDone(it)):L;
@@ -1860,7 +1860,7 @@ $("rAddBtn").onclick=()=>rfOpen(null);
 $("rBatchAdd").onclick=()=>bxOpen("批量新增資源項目","每行一項：分類 | 名稱 | 勾玉 | 黑蛋黑碎 | 備註 | 次數。分類可寫 每日／每週／每月／一次性／機率／不定期；勾玉、黑蛋、備註、次數可留空或寫 -。","例：\n每日 | 測試項目 | 20 | 1個黑蛋 | | \n不定期 | 情報屋 | 若干 | | 以遊戲為準 | 1",rParse,async items=>{if(!ROWN()){toast("只有擁有者可以改");return}setRes(RES.concat(items));saveRes();renderRes();toast(`已新增 ${items.length} 項 ✧`)});
 $("rSelOn").onclick=()=>{S.rSel=!S.rSel;S.rPicked.clear();renderRes()};
 $("rSelOff").onclick=()=>{S.rSel=false;S.rPicked.clear();renderRes()};
-$("rSelDel").onclick=function(){if(!S.rPicked.size)return toast("未揀任何項目");twoTap(this,()=>{const ids=new Set(S.rPicked);setRes(RES.filter(v=>!ids.has(v.id)));S.rPicked.clear();S.rSel=false;saveRes();renderRes();toast(`已刪除 ${ids.size} 項`)})};
+$("rSelDel").onclick=function(){if(!S.rPicked.size)return toast("未選任何項目");twoTap(this,()=>{const ids=new Set(S.rPicked);setRes(RES.filter(v=>!ids.has(v.id)));S.rPicked.clear();S.rSel=false;saveRes();renderRes();toast(`已刪除 ${ids.size} 項`)})};
 function rfSyncPer(){$("rfPerL").hidden=!["r","x"].includes($("rfCat").value)}
 $("rfCat").onchange=rfSyncPer;
 function rfOpen(it){
@@ -1886,11 +1886,11 @@ $("rfSave").onclick=()=>{
   if(x)it.x=x;if(g)it.g=g;if(e)it.e=e;if(k>1)it.k=k;
   const tr=$("rfT").value.trim();
   if(tr){const ts=[...new Set(tr.split(/[,，、\s]+/).filter(Boolean).map(x=>{const m=x.match(/^(\d{1,2}):(\d{2})$/);return m&&+m[1]<24&&+m[2]<60?String(+m[1]).padStart(2,"0")+":"+m[2]:null}))];
-    if(ts.includes(null)){toast("時間格式唔啱，例如 05:59, 17:59");return}it.t=ts.sort()}
+    if(ts.includes(null)){toast("時間格式不對，例如 05:59, 17:59");return}it.t=ts.sort()}
   const L=RES.slice(),i=L.findIndex(v=>v.id===it.id);if(i>=0)L[i]=it;else L.push(it);
   setRes(L);S.rfEdit=null;$("rScrim").hidden=true;S.rCat=c;pref("rCat",c);saveRes();renderRes();toast(`已儲存「${n}」✧`);
 };
-/* 擁有者：長按一項 → 放開＝修改（表格入面可以改分類，即係移去另一個清單）；長按後拖曳＝同一清單內換位置 */
+/* 擁有者：長按一項 → 放開＝修改（表格入面可以改分類，即是移去另一個清單）；長按後拖曳＝同一清單內換位置 */
 const RD={id:null,timer:0,lifted:false,moved:false,x0:0,y0:0,last:null,overCat:null,suppressClick:false};
 function rPressStart(li,x,y){
   if(!ROWN()||!li||RD.id)return;
@@ -1958,12 +1958,12 @@ $("themeFab").onclick=()=>{const i=THEMES.findIndex(x=>x[0]===THEME);THEME=THEME
 
 renderShiki();renderEggs();renderRes();
 
-/* GitHub 版：名單＋頭像存在公開倉庫（data/shiki.json、img/），個人紀錄存在私人倉庫（records.json）；通行證只存在這部裝置 */
+/* GitHub 版：名單＋頭像存在公開儲存庫（data/shiki.json、img/），個人紀錄存在私人儲存庫（records.json）；存取權杖只存在這部裝置 */
 const GH={tok:null,sha:{},q:Promise.resolve(),timer:null,busy:0,lastPub:"",lastPriv:"",store:null};
 const PUBK=["name","rarity","max","order","img","cn","work","shrine","shop"];
 function b64enc(str){const b=new TextEncoder().encode(str);let s="";for(let i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(s)}
 function b64dec(b64){const bin=atob(String(b64||"").replace(/\s/g,""));const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new TextDecoder().decode(u)}
-function ghSyncText(){if(GH.busy)return"☁️ 同步中…";if(GH.timer)return"☁️ 有改動，一陣自動同步…";if(GH.fail)return"⚠️ 同步失敗，15 秒後自動重試";const at=GH.lastAt||pref("ghLastAt");return at?"☁️ 已自動同步到 GitHub ✓・上次 "+at:"☁️ 已連接 GitHub，改動會自動同步"}
+function ghSyncText(){if(GH.busy)return"☁️ 同步中…";if(GH.timer)return"☁️ 有改動，稍後自動同步…";if(GH.fail)return"⚠️ 同步失敗，15 秒後自動重試";const at=GH.lastAt||pref("ghLastAt");return at?"☁️ 已自動同步到 GitHub ✓・上次 "+at:"☁️ 已連接 GitHub，改動會自動同步"}
 function ghStatus(t){if(!S.isGH)return;$("staticTag").textContent=" ・GitHub 版"+(S.owner===true?"（擁有者）":"")+(t?"・"+t:"");if(S.owner===true)document.querySelectorAll(".ghsync").forEach(e=>{e.textContent=ghSyncText();e.hidden=false})}
 async function ghApi(method,path,body,allow404){
   const r=await fetch("https://api.github.com"+path,{method,cache:"no-store",headers:{"Authorization":"Bearer "+GH.tok,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});
@@ -1981,7 +1981,7 @@ async function ghPut(repo,p,b64,msg){
   if(j&&j.content&&j.content.sha)GH.sha[key]=j.content.sha;return j;
 }
 async function ghDel(repo,p,msg){const key=repo+"/"+p;if(!GH.sha[key]&&!(await ghGet(repo,p)))return;await ghApi("DELETE",ghPath(repo,p),{message:msg,sha:GH.sha[key],branch:GH_CFG.branch},true);delete GH.sha[key]}
-/* 跟 claude 儲存同一套用法的小倉庫：doc().update/set/delete、collection().add/onSnapshot */
+/* 跟 claude 儲存同一套用法的小儲存庫：doc().update/set/delete、collection().add/onSnapshot */
 function ghStore(){
   const M=new Map(),CM=new Map(),subs=[],csubs=[];
   const snap=m=>({docs:[...m.values()].map(o=>({id:o.id,data:()=>{const c={...o};delete c.id;return c}}))});
@@ -2035,21 +2035,21 @@ async function ghFlush(){
     if(pk.resStr!==GH.lastRes){await ghPut(GH.PUB,"data/resources.json",b64enc(pk.resFile()),"更新資源清單");GH.lastRes=pk.resStr}
     if(pk.calStr!==GH.lastCal){await ghPut(GH.PUB,"data/calendar.json",b64enc(pk.calFile()),"更新行事月曆");GH.lastCal=pk.calStr}
     GH.busy--;GH.fail=false;const d=new Date();GH.lastAt=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");pref("ghLastAt",GH.lastAt);ghStatus(GH.timer?"未同步…":"已同步 ✓");if(!GH.timer)toast("☁️ 已幫你自動同步到 GitHub ✓");
-  }catch(e){GH.busy--;GH.fail=true;ghStatus("同步失敗，稍後自動重試");toast("同步失敗："+(e.code==="github_401"?"通行證過期或錯誤":e.code==="github_403"||e.code==="github_404"?"通行證沒有寫入權限":(e.code||e.message||"網絡問題")));setTimeout(ghQueue,15000)}
+  }catch(e){GH.busy--;GH.fail=true;ghStatus("同步失敗，稍後自動重試");toast("同步失敗："+(e.code==="github_401"?"存取權杖過期或錯誤":e.code==="github_403"||e.code==="github_404"?"存取權杖沒有寫入權限":(e.code||e.message||"網路問題")));setTimeout(ghQueue,15000)}
 }
 function ghFill(){$("ghPubIn").value=GH.PUB||"";$("ghPrivIn").value=GH.PRIV||"";$("ghTokIn").value="";$("ghTokIn").placeholder=GH.tok?"已儲存（想換先再貼）":"github_pat_…";$("ghLogin").textContent=GH.tok?"儲存並重新載入":"登入";$("ghLogout").hidden=!GH.tok;$("ghLogout").textContent="登出";GH.outArm=false}
 $("ghKey").onclick=()=>{const p=$("ghPanel");p.hidden=!p.hidden;if(!p.hidden){ghFill();p.scrollIntoView({block:"nearest",behavior:"smooth"})}};
 $("ghLogin").onclick=()=>{
   const rp=/^[^\/\s]+\/[^\/\s]+$/;const pub=$("ghPubIn").value.trim(),priv=$("ghPrivIn").value.trim(),t=$("ghTokIn").value.trim();
-  if(!rp.test(pub)||!rp.test(priv)){toast("倉庫要寫成「用戶名/倉庫名」喔");return}
-  if(!t&&!GH.tok){toast("記得貼上通行證");return}
-  if(t&&!/^(github_pat_|ghp_)/.test(t)){toast("看起來不是通行證喔，再檢查一下");return}
+  if(!rp.test(pub)||!rp.test(priv)){toast("儲存庫要寫成「使用者名稱/儲存庫名稱」喔");return}
+  if(!t&&!GH.tok){toast("記得貼上存取權杖");return}
+  if(t&&!/^(github_pat_|ghp_)/.test(t)){toast("看起來不是存取權杖喔，再檢查一下");return}
   if(GH.timer||GH.busy){toast("還在同步，等一下再試");return}
   pref("ghPub",pub);pref("ghPriv",priv);if(t)pref("ghTok",t);location.reload();
 };
 $("ghLogout").onclick=()=>{
   if(GH.timer||GH.busy){toast("還在同步，等一下再登出");return}
-  if(!GH.outArm){GH.outArm=true;$("ghLogout").textContent="再撳一次確認登出";return}
+  if(!GH.outArm){GH.outArm=true;$("ghLogout").textContent="再按一次確認登出";return}
   try{localStorage.removeItem("ghTok")}catch(e){}location.reload();
 };
 addEventListener("beforeunload",e=>{if(S.isGH&&(GH.timer||GH.busy)){e.preventDefault();e.returnValue=""}});
@@ -2090,7 +2090,7 @@ async function ghBoot(){
       return;
     }catch(e){
       if(e.code==="github_401"||e.code==="github_404"){try{localStorage.removeItem("ghTok")}catch(_){}GH.tok=null}
-      toast("通行證用不到："+(e.code==="github_401"?"錯誤或已過期":e.code==="github_404"?"找不到倉庫，或通行證沒有揀這兩個倉庫":(e.code||e.message||"網絡問題")));
+      toast("存取權杖用不到："+(e.code==="github_401"?"錯誤或已過期":e.code==="github_404"?"找不到儲存庫，或存取權杖沒有選這兩個儲存庫":(e.code||e.message||"網路問題")));
       $("ghPanel").hidden=false;ghFill();
     }
   }
@@ -2098,7 +2098,7 @@ async function ghBoot(){
   syncSrv();renderIO();renderShiki();renderEggs();renderRes();ghStatus(pub&&pub.built?"名單更新於 "+pub.built:"");
 }
 
-/* 行事月曆：Claude 版存 db 集合 cal；GitHub 版存公開倉庫 data/calendar.json；免登入版打包喺 STATIC_DB.cal。朋友只讀，擁有者可以改 */
+/* 行事月曆：Claude 版存 db 集合 cal；GitHub 版存公開儲存庫 data/calendar.json；免登入版打包在 STATIC_DB.cal。朋友只讀，擁有者可以改 */
 const CAL={y:0,m:0,ev:[],sel:null,eid:null,showEnded:false,view:"month",wk:"",selMode:false,picked:new Set(),open:{ing:true,soon:true,perm:true,end:false}};
 const WKS=["日","一","二","三","四","五","六"];
 const hkToday=()=>new Date(Date.now()+8*3600e3).toISOString().slice(0,10);
@@ -2128,7 +2128,7 @@ const autoDate=el=>{el.addEventListener("input",()=>{const v=el.value;if(!/^[\d-
 const BX={parse:null,apply:null,last:null};
 function twoTap(btn,fn){if(btn.dataset.arm){clearTimeout(+btn.dataset.arm);btn.removeAttribute("data-arm");btn.textContent=btn.dataset.lbl||btn.textContent;fn();return}btn.dataset.lbl=btn.textContent;btn.dataset.arm=String(setTimeout(()=>{btn.removeAttribute("data-arm");btn.textContent=btn.dataset.lbl},3000));btn.textContent="確定？"}
 function bxOpen(title,hint,ph,parse,apply){BX.parse=parse;BX.apply=apply;$("bxTitle").textContent=title;$("bxHint").textContent=hint;$("bxText").value="";$("bxText").placeholder=ph;$("bxGo").disabled=false;bxPreview();$("bxScrim").hidden=false}
-function bxPreview(){const r=BX.parse($("bxText").value);BX.last=r;$("bxPrev").textContent=r.items.length?`✓ 認到 ${r.items.length} 項`+(r.errs.length?`；第 ${r.errs.slice(0,8).join("、")} 行睇唔明，會略過`:""):(r.errs.length?`睇唔明：第 ${r.errs.slice(0,8).join("、")} 行`:"未有內容");$("bxGo").disabled=!r.items.length}
+function bxPreview(){const r=BX.parse($("bxText").value);BX.last=r;$("bxPrev").textContent=r.items.length?`✓ 認到 ${r.items.length} 項`+(r.errs.length?`；第 ${r.errs.slice(0,8).join("、")} 行看不明，會略過`:""):(r.errs.length?`看不明：第 ${r.errs.slice(0,8).join("、")} 行`:"未有內容");$("bxGo").disabled=!r.items.length}
 function calParse(text){const items=[],errs=[];text.split("\n").forEach((ln,i)=>{const t=ln.trim();if(!t)return;const p=t.split(/[|｜\t]/).map(x=>x.trim());const date=dParse(p[0]);const perm=/^永久/.test(p[1]||"");const endRaw=!perm&&p[1]&&p[1]!=="-"?p[1]:"";const end=endRaw?dParse(endRaw):null;const title=p[2]||"";if(!date||!title||(endRaw&&!end)||(end&&end<date)){errs.push(i+1);return}const tr=p[3]&&p[3]!=="-"?p[3]:"";const er=p[4]&&p[4]!=="-"?p[4]:"";const nt=p[5]&&p[5]!=="-"?p[5]:"";items.push({date,end,title,time:tParse(tr)||tr||null,endTime:perm?null:(tParse(er)||er||null),note:nt||null,perm})});return{items,errs}}
 const RCODE={"每日":"d","每週":"w","每月":"m","一次性":"o","機率":"r","不定期":"x",d:"d",w:"w",m:"m",o:"o",r:"r",x:"x"};
 function rParse(text){const items=[],errs=[];text.split("\n").forEach((ln,i)=>{const t=ln.trim();if(!t)return;const p=t.split(/[|｜\t]/).map(x=>x.trim());const c=RCODE[p[0]];const n=p[1];if(!c||!n){errs.push(i+1);return}const it={id:"u"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)+i,c,n};if(c==="r")it.p="d";if(c==="x")it.p="w";const g=p[2]&&p[2]!=="-"?p[2]:"",e=p[3]&&p[3]!=="-"?p[3]:"",x=p[4]&&p[4]!=="-"?p[4]:"",k=Math.max(1,Math.min(30,+p[5]||1));if(g)it.g=g;if(e)it.e=e;if(x)it.x=x;if(k>1)it.k=k;items.push(it)});return{items,errs}}
@@ -2144,7 +2144,7 @@ const startMs=e=>{const t=tParse(e.time);return t?new Date(`${e.date}T${t}:00+08
 const cdMs=d=>{const dd=Math.floor(d/864e5),hh=Math.floor(d%864e5/36e5),mm=Math.floor(d%36e5/6e4);return `${dd?dd+" 日 ":""}${hh} 時 ${mm} 分`};
 const cdLbl=e=>kindOf(e)==="m"?"距離維護還有":"距離結束還有";
 const urgent=e=>{const d=endMs(e)-Date.now();return d>=0&&d<864e5};
-const cdLine=e=>(kindOf(e)==="m"&&startMs(e)!=null&&!isEnded(e))?(startMs(e)>Date.now()?`距離維護還有 <b class="${startMs(e)-Date.now()<864e5?"urg":""}">${cdMs(startMs(e)-Date.now())}</b>`:`🛠 維護中，距離完成還有 <b class="urg">${cdText(e)}</b>`):e.perm?(e.date>hkToday()?`距離上線還有 <b>${cdText({date:e.date,endTime:e.time&&/^\d{2}:\d{2}$/.test(e.time)?e.time:"00:00"})}</b>`:`<b>✨ 永久上線，唔會結束</b>`):hasEnd(e)?`${cdLbl(e)} <b class="${urgent(e)?"urg":""}">${cdText(e)}</b>`:`<b>未設定結束日期</b>`;
+const cdLine=e=>(kindOf(e)==="m"&&startMs(e)!=null&&!isEnded(e))?(startMs(e)>Date.now()?`距離維護還有 <b class="${startMs(e)-Date.now()<864e5?"urg":""}">${cdMs(startMs(e)-Date.now())}</b>`:`🛠 維護中，距離完成還有 <b class="urg">${cdText(e)}</b>`):e.perm?(e.date>hkToday()?`距離上線還有 <b>${cdText({date:e.date,endTime:e.time&&/^\d{2}:\d{2}$/.test(e.time)?e.time:"00:00"})}</b>`:`<b>✨ 永久上線，不會結束</b>`):hasEnd(e)?`${cdLbl(e)} <b class="${urgent(e)?"urg":""}">${cdText(e)}</b>`:`<b>未設定結束日期</b>`;
 const calSort=(a,b)=>(a.date+(a.time||"~")).localeCompare(b.date+(b.time||"~"));
 const isEnded=e=>hasEnd(e)&&endMs(e)<Date.now();
 const statusOf=e=>{const t=hkToday();if(e.date>t)return "soon";if(e.perm)return e.date===t?"ing":"perm";return isEnded(e)?"end":"ing"};
@@ -2167,7 +2167,7 @@ function renderCalTop(){
     $("calCd1").innerHTML=`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span>${tt}${hrs?`（預計 ${hrs} 小時）`:""}</span><span class="cdtxt cdn">${cd}</span><span class="cdtxt cdnote">（請以官方公佈時間為準）</span>`;
   }else $("calCd1").innerHTML="🔧 暫時未有維護安排";
   const ne=CAL.ev.filter(e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now).sort((a,b)=>endMs(a)-endMs(b))[0];
-  $("calCd2").innerHTML=ne?`<span class="cdlbl">⏳ 即將結束</span><span class="cdtxt">${esc(ne.title)} : <b class="${urgent(ne)?"urg":""}">${cdText(ne)}</b></span>`:"⏳ 暫時冇進行中嘅限時活動";
+  $("calCd2").innerHTML=ne?`<span class="cdlbl">⏳ 即將結束</span><span class="cdtxt">${esc(ne.title)} : <b class="${urgent(ne)?"urg":""}">${cdText(ne)}</b></span>`:"⏳ 暫時沒有進行中的限時活動";
 }
 function renderCal(){
   if(!$("pane-cal"))return;
@@ -2217,7 +2217,7 @@ function renderCal(){
   const G={ing:[],soon:[],perm:[],end:[]};
   for(const e of L)G[statusOf(e)].push(e);
   const SEC=[["ing","🟢 進行中"],["soon","🔜 準備上線"],["perm","✨ 永久上線"],["end","⚫ 已結束"]];
-  $("calList").innerHTML=SEC.map(([k,t])=>`<details class="csec" data-k="${k}"${CAL.open[k]?" open":""}><summary>${t}<span class="cnt">${G[k].length}</span></summary>${G[k].length?G[k].map(bannerHTML).join(""):`<div class="empty" style="padding:10px 0">暫時冇</div>`}</details>`).join("");
+  $("calList").innerHTML=SEC.map(([k,t])=>`<details class="csec" data-k="${k}"${CAL.open[k]?" open":""}><summary>${t}<span class="cnt">${G[k].length}</span></summary>${G[k].length?G[k].map(bannerHTML).join(""):`<div class="empty" style="padding:10px 0">暫時沒有</div>`}</details>`).join("");
   $("calList").querySelectorAll(".csec").forEach(d=>d.ontoggle=()=>{CAL.open[d.dataset.k]=d.open});
   $("calList").querySelectorAll(".cbanner").forEach(b=>b.onclick=()=>calOpenDay(b.dataset.d));
   const own=S.owner===true;
@@ -2236,7 +2236,7 @@ function setView(v){
 function calNeedDb(){if(!S.db||S.owner!==true){toast("只有擁有者可以改");return false}return true}
 async function calDelMany(ids){if(!calNeedDb())return;let n=0;for(const id of ids){try{await S.db.doc("cal/"+id).delete();n++}catch(e){}}toast(`已刪除 ${n} 項`);CAL.picked.delete;ids.forEach(id=>CAL.picked.delete(id));if(!$("calDay").hidden)calRenderDay()}
 async function calBatchApply(items){if(!calNeedDb())return;let n=0;for(const b of items){try{await S.db.collection("cal").add({date:b.date,title:b.title,time:b.time,note:b.note,end:b.end,endTime:b.endTime,perm:!!b.perm});n++}catch(e){}}toast(`已新增 ${n} 項 ✧`)}
-async function calBatchEdit(){if(!calNeedDb())return;const ed=$("calbEnd").value.trim(),et=$("calbEndT").value.trim();const body={};if(ed){const d=dParse(ed);if(!d){toast("結束日期睇唔明，試下 1020 或 10/20");return}body.end=d}if(et){body.endTime=tParse(et)||et}if(!Object.keys(body).length){toast("未填任何改動");return}let n=0;for(const id of [...CAL.picked]){try{await S.db.doc("cal/"+id).update(body);n++}catch(e){}}$("calBE").hidden=true;toast(`已修改 ${n} 項 ✧`);CAL.picked.clear();CAL.selMode=false;renderCal()}
+async function calBatchEdit(){if(!calNeedDb())return;const ed=$("calbEnd").value.trim(),et=$("calbEndT").value.trim();const body={};if(ed){const d=dParse(ed);if(!d){toast("結束日期看不明，試下 1020 或 10/20");return}body.end=d}if(et){body.endTime=tParse(et)||et}if(!Object.keys(body).length){toast("未填任何改動");return}let n=0;for(const id of [...CAL.picked]){try{await S.db.doc("cal/"+id).update(body);n++}catch(e){}}$("calBE").hidden=true;toast(`已修改 ${n} 項 ✧`);CAL.picked.clear();CAL.selMode=false;renderCal()}
 function renderWeek(){
   if(!$("calWeek"))return;
   const start=CAL.wk,days=[0,1,2,3,4,5,6].map(i=>addDays(start,i)),end=days[6],today=hkToday();
@@ -2273,7 +2273,7 @@ function calRenderDay(){
   const d=CAL.sel,own=S.owner===true;
   $("calDayTitle").textContent=`${+d.slice(5,7)} 月 ${+d.slice(8)} 日（星期${WKS[new Date(d+"T00:00:00Z").getUTCDay()]}）`;
   const L=evOn(d);
-  $("calDayList").innerHTML=L.length?L.map(e=>{const k=kindOf(e);return `<div class="calitem k-${k}" style="--kc:${evColor(e)}"><div class="calt" style="flex:1"><b><span class="ktag">${KLBL[k]}</span>${e.time?esc(tDisp(e.time))+" ":""}${esc(e.title)}</b><small>${rangeOf(e)}${e.note?" · "+esc(e.note):""}</small><small class="ccd">${cdLine(e)}</small></div>${own?`<button class="btn ghost" type="button" data-ce="${esc(e.id)}">改</button>`:""}</div>`}).join(""):`<div class="empty" style="padding:12px 0">呢日暫時冇活動</div>`;
+  $("calDayList").innerHTML=L.length?L.map(e=>{const k=kindOf(e);return `<div class="calitem k-${k}" style="--kc:${evColor(e)}"><div class="calt" style="flex:1"><b><span class="ktag">${KLBL[k]}</span>${e.time?esc(tDisp(e.time))+" ":""}${esc(e.title)}</b><small>${rangeOf(e)}${e.note?" · "+esc(e.note):""}</small><small class="ccd">${cdLine(e)}</small></div>${own?`<button class="btn ghost" type="button" data-ce="${esc(e.id)}">改</button>`:""}</div>`}).join(""):`<div class="empty" style="padding:12px 0">這天暫時沒有活動</div>`;
   $("calDayList").querySelectorAll("[data-ce]").forEach(b=>b.onclick=()=>calEdit(b.dataset.ce));
   $("calDayAdd").hidden=!own;
 }
@@ -2286,10 +2286,10 @@ async function calSave(){
   const date=dParse($("calfDate").value),endRaw=$("calfEnd").value.trim(),end=endRaw?dParse(endRaw):null;
   const title=$("calfTitle").value.trim(),trRaw=$("calfTime").value.trim(),erRaw=$("calfEndT").value.trim(),note=$("calfNote").value.trim();
   const time=tParse(trRaw)||trRaw||null,endT=tParse(erRaw)||erRaw||null;
-  if(!date){toast("日期睇唔明，試下 1012 或 10/12");return}
-  if(endRaw&&!end&&!$("calfPerm").checked){toast("結束日期睇唔明，試下 1020 或 10/20");return}
-  if(end&&end<date){toast("結束日期唔可以早過開始日期");return}
-  if(!title){toast("打個活動名先啦");return}
+  if(!date){toast("日期看不明，試下 1012 或 10/12");return}
+  if(endRaw&&!end&&!$("calfPerm").checked){toast("結束日期看不明，試下 1020 或 10/20");return}
+  if(end&&end<date){toast("結束日期不可以早過開始日期");return}
+  if(!title){toast("打個活動名先吧");return}
   const perm=$("calfPerm").checked;
   const body={date,title,time,note:note||null,end:perm?null:(end||null),endTime:perm?null:(endT||null),perm};
   try{
@@ -2313,11 +2313,11 @@ document.querySelectorAll("[data-df]").forEach(b=>b.onclick=()=>{pref("calDF",b.
 document.querySelectorAll("[data-tf]").forEach(b=>b.onclick=()=>{pref("calTF",b.dataset.tf);syncSet();renderCal();if(!$("calDay").hidden)calRenderDay()});
 function syncSet(){document.querySelectorAll("[data-df]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.df===dfmt())));document.querySelectorAll("[data-tf]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tf===tfmt())))}
 syncSet();
-$("calNewTop").onclick=calNew;$("calBatchAdd").onclick=()=>bxOpen("批量新增活動","每行一個：開始日期 | 結束日期 | 活動名 | 開始時間 | 結束時間 | 備註。結束日期寫「永久」就係永久上線；結束日期、時間、備註可以留空或寫 -；日期可寫 2026-10-14 或 1410（跟上面揀嘅格式）；時間可寫 19:00 或 下午7:00。","例：\n2026-10-14 | | 停服維護 | 07:30 | 09:30 |\n2026-10-07 | 2026-10-20 | 櫻覓星願 | 08:00 | 23:59 |\n2026-10-14 | 永久 | 新皮膚上架 | | |",calParse,calBatchApply);
+$("calNewTop").onclick=calNew;$("calBatchAdd").onclick=()=>bxOpen("批量新增活動","每行一個：開始日期 | 結束日期 | 活動名 | 開始時間 | 結束時間 | 備註。結束日期寫「永久」就是永久上線；結束日期、時間、備註可以留空或寫 -；日期可寫 2026-10-14 或 1410（跟上面選的格式）；時間可寫 19:00 或 下午7:00。","例：\n2026-10-14 | | 停服維護 | 07:30 | 09:30 |\n2026-10-07 | 2026-10-20 | 櫻覓星願 | 08:00 | 23:59 |\n2026-10-14 | 永久 | 新皮膚上架 | | |",calParse,calBatchApply);
 $("calSelOn").onclick=()=>{CAL.selMode=!CAL.selMode;CAL.picked.clear();renderCal()};
 $("calSelOff").onclick=()=>{CAL.selMode=false;CAL.picked.clear();renderCal()};
-$("calSelDel").onclick=function(){if(!CAL.picked.size)return toast("未揀任何活動");twoTap(this,()=>{calDelMany([...CAL.picked]);CAL.picked.clear();CAL.selMode=false;renderCal()})};
-$("calSelEnd").onclick=()=>{if(!CAL.picked.size)return toast("未揀任何活動");$("calbEnd").value="";$("calbEndT").value="";$("calBETitle").textContent=`統一修改 ${CAL.picked.size} 項活動`;$("calBE").hidden=false};
+$("calSelDel").onclick=function(){if(!CAL.picked.size)return toast("未選任何活動");twoTap(this,()=>{calDelMany([...CAL.picked]);CAL.picked.clear();CAL.selMode=false;renderCal()})};
+$("calSelEnd").onclick=()=>{if(!CAL.picked.size)return toast("未選任何活動");$("calbEnd").value="";$("calbEndT").value="";$("calBETitle").textContent=`統一修改 ${CAL.picked.size} 項活動`;$("calBE").hidden=false};
 $("calbCancel").onclick=()=>{$("calBE").hidden=true};
 $("calbGo").onclick=calBatchEdit;
 $("bxCancel").onclick=()=>{$("bxScrim").hidden=true};
@@ -2338,7 +2338,7 @@ setInterval(()=>{if(!$("pane-cal").hidden&&$("calScrim").hidden&&$("calDay").hid
   try{const L=JSON.parse(pref("res_list_v1")||"null");if(Array.isArray(L)){const RL=cleanRes(L);if(RL)setRes(RL)}}catch(e){}
   if(!window.claude||!claude.use){notice("這個頁面要在 claude.ai 裡打開才能儲存紀錄。");return}
   const db=await claude.use("db");
-  if(!db){notice("目前連不上儲存（可能未登入），紀錄暫時不會保存。");return}
+  if(!db){notice("目前連不上儲存（可能未登入），紀錄暫時不會儲存。");return}
   S.db=db;
   let own=false;try{const u=await claude.use("user");if(u)own=!!(await u.isOwner())}catch(_){}
   S.owner=own;renderIO();
