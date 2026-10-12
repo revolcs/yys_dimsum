@@ -1,4 +1,4 @@
-{"built":"2026/10/12 22:46","shiki":[
+{"built":"2026/10/12 22:49","shiki":[
 {"id":"col003","name":"阿香","rarity":"合作","max":"515","order":3,"img":"a35dd50ebda6bc5c7aac6099c44b478b","work":"鬼燈的冷徹"},
 {"id":"col004","name":"蜜桃&芥子","rarity":"合作","max":"515","order":4,"img":"8560184a96b6270c21f6688a38f4db34","work":"鬼燈的冷徹","shrine":true},
 {"id":"col010","name":"朽木露琪亞","rarity":"合作","max":"555","order":10,"img":"e035fc8a7bc6cefa4299006325f60f6e","work":"BLEACH 死神","shrine":true},
@@ -6,8 +6,8 @@
 {"id":"col012","name":"禰豆子","rarity":"合作","max":"555","order":14,"img":"6359d1c46a39efe40285027aa4abe388","cn":true,"work":"鬼滅之刃"},
 {"id":"col022","name":"夏目&貓咪老師","rarity":"合作","max":"555","order":17,"img":"3580fd387e0026ad8b6e2aef2c56d947","work":"夏目友人帳"},
 {"id":"col029","name":"雪兔&月","rarity":"合作","order":29,"cn":true,"work":"庫洛魔法使"},
-{"id":"coln001","name":"洛天依","rarity":"合作","max":"555","order":19,"img":"cdf85a9f6ea19573835fa9333d8104c4","work":"洛天依（Vsinger）"},
-{"id":"coln002","name":"言和","rarity":"合作","max":"555","order":18,"img":"52500bb8421dd39a98a9d461b0729a6c","work":"洛天依（Vsinger）"},
+{"id":"coln001","name":"洛天依","rarity":"合作","max":"555","order":18,"img":"cdf85a9f6ea19573835fa9333d8104c4","work":"洛天依（Vsinger）"},
+{"id":"coln002","name":"言和","rarity":"合作","max":"555","order":19,"img":"52500bb8421dd39a98a9d461b0729a6c","work":"洛天依（Vsinger）"},
 {"id":"coln004","name":"知世&小可","rarity":"合作","order":28,"cn":true,"work":"庫洛魔法使"},
 {"id":"coln005","name":"李小狼","rarity":"合作","max":"555","order":27,"img":"76af0fe824e1040bb38b2b687c066651","cn":true,"work":"庫洛魔法使"},
 {"id":"coln006","name":"木之本櫻","rarity":"合作","max":"555","order":20,"img":"8c39731662702a47686371e78a42be93","work":"庫洛魔法使"},
