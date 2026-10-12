@@ -419,6 +419,17 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .d1line{display:block;margin-top:4px;color:var(--ink-soft)!important;font-weight:700}
 .endnote{margin:4px 0 8px;font-size:.75rem}
 .tgrow input.tgkw{flex:1 1 100%;font-size:.8rem}
+.cband{flex-wrap:wrap;row-gap:4px}
+.cband > b{white-space:nowrap}
+.tchips{display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;min-width:0;flex:1 1 auto;margin-left:auto}
+.tchips i{white-space:nowrap}
+.tgpick .tgck input{width:16px;height:16px;min-height:0;padding:0;margin:0;flex:none;accent-color:var(--ink)}
+.tgck{white-space:nowrap}
+.cband i .tdot,.tgck .tdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:1px;border:1px solid #fff}
+.tgpick{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.tgck{display:inline-flex;align-items:center;gap:4px;font-size:.82rem;font-weight:700;border:2px solid var(--line);border-radius:99px;padding:4px 10px;background:var(--paper);cursor:pointer}
+.tgck .tdot{border-color:var(--ink)}
+.tgck:has(input:checked){border-color:var(--ink);background:var(--sheet)}
 .tglist{display:flex;flex-direction:column;gap:8px;max-height:44vh;overflow:auto;padding:2px}
 .tgrow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;background:var(--paper);border-radius:12px;padding:8px}
 .tgrow input{flex:1 1 130px;min-width:0}
@@ -582,8 +593,8 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
         <li>維護：日期數字的底色變成磚紅；活動結束：金色；一般活動：每個一色，月曆上的細線同下面列表的色條對得返。</li>
         <li>下面每個活動都有日期範圍（dd/mm - dd/mm）同距離結束的時間。</li>
         <li>按一個日子，會彈出當日的活動；只有擁有者可以新增、修改、刪除，朋友打開只是看。</li>
-        <li>一般活動可以選標籤（預設有<b>活動-期間限定</b>、<b>活動-特別加成</b>、<b>活動-課金相關</b>、<b>活動-召喚(抽卡)相關</b>）；擁有者按<b>🏷 管理標籤</b>可以自己增減、改名、換顏色。</li>
-        <li>沒有手動選標籤的活動會按<b>關鍵字自動分類</b>：標題有「額外加成」「機率 UP」→ 活動-特別加成；有「禮」→ 活動-課金相關；有「召喚」「抽卡」→ 活動-召喚(抽卡)相關。同時符合幾個時，以標籤清單較前面的為準。關鍵字可以在<b>🏷 管理標籤</b>修改。</li>
+        <li>一般活動可以選一個或多個標籤（預設有<b>活動-期間限定</b>、<b>活動-特別加成</b>、<b>活動-課金相關</b>、<b>活動-召喚(抽卡)相關</b>）；擁有者按<b>🏷 管理標籤</b>可以自己增減、改名、換顏色。</li>
+        <li>沒有手動選標籤的活動會按<b>關鍵字自動分類</b>：標題有「額外加成」「機率 UP」→ 活動-特別加成；有「禮」→ 活動-課金相關；有「召喚」「抽卡」→ 活動-召喚(抽卡)相關。同時符合幾個時，會全部標上。關鍵字可以在<b>🏷 管理標籤</b>修改。</li>
         <li>寫著「以首次登入起算／起計 N 天」的活動，可以按<b>🗓 改我的 Day 1</b>填自己第一天登入的日期，月曆和倒數會跟著你的日期走（只在活動期間內有效；每台裝置、擁有者和訪客各自記錄）。</li>
         <li><b>⚫ 已結束</b>預設只顯示最近 30 天內結束的活動，最下面可以按「顯示更早的已結束」。</li>
         <li>擁有者可以用<b>📥 批量新增</b>一次貼入多個活動；<b>☑ 批量選取</b>之後可以一次刪除或統一改結束時間。</li>
@@ -794,7 +805,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <label class="fld">結束時間<input id="calfEndT" type="text" maxlength="20" placeholder="預設 23:59"></label>
     </div>
     <label class="fld">備註<input id="calfNote" type="text" maxlength="120"></label>
-    <label class="fld">標籤（只用於一般活動）<select id="calfTag"></select></label>
+    <div class="fld">標籤（只用於一般活動，可多選；全部不勾＝自動分類）<div id="calfTags" class="tgpick"></div></div>
     <label class="check"><input id="calfPerm" type="checkbox"> ✨ 永久上線（只在上線日顯示一次，不用填結束）</label>
     <div id="calfConfirm" class="confirm" hidden>
       確定刪除這個活動？
@@ -866,7 +877,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <label class="fld">結束日期<input id="calbEnd" type="text" inputmode="numeric" placeholder="1020 或 10/20"></label>
       <label class="fld">結束時間<input id="calbEndT" type="text" placeholder="例如 23:59"></label>
     </div>
-    <label class="fld">標籤<select id="calbTag"></select></label>
+    <label class="fld">標籤（加入或移除，可以重複套用）<select id="calbTag"></select></label>
     <div class="row"><button class="btn ghost" id="calbCancel" type="button">取消</button><button class="btn" id="calbGo" type="button">套用</button></div>
   </div>
 </div>
@@ -2033,7 +2044,7 @@ function ghStore(){
     onSnapshot:f=>{if(c==="shiki"){subs.push(f);emit()}else if(c==="cal"){csubs.push(f);emitC()}return()=>{}}});
   return{M,CM,doc,collection};
 }
-const CALK=["date","end","endTime","title","time","note","perm","tag"];
+const CALK=["date","end","endTime","title","time","note","perm","tag","tags"];
 function calClean(list){if(!Array.isArray(list))return [];return list.filter(e=>e&&e.id&&/^\d{4}-\d{2}-\d{2}$/.test(e.date||"")&&e.title).map(e=>{const o={id:String(e.id)};CALK.forEach(k=>{if(e[k]!==undefined&&e[k]!==null&&e[k]!==false&&e[k]!=="")o[k]=e[k]});return o}).sort((a,b)=>(a.date+a.id).localeCompare(b.date+b.id))}
 const ghImgPath=id=>{const m=window.STATIC_IMG&&STATIC_IMG[id];return m&&m.startsWith("img/")?m:"img/"+(id.includes(".")?id:id+".png")};
 const ghAssets={
@@ -2147,8 +2158,14 @@ const CAL_PRESET=["#8c6d46","#5f7d3a","#2f6f6a","#c96a2b","#4a5a78","#7a6a3f","#
 const TAG0=[{k:"t1",name:"活動-期間限定",color:"#5f7d3a",kw:[]},{k:"t2",name:"活動-特別加成",color:"#2f6f6a",kw:["額外加成","機率UP"]},{k:"t3",name:"活動-課金相關",color:"#c96a2b",kw:["禮"]},{k:"t4",name:"活動-召喚(抽卡)相關",color:"#3d6b8a",kw:["召喚","抽卡"]}];
 const kwNorm=x=>String(x||"").replace(/\s+/g,"").toLowerCase();
 CAL.tags=TAG0.map(t=>({...t,kw:[...t.kw]}));
-const tagOf=e=>{if(!e||kindOf(e)!=="n"||e.tag==="__none")return null;if(e.tag){const t=CAL.tags.find(x=>x.k===e.tag);if(t)return t}const tt=kwNorm(e.title);return CAL.tags.find(t=>(t.kw||[]).some(k=>k&&tt.includes(kwNorm(k))))||null};
-const labelOf=e=>{const k=kindOf(e);if(k==="n"){const t=tagOf(e);return t?t.name:"活動"}return KLBL[k]};
+const expTags=e=>Array.isArray(e&&e.tags)&&e.tags.length?e.tags.map(String):(e&&e.tag?[String(e.tag)]:[]);
+const tagsOf=e=>{if(!e||kindOf(e)!=="n")return [];const ex=expTags(e);if(ex.includes("__none"))return [];const got=ex.map(k=>CAL.tags.find(t=>t.k===k)).filter(Boolean);if(got.length)return got;const tt=kwNorm(e.title);return CAL.tags.filter(t=>(t.kw||[]).some(k=>k&&tt.includes(kwNorm(k))))};
+const tagOf=e=>tagsOf(e)[0]||null;
+const tagChips=e=>{const ts=kindOf(e)==="n"?tagsOf(e):[];return ts.length?`<span class="tchips">${ts.map(t=>`<i><span class="tdot" style="background:${t.color}"></span>${esc(t.name)}</i>`).join("")}</span>`:`<i>${esc(labelOf(e))}</i>`};
+function tagPick(sel){const on=new Set(sel);$("calfTags").innerHTML=CAL.tags.map(t=>`<label class="tgck"><input type="checkbox" value="${esc(t.k)}"${on.has(t.k)?" checked":""}><span class="tdot" style="background:${t.color}"></span>${esc(t.name)}</label>`).join("")+`<label class="tgck"><input type="checkbox" value="__none"${on.has("__none")?" checked":""}>不分類</label>`;
+  $("calfTags").querySelectorAll("input").forEach(c=>c.onchange=()=>{if(!c.checked)return;if(c.value==="__none")$("calfTags").querySelectorAll("input").forEach(o=>{if(o!==c)o.checked=false});else{const n=$("calfTags").querySelector('input[value="__none"]');if(n)n.checked=false}})}
+const tagPicked=()=>[...$("calfTags").querySelectorAll("input:checked")].map(c=>c.value);
+const labelOf=e=>{const k=kindOf(e);if(k==="n"){const ts=tagsOf(e);return ts.length?ts.map(t=>t.name).join("・"):"活動"}return KLBL[k]};
 const matchTag=v=>{const x=String(v||"").trim();return CAL.tags.find(t=>t.name===x||t.k===x)||null};
 const tagClean=list=>{if(!Array.isArray(list))return null;return list.filter(t=>t&&t.k&&t.name).map(t=>({k:String(t.k),name:String(t.name).slice(0,20),color:/^#[0-9a-f]{6}$/i.test(t.color||"")?t.color:"#8c6d46",kw:Array.isArray(t.kw)?t.kw.map(x=>String(x).trim()).filter(Boolean).slice(0,20):[...((TAG0.find(x=>x.k===t.k)||{}).kw||[])]}))};
 const tagOptions=sel=>`<option value="">（自動分類）</option><option value="__none"${sel==="__none"?" selected":""}>（不分類，顯示為「活動」）</option>`+CAL.tags.map(t=>`<option value="${esc(t.k)}"${t.k===sel?" selected":""}>${esc(t.name)}</option>`).join("");
@@ -2175,7 +2192,7 @@ const BX={parse:null,apply:null,last:null};
 function twoTap(btn,fn){if(btn.dataset.arm){clearTimeout(+btn.dataset.arm);btn.removeAttribute("data-arm");btn.textContent=btn.dataset.lbl||btn.textContent;fn();return}btn.dataset.lbl=btn.textContent;btn.dataset.arm=String(setTimeout(()=>{btn.removeAttribute("data-arm");btn.textContent=btn.dataset.lbl},3000));btn.textContent="確定？"}
 function bxOpen(title,hint,ph,parse,apply){BX.parse=parse;BX.apply=apply;$("bxTitle").textContent=title;$("bxHint").textContent=hint;$("bxText").value="";$("bxText").placeholder=ph;$("bxGo").disabled=false;bxPreview();$("bxScrim").hidden=false}
 function bxPreview(){const r=BX.parse($("bxText").value);BX.last=r;$("bxPrev").textContent=r.items.length?`✓ 認到 ${r.items.length} 項`+(r.errs.length?`；第 ${r.errs.slice(0,8).join("、")} 行看不明，會略過`:""):(r.errs.length?`看不明：第 ${r.errs.slice(0,8).join("、")} 行`:"未有內容");$("bxGo").disabled=!r.items.length}
-function calParse(text){const items=[],errs=[];text.split("\n").forEach((ln,i)=>{const t=ln.trim();if(!t)return;const p=t.split(/[|｜\t]/).map(x=>x.trim());const date=dParse(p[0]);const perm=/^永久/.test(p[1]||"");const endRaw=!perm&&p[1]&&p[1]!=="-"?p[1]:"";const end=endRaw?dParse(endRaw):null;const title=p[2]||"";if(!date||!title||(endRaw&&!end)||(end&&end<date)){errs.push(i+1);return}const tr=p[3]&&p[3]!=="-"?p[3]:"";const er=p[4]&&p[4]!=="-"?p[4]:"";const nt=p[5]&&p[5]!=="-"?p[5]:"";const tgRaw=p[6]&&p[6]!=="-"?p[6]:"";const noTag=tgRaw==="不分類";const tg=tgRaw&&!noTag?matchTag(tgRaw):null;if(tgRaw&&!noTag&&!tg){errs.push(i+1);return}items.push({date,end,title,time:tParse(tr)||tr||null,endTime:perm?null:(tParse(er)||er||null),note:nt||null,perm,tag:noTag?"__none":tg?tg.k:null})});return{items,errs}}
+function calParse(text){const items=[],errs=[];text.split("\n").forEach((ln,i)=>{const t=ln.trim();if(!t)return;const p=t.split(/[|｜\t]/).map(x=>x.trim());const date=dParse(p[0]);const perm=/^永久/.test(p[1]||"");const endRaw=!perm&&p[1]&&p[1]!=="-"?p[1]:"";const end=endRaw?dParse(endRaw):null;const title=p[2]||"";if(!date||!title||(endRaw&&!end)||(end&&end<date)){errs.push(i+1);return}const tr=p[3]&&p[3]!=="-"?p[3]:"";const er=p[4]&&p[4]!=="-"?p[4]:"";const nt=p[5]&&p[5]!=="-"?p[5]:"";const tgRaw=p[6]&&p[6]!=="-"?p[6]:"";let tags=null;if(tgRaw){if(tgRaw==="不分類")tags=["__none"];else{const ns=tgRaw.split(/[、,，\/]/).map(x=>x.trim()).filter(Boolean),ts=ns.map(matchTag);if(ts.some(x=>!x)){errs.push(i+1);return}tags=[...new Set(ts.map(x=>x.k))]}}items.push({date,end,title,time:tParse(tr)||tr||null,endTime:perm?null:(tParse(er)||er||null),note:nt||null,perm,tags})});return{items,errs}}
 const RCODE={"每日":"d","每週":"w","每月":"m","一次性":"o","機率":"r","不定期":"x",d:"d",w:"w",m:"m",o:"o",r:"r",x:"x"};
 function rParse(text){const items=[],errs=[];text.split("\n").forEach((ln,i)=>{const t=ln.trim();if(!t)return;const p=t.split(/[|｜\t]/).map(x=>x.trim());const c=RCODE[p[0]];const n=p[1];if(!c||!n){errs.push(i+1);return}const it={id:"u"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)+i,c,n};if(c==="r")it.p="d";if(c==="x")it.p="w";const g=p[2]&&p[2]!=="-"?p[2]:"",e=p[3]&&p[3]!=="-"?p[3]:"",x=p[4]&&p[4]!=="-"?p[4]:"",k=Math.max(1,Math.min(30,+p[5]||1));if(g)it.g=g;if(e)it.e=e;if(x)it.x=x;if(k>1)it.k=k;items.push(it)});return{items,errs}}
 const rangeOf=e=>{const en=endOf(e);return en!==e.date?`${dmOf(e.date)} - ${dmOf(en)}`:dmOf(e.date)};
@@ -2194,7 +2211,7 @@ const cdLine=e=>(kindOf(e)==="m"&&startMs(e)!=null&&!isEnded(e))?(startMs(e)>Dat
 const calSort=(a,b)=>(a.date+(a.time||"~")).localeCompare(b.date+(b.time||"~"));
 const isEnded=e=>hasEnd(e)&&endMs(e)<Date.now();
 const statusOf=e=>{const t=hkToday();if(e.date>t)return "soon";if(e.perm)return e.date===t?"ing":"perm";return isEnded(e)?"end":"ing"};
-const bannerHTML=e=>{const k=kindOf(e),own=S.owner===true,sel=CAL.selMode;const ban=`<button type="button" class="cbanner k-${k}" style="--kc:${evColor(e)}" data-d="${esc(e.date)}"><span class="cband"><b>${rangeOf(e)}</b><i>${esc(labelOf(e))}</i></span><span class="cbody"><b>${esc(e.title)}</b>${(e.time||e.note)?`<small>${e.time?esc(tDisp(e.time))+(e.note?" · ":""):""}${esc(e.note||"")}</small>`:""}<span class="ccd">${cdLine(e)}</span>${e._d1?`<small class="d1line">🗓 以你的 Day 1（${fmtMD(e._d1.d1)}）起算 ${e._d1.n} 天${e._d1.custom?"":"（目前用活動開始日）"}</small>`:""}</span></button>`;const d1b=e._d1?`<button type="button" class="btn ghost d1btn" data-d1="${esc(e.id)}">🗓 改我的 Day 1</button>`:"";if(!own)return d1b?`<div class="cbmain col d1g">${ban}${d1b}</div>`:ban;return `<div class="cbwrap">${sel?`<input type="checkbox" class="csel" data-sel="${esc(e.id)}"${CAL.picked.has(e.id)?" checked":""} aria-label="選取${esc(e.title)}">`:""}<div class="cbmain${d1b?" col":""}">${ban}${d1b}</div><div class="cbside"><button type="button" class="btn ghost cbtn" data-ce="${esc(e.id)}">改</button><button type="button" class="btn ghost cbtn cbdel" data-cdel="${esc(e.id)}">刪</button></div></div>`};
+const bannerHTML=e=>{const k=kindOf(e),own=S.owner===true,sel=CAL.selMode;const ban=`<button type="button" class="cbanner k-${k}" style="--kc:${evColor(e)}" data-d="${esc(e.date)}"><span class="cband"><b>${rangeOf(e)}</b>${tagChips(e)}</span><span class="cbody"><b>${esc(e.title)}</b>${(e.time||e.note)?`<small>${e.time?esc(tDisp(e.time))+(e.note?" · ":""):""}${esc(e.note||"")}</small>`:""}<span class="ccd">${cdLine(e)}</span>${e._d1?`<small class="d1line">🗓 以你的 Day 1（${fmtMD(e._d1.d1)}）起算 ${e._d1.n} 天${e._d1.custom?"":"（目前用活動開始日）"}</small>`:""}</span></button>`;const d1b=e._d1?`<button type="button" class="btn ghost d1btn" data-d1="${esc(e.id)}">🗓 改我的 Day 1</button>`:"";if(!own)return d1b?`<div class="cbmain col d1g">${ban}${d1b}</div>`:ban;return `<div class="cbwrap">${sel?`<input type="checkbox" class="csel" data-sel="${esc(e.id)}"${CAL.picked.has(e.id)?" checked":""} aria-label="選取${esc(e.title)}">`:""}<div class="cbmain${d1b?" col":""}">${ban}${d1b}</div><div class="cbside"><button type="button" class="btn ghost cbtn" data-ce="${esc(e.id)}">改</button><button type="button" class="btn ghost cbtn cbdel" data-cdel="${esc(e.id)}">刪</button></div></div>`};
 const d1Days=e=>{const m=String((e.title||"")+" "+(e.note||"")).match(/首次登入(?:起[計算]|後)\s*(\d+)\s*[日天]/);return m?Math.max(1,Math.min(60,+m[1])):0};
 const d1Key=e=>`calD1_${S.owner===true?"o":"g"}_${e.id}`;
 const d1Get=e=>{const v=pref(d1Key(e))||"",lo=e.date,hi=e.end||e.date;return /^\d{4}-\d{2}-\d{2}$/.test(v)&&v>=lo&&v<=hi?v:lo};
@@ -2290,8 +2307,10 @@ function setView(v){
 }
 function calNeedDb(){if(!S.db||S.owner!==true){toast("只有擁有者可以改");return false}return true}
 async function calDelMany(ids){if(!calNeedDb())return;let n=0;for(const id of ids){try{await S.db.doc("cal/"+id).delete();n++}catch(e){}}toast(`已刪除 ${n} 項`);CAL.picked.delete;ids.forEach(id=>CAL.picked.delete(id));if(!$("calDay").hidden)calRenderDay()}
-async function calBatchApply(items){if(!calNeedDb())return;let n=0;for(const b of items){try{await S.db.collection("cal").add({date:b.date,title:b.title,time:b.time,note:b.note,end:b.end,endTime:b.endTime,perm:!!b.perm,tag:b.tag||null});n++}catch(e){}}toast(`已新增 ${n} 項 ✧`)}
-async function calBatchEdit(){if(!calNeedDb())return;const ed=$("calbEnd").value.trim(),et=$("calbEndT").value.trim(),tgv=$("calbTag").value;const body={};if(tgv)body.tag=tgv==="__auto"?null:tgv;if(ed){const d=dParse(ed);if(!d){toast("結束日期看不明，試下 1020 或 10/20");return}body.end=d}if(et){body.endTime=tParse(et)||et}if(!Object.keys(body).length){toast("未填任何改動");return}let n=0;for(const id of [...CAL.picked]){try{await S.db.doc("cal/"+id).update(body);n++}catch(e){}}$("calBE").hidden=true;toast(`已修改 ${n} 項 ✧`);CAL.picked.clear();CAL.selMode=false;renderCal()}
+async function calBatchApply(items){if(!calNeedDb())return;let n=0;for(const b of items){try{await S.db.collection("cal").add({date:b.date,title:b.title,time:b.time,note:b.note,end:b.end,endTime:b.endTime,perm:!!b.perm,tags:b.tags||null});n++}catch(e){}}toast(`已新增 ${n} 項 ✧`)}
+async function calBatchEdit(){if(!calNeedDb())return;const ed=$("calbEnd").value.trim(),et=$("calbEndT").value.trim(),tgv=$("calbTag").value;const body={};if(ed){const d=dParse(ed);if(!d){toast("結束日期看不懂，試試 1020 或 10/20");return}body.end=d}if(et){body.endTime=tParse(et)||et}if(!Object.keys(body).length&&!tgv){toast("未填任何改動");return}
+  const tagFor=e=>{if(tgv==="__auto")return null;if(tgv==="__none")return ["__none"];const k=tgv.slice(1),cur=tagsOf(e).map(t=>t.k);let out=tgv[0]==="+"?[...new Set([...cur,k])]:cur.filter(x=>x!==k);return out.length?out:["__none"]};
+  let n=0;for(const id of [...CAL.picked]){const e=CAL.ev.find(x=>x.id===id);if(!e)continue;const b={...body};if(tgv){b.tags=tagFor(e);b.tag=null}try{await S.db.doc("cal/"+id).update(b);n++}catch(err){}}$("calBE").hidden=true;toast(`已修改 ${n} 項 ✧`);CAL.picked.clear();CAL.selMode=false;renderCal()}
 function renderWeek(){
   if(!$("calWeek"))return;
   const start=CAL.wk,days=[0,1,2,3,4,5,6].map(i=>addDays(start,i)),end=days[6],today=hkToday();
@@ -2332,7 +2351,7 @@ function calRenderDay(){
   $("calDayList").querySelectorAll("[data-ce]").forEach(b=>b.onclick=()=>calEdit(b.dataset.ce));
   $("calDayAdd").hidden=!own;
 }
-function calFill(e){$("calfDate").value=e.date||"";$("calfEnd").value=e.end||"";$("calfTitle").value=e.title||"";$("calfTime").value=e.time||"";$("calfEndT").value=e.endTime||"";$("calfNote").value=e.note||"";$("calfTag").innerHTML=tagOptions(e.tag||"");$("calfPerm").checked=!!e.perm;permSync();$("calfConfirm").hidden=true}
+function calFill(e){$("calfDate").value=e.date||"";$("calfEnd").value=e.end||"";$("calfTitle").value=e.title||"";$("calfTime").value=e.time||"";$("calfEndT").value=e.endTime||"";$("calfNote").value=e.note||"";tagPick(expTags(e));$("calfPerm").checked=!!e.perm;permSync();$("calfConfirm").hidden=true}
 function permSync(){const p=$("calfPerm").checked;$("calfEnd").disabled=p;$("calfEndT").disabled=p}
 function calNew(){CAL.eid=null;calFill({date:CAL.sel});$("calEvT").textContent="新增活動";$("calDelBtn").hidden=true;$("calScrim").hidden=false}
 function calEdit(id){const e=CAL.ev.find(x=>x.id===id);if(!e)return;CAL.eid=id;calFill(e);$("calEvT").textContent="修改活動";$("calDelBtn").hidden=S.owner!==true;$("calScrim").hidden=false}
@@ -2346,7 +2365,7 @@ async function calSave(){
   if(end&&end<date){toast("結束日期不可以早過開始日期");return}
   if(!title){toast("打個活動名先吧");return}
   const perm=$("calfPerm").checked;
-  const body={date,title,time,note:note||null,end:perm?null:(end||null),endTime:perm?null:(endT||null),perm,tag:$("calfTag").value||null};
+  const body={date,title,time,note:note||null,end:perm?null:(end||null),endTime:perm?null:(endT||null),perm,tag:null,tags:(()=>{const p=tagPicked();return p.includes("__none")?["__none"]:p.length?p:null})()};
   try{
     if(CAL.eid)await S.db.doc("cal/"+CAL.eid).update(body);
     else await S.db.collection("cal").add(body);
@@ -2399,16 +2418,16 @@ $("tgSave").onclick=async()=>{
   $("tgSave").disabled=true;
   try{
     await S.db.doc("meta/caltags").set({list:clean});
-    let n=0;for(const e of CAL.ev){if(e.tag&&gone.includes(e.tag)){try{await S.db.doc("cal/"+e.id).update({tag:null});n++}catch(err){}}}
+    let n=0;for(const e of CAL.ev){const ex=expTags(e);if(ex.some(k=>gone.includes(k))){const left=ex.filter(k=>!gone.includes(k));try{await S.db.doc("cal/"+e.id).update({tag:null,tags:left.length?left:null});n++}catch(err){}}}
     CAL.tags=clean.map(t=>({...t}));renderCal();renderCalTop();if(!$("calDay").hidden)calRenderDay();
-    $("tgScrim").hidden=true;toast(n?`標籤已儲存，${n} 個活動已變回「活動」`:"標籤已儲存 ✧");
+    $("tgScrim").hidden=true;toast(n?`標籤已儲存，${n} 個活動已移除被刪的標籤`:"標籤已儲存 ✧");
   }catch(err){toast("沒存到："+(err.code||"錯誤"))}
   $("tgSave").disabled=false;
-};$("calBatchAdd").onclick=()=>bxOpen("批量新增活動","每行一個：開始日期 | 結束日期 | 活動名 | 開始時間 | 結束時間 | 備註 | 標籤。標籤可以寫名稱（例如 活動-期間限定）、寫「不分類」，或留空讓它自動分類；結束日期寫「永久」就是永久上線；結束日期、時間、備註可以留空或寫 -；日期可寫 2026-10-14 或 1410（跟上面選的格式）；時間可寫 19:00 或 下午7:00。","例：\n2026-10-14 | | 停服維護 | 07:30 | 09:30 | | \n2026-10-07 | 2026-10-20 | 櫻覓星願 | 08:00 | 23:59 | | 活動-期間限定\n2026-10-14 | 永久 | 新皮膚上架 | | | | ",calParse,calBatchApply);
+};$("calBatchAdd").onclick=()=>bxOpen("批量新增活動","每行一個：開始日期 | 結束日期 | 活動名 | 開始時間 | 結束時間 | 備註 | 標籤。標籤可以寫一個或多個名稱（用、分隔，例如 活動-特別加成、活動-召喚(抽卡)相關）、寫「不分類」，或留空讓它自動分類；結束日期寫「永久」就是永久上線；結束日期、時間、備註可以留空或寫 -；日期可寫 2026-10-14 或 1410（跟上面選的格式）；時間可寫 19:00 或 下午7:00。","例：\n2026-10-14 | | 停服維護 | 07:30 | 09:30 | | \n2026-10-07 | 2026-10-20 | 櫻覓星願 | 08:00 | 23:59 | | 活動-期間限定、活動-特別加成\n2026-10-14 | 永久 | 新皮膚上架 | | | | ",calParse,calBatchApply);
 $("calSelOn").onclick=()=>{CAL.selMode=!CAL.selMode;CAL.picked.clear();renderCal()};
 $("calSelOff").onclick=()=>{CAL.selMode=false;CAL.picked.clear();renderCal()};
 $("calSelDel").onclick=function(){if(!CAL.picked.size)return toast("未選任何活動");twoTap(this,()=>{calDelMany([...CAL.picked]);CAL.picked.clear();CAL.selMode=false;renderCal()})};
-$("calSelEnd").onclick=()=>{if(!CAL.picked.size)return toast("未選任何活動");$("calbEnd").value="";$("calbEndT").value="";$("calbTag").innerHTML=`<option value="">（不改）</option><option value="__auto">（改成自動分類）</option><option value="__none">（改成不分類）</option>`+CAL.tags.map(t=>`<option value="${esc(t.k)}">${esc(t.name)}</option>`).join("");$("calBETitle").textContent=`統一修改 ${CAL.picked.size} 項活動`;$("calBE").hidden=false};
+$("calSelEnd").onclick=()=>{if(!CAL.picked.size)return toast("未選任何活動");$("calbEnd").value="";$("calbEndT").value="";$("calbTag").innerHTML=`<option value="">（不改）</option><option value="__auto">（改成自動分類）</option><option value="__none">（改成不分類）</option>`+CAL.tags.map(t=>`<option value="+${esc(t.k)}">加入：${esc(t.name)}</option>`).join("")+CAL.tags.map(t=>`<option value="-${esc(t.k)}">移除：${esc(t.name)}</option>`).join("");$("calBETitle").textContent=`統一修改 ${CAL.picked.size} 項活動`;$("calBE").hidden=false};
 $("calbCancel").onclick=()=>{$("calBE").hidden=true};
 $("calbGo").onclick=calBatchEdit;
 $("bxCancel").onclick=()=>{$("bxScrim").hidden=true};
