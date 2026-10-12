@@ -582,8 +582,8 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
         <li>維護：日期數字的底色變成磚紅；活動結束：金色；一般活動：每個一色，月曆上的細線同下面列表的色條對得返。</li>
         <li>下面每個活動都有日期範圍（dd/mm - dd/mm）同距離結束的時間。</li>
         <li>按一個日子，會彈出當日的活動；只有擁有者可以新增、修改、刪除，朋友打開只是看。</li>
-        <li>一般活動可以選標籤（預設有<b>活動-期間限定</b>、<b>活動-特別加成</b>、<b>活動-課金相關</b>）；擁有者按<b>🏷 管理標籤</b>可以自己增減、改名、換顏色。</li>
-        <li>沒有手動選標籤的活動會按<b>關鍵字自動分類</b>：標題有「額外加成」「機率 UP」→ 活動-特別加成；有「禮」→ 活動-課金相關。關鍵字可以在<b>🏷 管理標籤</b>修改。</li>
+        <li>一般活動可以選標籤（預設有<b>活動-期間限定</b>、<b>活動-特別加成</b>、<b>活動-課金相關</b>、<b>活動-召喚(抽卡)相關</b>）；擁有者按<b>🏷 管理標籤</b>可以自己增減、改名、換顏色。</li>
+        <li>沒有手動選標籤的活動會按<b>關鍵字自動分類</b>：標題有「額外加成」「機率 UP」→ 活動-特別加成；有「禮」→ 活動-課金相關；有「召喚」「抽卡」→ 活動-召喚(抽卡)相關。同時符合幾個時，以標籤清單較前面的為準。關鍵字可以在<b>🏷 管理標籤</b>修改。</li>
         <li>寫著「以首次登入起算／起計 N 天」的活動，可以按<b>🗓 改我的 Day 1</b>填自己第一天登入的日期，月曆和倒數會跟著你的日期走（只在活動期間內有效；每台裝置、擁有者和訪客各自記錄）。</li>
         <li><b>⚫ 已結束</b>預設只顯示最近 30 天內結束的活動，最下面可以按「顯示更早的已結束」。</li>
         <li>擁有者可以用<b>📥 批量新增</b>一次貼入多個活動；<b>☑ 批量選取</b>之後可以一次刪除或統一改結束時間。</li>
@@ -2144,7 +2144,7 @@ const ymdOf=(y,m,d)=>`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2
 const kindOf=e=>e.perm?"p":/維護/.test(e.title||"")?"m":/結束|到期/.test(e.title||"")?"e":"n";
 const KLBL={m:"維護",e:"結束",n:"活動",p:"永久"};
 const CAL_PRESET=["#8c6d46","#5f7d3a","#2f6f6a","#c96a2b","#4a5a78","#7a6a3f","#3d6b8a"];
-const TAG0=[{k:"t1",name:"活動-期間限定",color:"#5f7d3a",kw:[]},{k:"t2",name:"活動-特別加成",color:"#2f6f6a",kw:["額外加成","機率UP"]},{k:"t3",name:"活動-課金相關",color:"#c96a2b",kw:["禮"]}];
+const TAG0=[{k:"t1",name:"活動-期間限定",color:"#5f7d3a",kw:[]},{k:"t2",name:"活動-特別加成",color:"#2f6f6a",kw:["額外加成","機率UP"]},{k:"t3",name:"活動-課金相關",color:"#c96a2b",kw:["禮"]},{k:"t4",name:"活動-召喚(抽卡)相關",color:"#3d6b8a",kw:["召喚","抽卡"]}];
 const kwNorm=x=>String(x||"").replace(/\s+/g,"").toLowerCase();
 CAL.tags=TAG0.map(t=>({...t,kw:[...t.kw]}));
 const tagOf=e=>{if(!e||kindOf(e)!=="n"||e.tag==="__none")return null;if(e.tag){const t=CAL.tags.find(x=>x.k===e.tag);if(t)return t}const tt=kwNorm(e.title);return CAL.tags.find(t=>(t.kw||[]).some(k=>k&&tt.includes(kwNorm(k))))||null};
