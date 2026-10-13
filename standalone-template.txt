@@ -2183,8 +2183,8 @@ const ymdOf=(y,m,d)=>`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2
 (()=>{const t=hkToday();CAL.y=+t.slice(0,4);CAL.m=+t.slice(5,7)-1;CAL.sel=t;CAL.wk=addDays(t,-3)})();
 const kindOf=e=>e.perm?"p":/維護/.test(e.title||"")?"m":/結束|到期/.test(e.title||"")?"e":"n";
 const KLBL={m:"維護",e:"結束",n:"活動",p:"永久"};
-const CAL_PRESET=["#8c6d46","#5f7d3a","#2f6f6a","#c96a2b","#4a5a78","#7a6a3f","#3d6b8a","#7b4f9e"];
-const TAG0=[{k:"t1",name:"活動-期間限定",color:"#5f7d3a",kw:[]},{k:"t2",name:"活動-特別加成",color:"#2f6f6a",kw:["額外加成","機率UP"]},{k:"t3",name:"活動-課金相關",color:"#c96a2b",kw:["禮"]},{k:"t4",name:"活動-召喚(抽卡)相關",color:"#7b4f9e",kw:["召喚","抽卡"]}];
+const CAL_PRESET=["#8c6d46","#5f7d3a","#2f6f6a","#c96a2b","#4a5a78","#7a6a3f","#3d6b8a","#7b4f9e","#4c6db0"];
+const TAG0=[{k:"t1",name:"活動-期間限定",color:"#5f7d3a",kw:[]},{k:"t2",name:"活動-特別加成",color:"#2f6f6a",kw:["額外加成","機率UP"]},{k:"t3",name:"活動-課金相關",color:"#c96a2b",kw:["禮"]},{k:"t4",name:"活動-召喚(抽卡)相關",color:"#7b4f9e",kw:["召喚","抽卡"]},{k:"t5",name:"活動-皮膚上新",color:"#4c6db0",kw:["皮膚","外觀","染色","裝扮"]}];
 const kwNorm=x=>String(x||"").replace(/\s+/g,"").toLowerCase();
 CAL.tags=TAG0.map(t=>({...t,kw:[...t.kw]}));
 const expTags=e=>Array.isArray(e&&e.tags)&&e.tags.length?e.tags.map(String):(e&&e.tag?[String(e.tag)]:[]);
