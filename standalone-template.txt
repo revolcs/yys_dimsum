@@ -2179,7 +2179,7 @@ async function ghBoot(){
 }
 
 /* 行事月曆：Claude 版存 db 集合 cal；GitHub 版存公開儲存庫 data/calendar.json；免登入版打包在 STATIC_DB.cal。朋友只讀，擁有者可以改 */
-const CAL={endAll:false,y:0,m:0,ev:[],sel:null,eid:null,showEnded:false,view:"month",wk:"",selMode:false,picked:new Set(),open:{ing:true,soon:true,perm:true,end:false}};
+const CAL={endAll:false,y:0,m:0,ev:[],sel:null,eid:null,showEnded:false,view:"month",wk:"",selMode:false,picked:new Set(),open:{ing:true,soon:true,ending:true,perm:true,end:false}};
 const WKS=["日","一","二","三","四","五","六"];
 const hkToday=()=>new Date(Date.now()+8*3600e3).toISOString().slice(0,10);
 const addDays=(s,n)=>{const d=new Date(s+"T00:00:00Z");d.setUTCDate(d.getUTCDate()+n);return d.toISOString().slice(0,10)};
@@ -2326,12 +2326,13 @@ function renderCal(){
   $("calGrid").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>calOpenDay(b.dataset.d));
   const ms=`${monthKey()}-01`,me=`${monthKey()}-${String(days).padStart(2,"0")}`;
   const ALL=CALV().filter(tagPass),L=ALL.filter(e=>e.date<=me&&endOf(e)>=ms).sort(calSort);
-  const G={ing:[],soon:[],perm:[],end:[]};
+  const G={ing:[],soon:[],ending:[],perm:[],end:[]};
   for(const e of L){const st=statusOf(e);if(st!=="end")G[st].push(e)}
+  {const soonEnd=Date.now()+3*864e5;G.ending=G.ing.filter(e=>e.end&&!e.perm&&endMs(e)<=soonEnd);G.ing=G.ing.filter(e=>!G.ending.includes(e))}
   const endAll=ALL.filter(e=>statusOf(e)==="end").sort((a,b)=>endMs(b)-endMs(a)),cut=addDays(today,-30),endRecent=endAll.filter(e=>endOf(e)>=cut);
   G.end=CAL.endAll?endAll:endRecent;const endOlder=endAll.length-endRecent.length;
-  const SEC=[["ing","🟢 進行中"],["soon","🔜 準備上線"],["perm","✨ 永久上線"],["end","⚫ 已結束"]];
-  $("calList").innerHTML=SEC.map(([k,t])=>`<details class="csec" data-k="${k}"${CAL.open[k]?" open":""}><summary>${t}<span class="cnt">${G[k].length}</span></summary>${k==="end"?`<p class="sub endnote">${CAL.endAll?"顯示全部已結束的活動":"預設只顯示最近 30 天內結束的活動"}</p>`:""}${G[k].length?G[k].map(bannerHTML).join(""):`<div class="empty" style="padding:10px 0">暫時沒有</div>`}${k==="end"&&(endOlder>0||CAL.endAll)?`<button type="button" class="btn ghost rfull" id="calEndMore">${CAL.endAll?"只顯示最近 30 天":`顯示更早的已結束（${endOlder}）`}</button>`:""}</details>`).join("");
+  const SEC=[["ing","🟢 進行中"],["soon","🔜 準備上線"],["ending","⏳ 即將結束（3 日內）"],["perm","✨ 永久上線"],["end","⚫ 已結束"]];
+  $("calList").innerHTML=SEC.map(([k,t])=>`<details class="csec" data-k="${k}"${(CAL.open[k]??(k==="ending"))?" open":""}><summary>${t}<span class="cnt">${G[k].length}</span></summary>${k==="end"?`<p class="sub endnote">${CAL.endAll?"顯示全部已結束的活動":"預設只顯示最近 30 天內結束的活動"}</p>`:""}${G[k].length?G[k].map(bannerHTML).join(""):`<div class="empty" style="padding:10px 0">暫時沒有</div>`}${k==="end"&&(endOlder>0||CAL.endAll)?`<button type="button" class="btn ghost rfull" id="calEndMore">${CAL.endAll?"只顯示最近 30 天":`顯示更早的已結束（${endOlder}）`}</button>`:""}</details>`).join("");
   {const b=$("calEndMore");if(b)b.onclick=()=>{CAL.endAll=!CAL.endAll;renderCal()}}
   $("calList").querySelectorAll("[data-d1]").forEach(b=>b.onclick=e=>{e.stopPropagation();d1Open(b.dataset.d1)});
   $("calList").querySelectorAll(".csec").forEach(d=>d.ontoggle=()=>{CAL.open[d.dataset.k]=d.open});
@@ -2397,7 +2398,8 @@ function calRenderDay(){
 }
 const tbdIsM=()=>/維護/.test($("calfTitle").value);
 function tbdSync(){const t=$("calfTBD").checked,m=tbdIsM(),hard=t&&!m;if(hard)$("calfTime").value="";$("calfTime").disabled=hard;$("calfEndT").disabled=hard||$("calfPerm").checked;$("calfTBDt").textContent=m?"⚠️ 結束時間未定（首頁會顯示提示，時間照填）":"⏰ 時間未定（會提醒留意官方公告）"}
-function calFill(e){const M=/維護/.test(e.title||"");$("calfDate").value=e.date||"";$("calfEnd").value=e.end||"";$("calfTitle").value=e.title||"";$("calfTime").value=TBD(e.time)?"":(e.time||"");$("calfTBD").checked=M?!!e.endTbd:TBD(e.time);tbdSync();$("calfEndT").value=e.endTime||"";$("calfNote").value=e.note||"";tagPick(expTags(e));$("calfPerm").checked=!!e.perm;permSync();$("calfConfirm").hidden=true}
+function dateHints(){const md=dfmt()==="md",h=md?"月/日，例 1014 或 10/14":"日/月，例 1410 或 14/10";const a=$("calfDate"),b=$("calfEnd");if(a){a.placeholder=md?"1014 或 10/14":"1410 或 14/10";a.parentElement.firstChild.textContent=`開始日期（${h}）`}if(b){b.placeholder=md?"1025 或 10/25":"2510 或 25/10";b.parentElement.firstChild.textContent=`結束日期（可留空；${h}）`}}
+function calFill(e){dateHints();const M=/維護/.test(e.title||"");$("calfDate").value=e.date||"";$("calfEnd").value=e.end||"";$("calfTitle").value=e.title||"";$("calfTime").value=TBD(e.time)?"":(e.time||"");$("calfTBD").checked=M?!!e.endTbd:TBD(e.time);tbdSync();$("calfEndT").value=e.endTime||"";$("calfNote").value=e.note||"";tagPick(expTags(e));$("calfPerm").checked=!!e.perm;permSync();$("calfConfirm").hidden=true}
 function permSync(){const p=$("calfPerm").checked;$("calfEnd").disabled=p;$("calfEndT").disabled=p||($("calfTBD").checked&&!tbdIsM())}
 function calNew(){CAL.eid=null;calFill({date:CAL.sel});$("calEvT").textContent="新增活動";$("calDelBtn").hidden=true;$("calScrim").hidden=false}
 function calEdit(id){const e=CAL.ev.find(x=>x.id===id);if(!e)return;CAL.eid=id;calFill(e);$("calEvT").textContent="修改活動";$("calDelBtn").hidden=S.owner!==true;$("calScrim").hidden=false}
@@ -2440,7 +2442,7 @@ $("calDelBtn").onclick=()=>{$("calfConfirm").hidden=false};$("calfNo").onclick=(
 autoDate($("calfDate"));autoDate($("calfEnd"));$("calfPerm").onchange=permSync;$("calfTBD").onchange=tbdSync;
 document.querySelectorAll("[data-df]").forEach(b=>b.onclick=()=>{pref("calDF",b.dataset.df);syncSet();renderCal();renderCalTop();if(!$("calDay").hidden)calRenderDay()});
 document.querySelectorAll("[data-tf]").forEach(b=>b.onclick=()=>{pref("calTF",b.dataset.tf);syncSet();renderCal();if(!$("calDay").hidden)calRenderDay()});
-function syncSet(){document.querySelectorAll("[data-df]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.df===dfmt())));document.querySelectorAll("[data-tf]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tf===tfmt())))}
+function syncSet(){dateHints();document.querySelectorAll("[data-df]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.df===dfmt())));document.querySelectorAll("[data-tf]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tf===tfmt())))}
 syncSet();
 $("calNewTop").onclick=calNew;
 let D1ID=null;
