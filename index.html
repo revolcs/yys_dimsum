@@ -323,6 +323,8 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .cdlbl{display:block;font-weight:700;color:var(--ink-soft)}
 .hsec{margin-top:10px;border:3px solid var(--ink);border-radius:16px;padding:9px 12px 10px;background:var(--sheet);box-shadow:4px 4px 0 var(--ink)}
 .hsec .cdlbl{margin-top:0}
+.hshd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.hstog{flex:none;width:30px;height:30px;border:2px solid var(--ink);background:var(--sheet);color:var(--ink);border-radius:99px;font-size:.75rem;line-height:1;cursor:pointer;padding:0}
 .cdtxt{display:block;color:var(--ink);font-weight:700;overflow-wrap:anywhere;padding-left:1.4em;margin-top:1px}
 .cdtxt b{font-family:var(--f-num);margin-left:4px;white-space:nowrap}
 .cdtxt.cdn{font-weight:600;color:var(--ink-soft)}
@@ -2288,7 +2290,7 @@ function renderCalTop(){
   const hdrBase=e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e);const sumL=CALV().filter(e=>hdrBase(e)&&tagsOf(e).some(t=>t.k==="t4")).sort((a,b)=>endMs(a)-endMs(b));const verL=CALV().filter(e=>hdrBase(e)&&/開啟/.test(e.title||"")&&!tagsOf(e).some(t=>t.k==="t4")).sort((a,b)=>endMs(a)-endMs(b));const sumNear=sumL.some(e=>endMs(e)-now<3*864e5);
   {const td=$("calTodo");const n=S.owner===true?CAL.ev.filter(autoLT).length:0;if(td){td.hidden=!n;td.textContent=`⚠️ 有 ${n} 項活動嘅「長期有效」係自動判斷，點擊查看待確認`;td.onclick=()=>autoOpen()}}
   const hdrRow=e=>`<span class="cdtxt">${esc(e.title)} : <b class="${urgent(e)?"urg":""}">${cdText(e)}</b></span>`;
-  const hsec=(body)=>`<div class="hsec">${body}</div>`;const secV=verL.length?hsec(`<span class="cdlbl">🎉 版本活動</span>`+verL.slice(0,5).map(hdrRow).join("")):"";const secS=hsec(`<span class="cdlbl">${sumNear?"⚠️ 即將結束（抽卡） ⚠️":"⏳ 即將結束（抽卡）"}</span>`+(sumL.length?sumL.slice(0,5).map(hdrRow).join(""):`<span class="cdtxt">暫時沒有抽卡活動</span>`));$("calCd2").innerHTML=secV+secS;
+  const hsOpen=k=>{try{const v=JSON.parse(pref("calHsOpen")||"{}");return v[k]!==false}catch(x){return true}};const hsec=(k,lbl,rows)=>{const o=hsOpen(k);return `<div class="hsec"><div class="hshd"><span class="cdlbl">${lbl}</span><button type="button" class="hstog" data-hs="${k}" aria-label="${o?"收起":"展開"}">${o?"▲":"▼"}</button></div>${o?`<div class="hsbody">${rows}</div>`:""}</div>`};const secV=verL.length?hsec("ver","🎉 版本活動",verL.slice(0,5).map(hdrRow).join("")):"";const secS=hsec("sum",`${sumNear?"⚠️ 即將結束（抽卡） ⚠️":"⏳ 即將結束（抽卡）"}`,sumL.length?sumL.slice(0,5).map(hdrRow).join(""):`<span class="cdtxt">暫時沒有抽卡活動</span>`);$("calCd2").innerHTML=secV+secS;
 }
 function renderCal(){
   if(!$("pane-cal"))return;renderCalLegend();
@@ -2440,6 +2442,7 @@ $("autoCancel").onclick=()=>{$("autoScrim").hidden=true};
 $("autoFilter").onclick=()=>{$("autoScrim").hidden=true;pref("calTagShow",JSON.stringify(["t6"]));renderCal();if(!$("calDay").hidden)calRenderDay()};
 $("autoGo").onclick=autoConfirm;
 $("autoList").onclick=ev=>{const b=ev.target.closest("button");if(!b)return;const id=b.dataset.ae||b.dataset.ad;if(!id)return;$("autoScrim").hidden=true;calEdit(id);if(b.dataset.ad)$("calfConfirm").hidden=false};
+$("calCd2").onclick=e=>{const b=e.target.closest(".hstog");if(!b)return;let v={};try{v=JSON.parse(pref("calHsOpen")||"{}")}catch(x){}const k=b.dataset.hs;v[k]=!(v[k]!==false);pref("calHsOpen",JSON.stringify(v));renderCalTop()};
 $("calMaintBack").onclick=async()=>{const id=$("calMaintBack").dataset.mid;if(!id){toast("未有可以返回嘅步驟");return}try{await S.db.doc("cal/"+id).update({endTbd:false});toast("已返回，維護結束時間唔再標示未定 ✧");renderCal();renderCalTop()}catch(x){toast("沒存到："+(x.code||"錯誤"))}};
 $("calMaintEdit").onclick=()=>{const id=$("calMaintEdit").dataset.mid;if(id)calEdit(id)};
 $("calPrev").onclick=()=>calMove(-1);$("calNext").onclick=()=>calMove(1);
