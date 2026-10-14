@@ -462,7 +462,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="tab" id="tab-res" role="tab" aria-selected="false">資源獲取</button>
       <button class="tab" id="tab-cal" role="tab" aria-selected="false">行事月曆</button>
     </nav>
-    <div class="calbar" id="calTop" hidden><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><div id="calCd2"></div><div id="calTodo" hidden></div></div>
+    <div class="calbar" id="calTop" hidden><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><button type="button" class="btn ghost" id="calMaintTbd" hidden style="margin-top:6px;width:auto;font-size:.8rem;padding:5px 12px"></button><div id="calCd2"></div><div id="calTodo" hidden></div></div>
     <div class="acctwrap topacct" id="acctRow"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button></div>
     <div class="jump" id="jump" aria-label="跳到稀有度"></div>
   </div>
@@ -2077,7 +2077,7 @@ function ghStore(){
     onSnapshot:f=>{if(c==="shiki"){subs.push(f);emit()}else if(c==="cal"){csubs.push(f);emitC()}return()=>{}}});
   return{M,CM,doc,collection};
 }
-const CALK=["date","end","endTime","title","time","note","perm","tag","tags"];
+const CALK=["date","end","endTime","title","time","note","perm","tag","tags","endTbd"];
 function calClean(list){if(!Array.isArray(list))return [];return list.filter(e=>e&&e.id&&/^\d{4}-\d{2}-\d{2}$/.test(e.date||"")&&e.title).map(e=>{const o={id:String(e.id)};CALK.forEach(k=>{if(e[k]!==undefined&&e[k]!==null&&e[k]!==false&&e[k]!=="")o[k]=e[k]});return o}).sort((a,b)=>(a.date+a.id).localeCompare(b.date+b.id))}
 const ghImgPath=id=>{const m=window.STATIC_IMG&&STATIC_IMG[id];return m&&m.startsWith("img/")?m:"img/"+(id.includes(".")?id:id+".png")};
 const ghAssets={
@@ -2266,7 +2266,9 @@ function renderCalTop(){
   $("calTodayTxt").textContent=`📅 今日 ${y} 年 ${m} 月 ${d} 日（星期${WKS[new Date(Date.UTC(y,m-1,d)).getUTCDay()]}）`;
   const now=Date.now();
   const nm=CALV().filter(e=>kindOf(e)==="m"&&endMs(e)>=now).sort((a,b)=>endMs(a)-endMs(b))[0];
-  if(nm){
+  const ftd=CAL.ev.filter(e=>kindOf(e)==="m"&&e.endTbd).sort((a,b)=>a.date<b.date?1:-1)[0];
+  if(ftd){$("calCd1").innerHTML=`<span class="cdlbl">🔧 維護</span><span class="cdtxt">${rangeOf(ftd)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span></span><span class="cdtxt cdn urg">⚠️維護結束時間未定⚠️</span>`}
+  else if(nm){
     const st=startMs(nm),en=endMs(nm),dur=st!=null&&nm.endTime&&/^\d{2}:\d{2}$/.test(nm.endTime)?en-st:null,during=st!=null&&st<=now;
     const hrs=dur>0?Math.round(dur/36e5*10)/10:null;
     const tt=nm.time?` ${esc(tDisp(nm.time))}${dur>0?` – ${esc(tDisp(nm.endTime))}`:""}`:"";
@@ -2274,6 +2276,12 @@ function renderCalTop(){
     const tbdNm=TBD(nm.time);
     $("calCd1").innerHTML=tbdNm?`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span> <b class="urg">時間未定</b></span><span class="cdtxt cdn urg">⏰ 維護時間未定，請留意官方公告</span>`:`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span>${tt}${hrs?`（預計 ${hrs} 小時）`:""}</span><span class="cdtxt cdn">${cd}</span><span class="cdtxt cdnote">（請以官方公佈時間為準）</span>`;
   }else $("calCd1").innerHTML="🔧 暫時未有維護安排";
+  {const mb=$("calMaintTbd");if(mb){
+    const tgt=ftd||nm||CAL.ev.filter(e=>kindOf(e)==="m"&&e.date<=hkToday()).sort((a,b)=>a.date<b.date?1:-1)[0];
+    mb.hidden=!(S.owner===true&&tgt);
+    mb.textContent=ftd?"✅ 已確定維護結束時間":"⏰ 維護結束時間未定";
+    mb.dataset.mid=tgt?tgt.id:"";mb.dataset.on=ftd?"1":"0";
+  }}
   const ne=CALV().filter(e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e)).sort((a,b)=>endMs(a)-endMs(b))[0];
   {const td=$("calTodo");const n=S.owner===true?CAL.ev.filter(autoLT).length:0;if(td){td.hidden=!n;td.textContent=`⚠️ 有 ${n} 項活動嘅「長期有效」係自動判斷，點擊查看待確認`;td.onclick=()=>autoOpen()}}
   $("calCd2").innerHTML=ne?`<span class="cdlbl">⏳ 即將結束</span><span class="cdtxt">${esc(ne.title)} : <b class="${urgent(ne)?"urg":""}">${cdText(ne)}</b></span>`:"⏳ 暫時沒有進行中的限時活動";
@@ -2424,6 +2432,7 @@ async function autoConfirm(){if(!S.db||S.owner!==true)return;const L=autoItems()
 $("autoCancel").onclick=()=>{$("autoScrim").hidden=true};
 $("autoFilter").onclick=()=>{$("autoScrim").hidden=true;pref("calTagShow",JSON.stringify(["t6"]));renderCal();if(!$("calDay").hidden)calRenderDay()};
 $("autoGo").onclick=autoConfirm;
+$("calMaintTbd").onclick=async()=>{if(!S.db||S.owner!==true)return;const b=$("calMaintTbd");const on=b.dataset.on==="1";const id=b.dataset.mid;if(!id)return;try{await S.db.doc("cal/"+id).update({endTbd:!on});toast(on?"已確定維護結束時間 ✧":"⚠️ 已標記維護結束時間未定");renderCal();renderCalTop()}catch(x){toast("沒存到："+(x.code||"錯誤"))}};
 $("calPrev").onclick=()=>calMove(-1);$("calNext").onclick=()=>calMove(1);
 $("calToday").onclick=()=>{const t=hkToday();CAL.y=+t.slice(0,4);CAL.m=+t.slice(5,7)-1;CAL.sel=t;renderCal()};
 $("calEndedBtn").onclick=()=>{CAL.showEnded=!CAL.showEnded;renderCal();if(!$("calDay").hidden)calRenderDay()};
