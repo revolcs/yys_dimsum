@@ -462,7 +462,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="tab" id="tab-res" role="tab" aria-selected="false">資源獲取</button>
       <button class="tab" id="tab-cal" role="tab" aria-selected="false">行事月曆</button>
     </nav>
-    <div class="calbar" id="calTop" hidden><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><button type="button" class="btn ghost" id="calMaintTbd" hidden style="margin-top:6px;width:auto;font-size:.8rem;padding:5px 12px"></button><div id="calCd2"></div><div id="calTodo" hidden></div></div>
+    <div class="calbar" id="calTop" hidden><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><div id="calMaintBtns" hidden style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn ghost" id="calMaintBack" style="width:auto;font-size:.8rem;padding:5px 12px">↩️ 返回上一步</button><button type="button" class="btn ghost" id="calMaintEdit" style="width:auto;font-size:.8rem;padding:5px 12px">✏️ 修改維護時間</button></div><div id="calCd2"></div><div id="calTodo" hidden></div></div>
     <div class="acctwrap topacct" id="acctRow"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button></div>
     <div class="jump" id="jump" aria-label="跳到稀有度"></div>
   </div>
@@ -817,7 +817,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div class="two" style="grid-template-columns:1fr 1fr">
       <label class="fld">開始時間<input id="calfTime" type="text" maxlength="20" placeholder="例如 19:00 或 下午7:00（或勾選時間未定）"></label>
       <label class="fld">結束時間<input id="calfEndT" type="text" maxlength="20" placeholder="預設 23:59"></label>
-      <label class="check"><input id="calfTBD" type="checkbox"> ⏰ 時間未定（會提醒留意官方公告）</label>
+      <label class="check"><input id="calfTBD" type="checkbox"> <span id="calfTBDt">⏰ 時間未定（會提醒留意官方公告）</span></label>
     </div>
     <label class="fld">備註<input id="calfNote" type="text" maxlength="120"></label>
     <div class="fld">標籤（只用於一般活動，可多選；全部不勾＝自動分類）<div id="calfTags" class="tgpick"></div></div>
@@ -1538,7 +1538,7 @@ $("pvGuest").onclick=()=>{
   if(S.previewing){S.previewing=false;S.owner=true;S.mine={};S.dirty=false;toast("回到擁有者模式 ✧")}
   else{S.previewing=true;S.owner=false;S.mine={};S.gAccts=DEFACC.map(a=>({...a}));S.dirty=false;S.edit=false;toast("預覽訪客模式：這裡的操作不會動到你的資料 👀")}
   CAL.selMode=false;CAL.picked.clear();S.rEdit=false;S.rSel=false;S.rPicked.clear();S.shSel=false;S.shPicked.clear();
-  syncSrv();renderIO();renderShiki();renderEggs();renderCal();renderRes();if(!$("calDay").hidden)calRenderDay();window.scrollTo({top:0});
+  syncSrv();renderIO();renderShiki();renderEggs();renderCal();renderCalTop();renderRes();if(!$("calDay").hidden)calRenderDay();window.scrollTo({top:0});
 };
 function renderIO(){
   const g=S.owner===false;$("io").hidden=S.owner===null;$("io").classList.toggle("guest",g);
@@ -2267,7 +2267,7 @@ function renderCalTop(){
   const now=Date.now();
   const nm=CALV().filter(e=>kindOf(e)==="m"&&endMs(e)>=now).sort((a,b)=>endMs(a)-endMs(b))[0];
   const ftd=CAL.ev.filter(e=>kindOf(e)==="m"&&e.endTbd).sort((a,b)=>a.date<b.date?1:-1)[0];
-  if(ftd){$("calCd1").innerHTML=`<span class="cdlbl">🔧 維護</span><span class="cdtxt">${rangeOf(ftd)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span></span><span class="cdtxt cdn urg">⚠️維護結束時間未定⚠️</span>`}
+  if(ftd){$("calCd1").innerHTML=`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(ftd)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span>${ftd.time&&!TBD(ftd.time)?" "+esc(tDisp(ftd.time)):""}${ftd.endTime?" – "+esc(tDisp(ftd.endTime)):""}</span><span class="cdtxt cdn urg">⚠️維護結束時間未定⚠️</span>`}
   else if(nm){
     const st=startMs(nm),en=endMs(nm),dur=st!=null&&nm.endTime&&/^\d{2}:\d{2}$/.test(nm.endTime)?en-st:null,during=st!=null&&st<=now;
     const hrs=dur>0?Math.round(dur/36e5*10)/10:null;
@@ -2276,12 +2276,7 @@ function renderCalTop(){
     const tbdNm=TBD(nm.time);
     $("calCd1").innerHTML=tbdNm?`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span> <b class="urg">時間未定</b></span><span class="cdtxt cdn urg">⏰ 維護時間未定，請留意官方公告</span>`:`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span>${tt}${hrs?`（預計 ${hrs} 小時）`:""}</span><span class="cdtxt cdn">${cd}</span><span class="cdtxt cdnote">（請以官方公佈時間為準）</span>`;
   }else $("calCd1").innerHTML="🔧 暫時未有維護安排";
-  {const mb=$("calMaintTbd");if(mb){
-    const tgt=ftd||nm||CAL.ev.filter(e=>kindOf(e)==="m"&&e.date<=hkToday()).sort((a,b)=>a.date<b.date?1:-1)[0];
-    mb.hidden=!(S.owner===true&&tgt);
-    mb.textContent=ftd?"✅ 已確定維護結束時間":"⏰ 維護結束時間未定";
-    mb.dataset.mid=tgt?tgt.id:"";mb.dataset.on=ftd?"1":"0";
-  }}
+  {const box=$("calMaintBtns");if(box){const tgt=ftd||nm||CAL.ev.filter(e=>kindOf(e)==="m"&&e.date<=hkToday()).sort((a,b)=>a.date<b.date?1:-1)[0];box.hidden=!(S.owner===true&&!S.previewing&&tgt);$("calMaintBack").dataset.mid=ftd?ftd.id:"";$("calMaintEdit").dataset.mid=tgt?tgt.id:""}}
   const ne=CALV().filter(e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e)).sort((a,b)=>endMs(a)-endMs(b))[0];
   {const td=$("calTodo");const n=S.owner===true?CAL.ev.filter(autoLT).length:0;if(td){td.hidden=!n;td.textContent=`⚠️ 有 ${n} 項活動嘅「長期有效」係自動判斷，點擊查看待確認`;td.onclick=()=>autoOpen()}}
   $("calCd2").innerHTML=ne?`<span class="cdlbl">⏳ 即將結束</span><span class="cdtxt">${esc(ne.title)} : <b class="${urgent(ne)?"urg":""}">${cdText(ne)}</b></span>`:"⏳ 暫時沒有進行中的限時活動";
@@ -2400,26 +2395,27 @@ function calRenderDay(){
   $("calDayList").querySelectorAll("[data-ce]").forEach(b=>b.onclick=()=>calEdit(b.dataset.ce));
   $("calDayAdd").hidden=!own;
 }
-function tbdSync(){const t=$("calfTBD").checked;if(t)$("calfTime").value="";$("calfTime").disabled=t;$("calfEndT").disabled=t||$("calfPerm").checked}
-function calFill(e){$("calfDate").value=e.date||"";$("calfEnd").value=e.end||"";$("calfTitle").value=e.title||"";$("calfTime").value=TBD(e.time)?"":(e.time||"");$("calfTBD").checked=TBD(e.time);tbdSync();$("calfEndT").value=e.endTime||"";$("calfNote").value=e.note||"";tagPick(expTags(e));$("calfPerm").checked=!!e.perm;permSync();$("calfConfirm").hidden=true}
-function permSync(){const p=$("calfPerm").checked;$("calfEnd").disabled=p;$("calfEndT").disabled=p||$("calfTBD").checked}
+const tbdIsM=()=>/維護/.test($("calfTitle").value);
+function tbdSync(){const t=$("calfTBD").checked,m=tbdIsM(),hard=t&&!m;if(hard)$("calfTime").value="";$("calfTime").disabled=hard;$("calfEndT").disabled=hard||$("calfPerm").checked;$("calfTBDt").textContent=m?"⚠️ 結束時間未定（首頁會顯示提示，時間照填）":"⏰ 時間未定（會提醒留意官方公告）"}
+function calFill(e){const M=/維護/.test(e.title||"");$("calfDate").value=e.date||"";$("calfEnd").value=e.end||"";$("calfTitle").value=e.title||"";$("calfTime").value=TBD(e.time)?"":(e.time||"");$("calfTBD").checked=M?!!e.endTbd:TBD(e.time);tbdSync();$("calfEndT").value=e.endTime||"";$("calfNote").value=e.note||"";tagPick(expTags(e));$("calfPerm").checked=!!e.perm;permSync();$("calfConfirm").hidden=true}
+function permSync(){const p=$("calfPerm").checked;$("calfEnd").disabled=p;$("calfEndT").disabled=p||($("calfTBD").checked&&!tbdIsM())}
 function calNew(){CAL.eid=null;calFill({date:CAL.sel});$("calEvT").textContent="新增活動";$("calDelBtn").hidden=true;$("calScrim").hidden=false}
 function calEdit(id){const e=CAL.ev.find(x=>x.id===id);if(!e)return;CAL.eid=id;calFill(e);$("calEvT").textContent="修改活動";$("calDelBtn").hidden=S.owner!==true;$("calScrim").hidden=false}
 async function calSave(){
   if(!S.db||S.owner!==true){toast("只有擁有者可以改");return}
   const date=dParse($("calfDate").value),endRaw=$("calfEnd").value.trim(),end=endRaw?dParse(endRaw):null;
   const title=$("calfTitle").value.trim(),trRaw=$("calfTime").value.trim(),erRaw=$("calfEndT").value.trim(),note=$("calfNote").value.trim();
-  const tbd=$("calfTBD").checked||/^(時間)?未定$/.test(trRaw);const time=tbd?"時間未定":(tParse(trRaw)||trRaw||null),endT=tbd?null:(tParse(erRaw)||erRaw||null);
+  const isM=/維護/.test(title),tbd=!isM&&($("calfTBD").checked||/^(時間)?未定$/.test(trRaw)),endTbdM=isM&&$("calfTBD").checked;const time=tbd?"時間未定":(tParse(trRaw)||trRaw||null),endT=tbd?null:(tParse(erRaw)||erRaw||null);
   if(!date){toast("日期看不明，試下 1012 或 10/12");return}
   if(endRaw&&!end&&!$("calfPerm").checked){toast("結束日期看不明，試下 1020 或 10/20");return}
   if(end&&end<date){toast("結束日期不可以早過開始日期");return}
   if(!title){toast("打個活動名先吧");return}
   const perm=$("calfPerm").checked;
-  const body={date,title,time,note:note||null,end:perm?null:(end||null),endTime:perm?null:(endT||null),perm,tag:null,tags:(()=>{const p=tagPicked();return p.includes("__none")?["__none"]:p.length?p:null})()};
+  const body={date,title,time,note:note||null,end:perm?null:(end||null),endTime:perm?null:(endT||null),perm,endTbd:endTbdM||null,tag:null,tags:(()=>{const p=tagPicked();return p.includes("__none")?["__none"]:p.length?p:null})()};
   try{
     if(CAL.eid)await S.db.doc("cal/"+CAL.eid).update(body);
     else await S.db.collection("cal").add(body);
-    $("calScrim").hidden=true;toast(tbd?(/維護/.test(title)?"⏰ 維護時間未定，首頁會提醒留意官方公告":"⏰ 時間未定，首頁會提醒留意官方公告"):"已儲存 ✧");calOpenDay(date);
+    $("calScrim").hidden=true;toast(tbd?(/維護/.test(title)?"⏰ 維護時間未定，首頁會提醒留意官方公告":"⏰ 時間未定，首頁會提醒留意官方公告"):"已儲存 ✧");renderCal();renderCalTop();calOpenDay(date);
   }catch(e){toast("沒存到："+(e.code||"錯誤"))}
 }
 async function calDel(){
@@ -2433,7 +2429,8 @@ $("autoCancel").onclick=()=>{$("autoScrim").hidden=true};
 $("autoFilter").onclick=()=>{$("autoScrim").hidden=true;pref("calTagShow",JSON.stringify(["t6"]));renderCal();if(!$("calDay").hidden)calRenderDay()};
 $("autoGo").onclick=autoConfirm;
 $("autoList").onclick=ev=>{const b=ev.target.closest("button");if(!b)return;const id=b.dataset.ae||b.dataset.ad;if(!id)return;$("autoScrim").hidden=true;calEdit(id);if(b.dataset.ad)$("calfConfirm").hidden=false};
-$("calMaintTbd").onclick=async()=>{if(!S.db||S.owner!==true)return;const b=$("calMaintTbd");const on=b.dataset.on==="1";const id=b.dataset.mid;if(!id)return;try{await S.db.doc("cal/"+id).update({endTbd:!on});toast(on?"已確定維護結束時間 ✧":"⚠️ 已標記維護結束時間未定");renderCal();renderCalTop()}catch(x){toast("沒存到："+(x.code||"錯誤"))}};
+$("calMaintBack").onclick=async()=>{const id=$("calMaintBack").dataset.mid;if(!id){toast("未有可以返回嘅步驟");return}try{await S.db.doc("cal/"+id).update({endTbd:false});toast("已返回，維護結束時間唔再標示未定 ✧");renderCal();renderCalTop()}catch(x){toast("沒存到："+(x.code||"錯誤"))}};
+$("calMaintEdit").onclick=()=>{const id=$("calMaintEdit").dataset.mid;if(id)calEdit(id)};
 $("calPrev").onclick=()=>calMove(-1);$("calNext").onclick=()=>calMove(1);
 $("calToday").onclick=()=>{const t=hkToday();CAL.y=+t.slice(0,4);CAL.m=+t.slice(5,7)-1;CAL.sel=t;renderCal()};
 $("calEndedBtn").onclick=()=>{CAL.showEnded=!CAL.showEnded;renderCal();if(!$("calDay").hidden)calRenderDay()};
