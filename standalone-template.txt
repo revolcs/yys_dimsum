@@ -316,6 +316,8 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .cbody b{font-weight:700;overflow-wrap:anywhere}
 .cbody small{color:var(--ink-soft);font-size:.78rem}
 .ccd{font-size:.8rem;color:var(--ink-soft)}
+.autolt{display:inline-block;margin-top:4px;font-size:.72rem;font-weight:700;background:var(--gold);color:#222;border-radius:6px;padding:1px 6px}
+#calTodo{cursor:pointer;margin-top:6px;font-size:.8rem;font-weight:700;color:var(--ink);background:var(--gold);color:#222;border-radius:10px;padding:5px 9px;display:block}
 .ccd b{font-family:var(--f-num);color:var(--ink);font-weight:700}
 .urg{color:var(--seal)!important;font-weight:900!important}
 .cdlbl{display:block;font-weight:700;color:var(--ink-soft)}
@@ -460,7 +462,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="tab" id="tab-res" role="tab" aria-selected="false">資源獲取</button>
       <button class="tab" id="tab-cal" role="tab" aria-selected="false">行事月曆</button>
     </nav>
-    <div class="calbar" id="calTop" hidden><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><div id="calCd2"></div></div>
+    <div class="calbar" id="calTop" hidden><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><div id="calCd2"></div><div id="calTodo" hidden></div></div>
     <div class="acctwrap topacct" id="acctRow"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button></div>
     <div class="jump" id="jump" aria-label="跳到稀有度"></div>
   </div>
@@ -2182,7 +2184,8 @@ const TAG0=[{k:"t1",name:"活動-期間限定",color:"#5f7d3a",kw:[]},{k:"t2",na
 const kwNorm=x=>String(x||"").replace(/\s+/g,"").toLowerCase();
 CAL.tags=TAG0.map(t=>({...t,kw:[...t.kw]}));
 const expTags=e=>Array.isArray(e&&e.tags)&&e.tags.length?e.tags.map(String):(e&&e.tag?[String(e.tag)]:[]);
-const tagsOf=e=>{if(!e||kindOf(e)!=="n")return [];const ex=expTags(e);if(ex.includes("__none"))return [];const got=ex.map(k=>CAL.tags.find(t=>t.k===k)).filter(Boolean);if(got.length)return got;const tt=kwNorm(e.title);const kw=CAL.tags.filter(t=>(t.kw||[]).some(k=>k&&tt.includes(kwNorm(k))));const t1=CAL.tags.find(t=>t.k==="t1");const out=[];if(t1&&e.end&&!e.perm)out.push(t1);for(const t of kw)if(!out.includes(t))out.push(t);return out};
+const tagsOf=e=>{if(!e||kindOf(e)!=="n")return [];const ex=expTags(e);if(ex.includes("__none"))return [];const got=ex.map(k=>CAL.tags.find(t=>t.k===k)).filter(Boolean);if(got.length)return got;const tt=kwNorm(e.title);const kw=CAL.tags.filter(t=>(t.kw||[]).some(k=>k&&tt.includes(kwNorm(k))));const t1=CAL.tags.find(t=>t.k==="t1");const out=[];if(t1&&e.end&&!e.perm)out.push(t1);for(const t of kw)if(!out.includes(t))out.push(t);if(!e.end&&!e.perm&&!out.some(t=>t.k==="t6")){const t6=CAL.tags.find(t=>t.k==="t6");if(t6)out.push(t6)}return out};
+const autoLT=e=>{if(!e||kindOf(e)!=="n"||e.end||e.perm||expTags(e).length)return false;const t6=CAL.tags.find(t=>t.k==="t6");const tt=kwNorm(e.title);return !(t6&&(t6.kw||[]).some(k=>k&&tt.includes(kwNorm(k))))};
 const tagOf=e=>tagsOf(e)[0]||null;
 const tagShown=()=>{try{const v=JSON.parse(pref("calTagShow")||"[]");return Array.isArray(v)?v:[]}catch(x){return []}};
 const tagPass=e=>{const sh=tagShown();if(!sh.length||kindOf(e)!=="n")return true;return tagsOf(e).some(t=>sh.includes(t.k))};
@@ -2239,7 +2242,7 @@ const cdLine=e=>(kindOf(e)==="m"&&TBD(e.time))?"⏰ <b class=\"urg\">時間未�
 const calSort=(a,b)=>(a.date+(a.time||"~")).localeCompare(b.date+(b.time||"~"));
 const isEnded=e=>hasEnd(e)&&endMs(e)<Date.now();
 const statusOf=e=>{const t=hkToday();if(e.date>t)return "soon";if(e.perm)return e.date===t?"ing":"perm";return isEnded(e)?"end":"ing"};
-const bannerHTML=e=>{const k=kindOf(e),own=S.owner===true,sel=CAL.selMode;const ban=`<button type="button" class="cbanner k-${k}" style="--kc:${evColor(e)}" data-d="${esc(e.date)}"><span class="cband"><b>${rangeOf(e)}</b>${tagChips(e)}</span><span class="cbody"><b>${esc(e.title)}</b>${(e.time||e.note)?`<small>${e.time?esc(tDisp(e.time))+(e.note?" · ":""):""}${esc(e.note||"")}</small>`:""}<span class="ccd">${cdLine(e)}</span>${e._d1?`<small class="d1line">🗓 以你的 Day 1（${fmtMD(e._d1.d1)}）起算 ${e._d1.n} 天${e._d1.custom?"":"（目前用活動開始日）"}</small>`:""}</span></button>`;const d1b=e._d1?`<button type="button" class="btn ghost d1btn" data-d1="${esc(e.id)}">🗓 改我的 Day 1</button>`:"";if(!own)return d1b?`<div class="cbmain col d1g">${ban}${d1b}</div>`:ban;return `<div class="cbwrap">${sel?`<input type="checkbox" class="csel" data-sel="${esc(e.id)}"${CAL.picked.has(e.id)?" checked":""} aria-label="選取${esc(e.title)}">`:""}<div class="cbmain${d1b?" col":""}">${ban}${d1b}</div><div class="cbside"><button type="button" class="btn ghost cbtn" data-ce="${esc(e.id)}">改</button><button type="button" class="btn ghost cbtn cbdel" data-cdel="${esc(e.id)}">刪</button></div></div>`};
+const bannerHTML=e=>{const k=kindOf(e),own=S.owner===true,sel=CAL.selMode;const ban=`<button type="button" class="cbanner k-${k}" style="--kc:${evColor(e)}" data-d="${esc(e.date)}"><span class="cband"><b>${rangeOf(e)}</b>${tagChips(e)}</span><span class="cbody"><b>${esc(e.title)}</b>${(e.time||e.note)?`<small>${e.time?esc(tDisp(e.time))+(e.note?" · ":""):""}${esc(e.note||"")}</small>`:""}<span class="ccd">${cdLine(e)}</span>${own&&autoLT(e)?`<span class="autolt">⚠️ 長期有效係自動判斷，待確認（改一次標籤即可確認）</span>`:""}${e._d1?`<small class="d1line">🗓 以你的 Day 1（${fmtMD(e._d1.d1)}）起算 ${e._d1.n} 天${e._d1.custom?"":"（目前用活動開始日）"}</small>`:""}</span></button>`;const d1b=e._d1?`<button type="button" class="btn ghost d1btn" data-d1="${esc(e.id)}">🗓 改我的 Day 1</button>`:"";if(!own)return d1b?`<div class="cbmain col d1g">${ban}${d1b}</div>`:ban;return `<div class="cbwrap">${sel?`<input type="checkbox" class="csel" data-sel="${esc(e.id)}"${CAL.picked.has(e.id)?" checked":""} aria-label="選取${esc(e.title)}">`:""}<div class="cbmain${d1b?" col":""}">${ban}${d1b}</div><div class="cbside"><button type="button" class="btn ghost cbtn" data-ce="${esc(e.id)}">改</button><button type="button" class="btn ghost cbtn cbdel" data-cdel="${esc(e.id)}">刪</button></div></div>`};
 const d1Days=e=>{const m=String((e.title||"")+" "+(e.note||"")).match(/首次登入(?:起[計算]|後)\s*(\d+)\s*[日天]/);return m?Math.max(1,Math.min(60,+m[1])):0};
 const d1Key=e=>`calD1_${S.owner===true?"o":"g"}_${e.id}`;
 const d1Get=e=>{const v=pref(d1Key(e))||"",lo=e.date,hi=e.end||e.date;return /^\d{4}-\d{2}-\d{2}$/.test(v)&&v>=lo&&v<=hi?v:lo};
@@ -2264,6 +2267,7 @@ function renderCalTop(){
     $("calCd1").innerHTML=tbdNm?`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span> <b class="urg">時間未定</b></span><span class="cdtxt cdn urg">⏰ 維護時間未定，請留意官方公告</span>`:`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span>${tt}${hrs?`（預計 ${hrs} 小時）`:""}</span><span class="cdtxt cdn">${cd}</span><span class="cdtxt cdnote">（請以官方公佈時間為準）</span>`;
   }else $("calCd1").innerHTML="🔧 暫時未有維護安排";
   const ne=CALV().filter(e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e)).sort((a,b)=>endMs(a)-endMs(b))[0];
+  {const td=$("calTodo");const n=S.owner===true?CAL.ev.filter(autoLT).length:0;if(td){td.hidden=!n;td.textContent=`⚠️ 有 ${n} 項活動嘅「長期有效」係自動判斷，點擊查看待確認`;td.onclick=()=>{pref("calTagShow",JSON.stringify(["t6"]));renderCal();if(!$("calDay").hidden)calRenderDay()}}}
   $("calCd2").innerHTML=ne?`<span class="cdlbl">⏳ 即將結束</span><span class="cdtxt">${esc(ne.title)} : <b class="${urgent(ne)?"urg":""}">${cdText(ne)}</b></span>`:"⏳ 暫時沒有進行中的限時活動";
 }
 function renderCal(){
