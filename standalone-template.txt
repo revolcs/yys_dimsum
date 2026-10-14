@@ -2178,11 +2178,11 @@ const ymdOf=(y,m,d)=>`${y}-${String(m+1).padStart(2,"0")}-${String(d).padStart(2
 const kindOf=e=>e.perm?"p":/維護/.test(e.title||"")?"m":/結束|到期/.test(e.title||"")?"e":"n";
 const KLBL={m:"維護",e:"結束",n:"活動",p:"永久"};
 const CAL_PRESET=["#8c6d46","#5f7d3a","#2f6f6a","#c96a2b","#4a5a78","#7a6a3f","#3d6b8a","#7b4f9e","#4c6db0"];
-const TAG0=[{k:"t1",name:"活動-期間限定",color:"#5f7d3a",kw:[]},{k:"t2",name:"活動-特別加成",color:"#2f6f6a",kw:["額外加成","機率UP"]},{k:"t3",name:"活動-課金相關",color:"#c96a2b",kw:["禮"]},{k:"t4",name:"活動-召喚(抽卡)相關",color:"#7b4f9e",kw:["召喚","抽卡"]},{k:"t5",name:"活動-皮膚上新",color:"#4c6db0",kw:["皮膚","外觀","染色","裝扮"]}];
+const TAG0=[{k:"t1",name:"活動-期間限定",color:"#5f7d3a",kw:[]},{k:"t2",name:"活動-特別加成",color:"#2f6f6a",kw:["額外加成","機率UP"]},{k:"t3",name:"活動-課金相關",color:"#c96a2b",kw:["禮"]},{k:"t4",name:"活動-召喚(抽卡)相關",color:"#7b4f9e",kw:["召喚","抽卡"]},{k:"t5",name:"活動-皮膚上新",color:"#4c6db0",kw:["皮膚上新","外觀","染色","裝扮"]},{k:"t6",name:"活動-長期有效",color:"#2a8fb0",kw:["秘聞","皮膚塔"]}];
 const kwNorm=x=>String(x||"").replace(/\s+/g,"").toLowerCase();
 CAL.tags=TAG0.map(t=>({...t,kw:[...t.kw]}));
 const expTags=e=>Array.isArray(e&&e.tags)&&e.tags.length?e.tags.map(String):(e&&e.tag?[String(e.tag)]:[]);
-const tagsOf=e=>{if(!e||kindOf(e)!=="n")return [];const ex=expTags(e);if(ex.includes("__none"))return [];const got=ex.map(k=>CAL.tags.find(t=>t.k===k)).filter(Boolean);if(got.length)return got;const tt=kwNorm(e.title);return CAL.tags.filter(t=>(t.kw||[]).some(k=>k&&tt.includes(kwNorm(k))))};
+const tagsOf=e=>{if(!e||kindOf(e)!=="n")return [];const ex=expTags(e);if(ex.includes("__none"))return [];const got=ex.map(k=>CAL.tags.find(t=>t.k===k)).filter(Boolean);if(got.length)return got;const tt=kwNorm(e.title);const kw=CAL.tags.filter(t=>(t.kw||[]).some(k=>k&&tt.includes(kwNorm(k))));const t1=CAL.tags.find(t=>t.k==="t1");const out=[];if(t1&&e.end&&!e.perm)out.push(t1);for(const t of kw)if(!out.includes(t))out.push(t);return out};
 const tagOf=e=>tagsOf(e)[0]||null;
 const tagShown=()=>{try{const v=JSON.parse(pref("calTagShow")||"[]");return Array.isArray(v)?v:[]}catch(x){return []}};
 const tagPass=e=>{const sh=tagShown();if(!sh.length||kindOf(e)!=="n")return true;return tagsOf(e).some(t=>sh.includes(t.k))};
