@@ -2283,9 +2283,10 @@ function renderCalTop(){
     $("calCd1").innerHTML=tbdNm?`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span> <b class="urg">時間未定</b></span><span class="cdtxt cdn urg">⏰ 維護時間未定，請留意官方公告</span>`:`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span>${tt}${hrs?`（預計 ${hrs} 小時）`:""}</span><span class="cdtxt cdn">${cd}</span><span class="cdtxt cdnote">（請以官方公佈時間為準）</span>`;
   }else $("calCd1").innerHTML="🔧 暫時未有維護安排";
   {const box=$("calMaintBtns");if(box){const tgt=ftd||nm||CAL.ev.filter(e=>kindOf(e)==="m"&&e.date<=hkToday()).sort((a,b)=>a.date<b.date?1:-1)[0];box.hidden=!(S.owner===true&&!S.previewing&&tgt);$("calMaintBack").dataset.mid=ftd?ftd.id:"";$("calMaintEdit").dataset.mid=tgt?tgt.id:""}}
-  const hdrOk=e=>/開啟/.test(e.title||"")||tagsOf(e).some(t=>t.k==="t4");const ne=CALV().filter(e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e)&&hdrOk(e)).sort((a,b)=>endMs(a)-endMs(b))[0];const neNear=!!ne&&endMs(ne)-now<3*864e5;
+  const hdrBase=e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e);const sumL=CALV().filter(e=>hdrBase(e)&&tagsOf(e).some(t=>t.k==="t4")).sort((a,b)=>endMs(a)-endMs(b));const verL=CALV().filter(e=>hdrBase(e)&&/開啟/.test(e.title||"")&&!tagsOf(e).some(t=>t.k==="t4")).sort((a,b)=>endMs(a)-endMs(b));const sumNear=sumL.some(e=>endMs(e)-now<3*864e5);
   {const td=$("calTodo");const n=S.owner===true?CAL.ev.filter(autoLT).length:0;if(td){td.hidden=!n;td.textContent=`⚠️ 有 ${n} 項活動嘅「長期有效」係自動判斷，點擊查看待確認`;td.onclick=()=>autoOpen()}}
-  $("calCd2").innerHTML=ne?`<span class="cdlbl">${neNear?"⚠️ 即將結束 ⚠️":"⏳ 即將結束"}</span><span class="cdtxt">${esc(ne.title)} : <b class="${urgent(ne)?"urg":""}">${cdText(ne)}</b></span>`:"⏳ 暫時沒有進行中的限時活動";
+  const hdrRow=e=>`<span class="cdtxt">${esc(e.title)} : <b class="${urgent(e)?"urg":""}">${cdText(e)}</b></span>`;
+  $("calCd2").innerHTML=`<span class="cdlbl">${sumNear?"⚠️ 即將結束（抽卡） ⚠️":"⏳ 即將結束（抽卡）"}</span>`+(sumL.length?sumL.slice(0,5).map(hdrRow).join(""):`<span class="cdtxt">暫時沒有抽卡活動</span>`)+(verL.length?`<span class="cdlbl" style="margin-top:6px">🎉 版本活動</span>`+verL.slice(0,5).map(hdrRow).join(""):"");
 }
 function renderCal(){
   if(!$("pane-cal"))return;renderCalLegend();
