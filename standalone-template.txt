@@ -321,6 +321,8 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .ccd b{font-family:var(--f-num);color:var(--ink);font-weight:700}
 .urg{color:var(--seal)!important;font-weight:900!important}
 .cdlbl{display:block;font-weight:700;color:var(--ink-soft)}
+.hsec{margin-top:10px;border:3px solid var(--ink);border-radius:16px;padding:9px 12px 10px;background:var(--sheet);box-shadow:4px 4px 0 var(--ink)}
+.hsec .cdlbl{margin-top:0}
 .cdtxt{display:block;color:var(--ink);font-weight:700;overflow-wrap:anywhere;padding-left:1.4em;margin-top:1px}
 .cdtxt b{font-family:var(--f-num);margin-left:4px;white-space:nowrap}
 .cdtxt.cdn{font-weight:600;color:var(--ink-soft)}
@@ -2286,7 +2288,7 @@ function renderCalTop(){
   const hdrBase=e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e);const sumL=CALV().filter(e=>hdrBase(e)&&tagsOf(e).some(t=>t.k==="t4")).sort((a,b)=>endMs(a)-endMs(b));const verL=CALV().filter(e=>hdrBase(e)&&/開啟/.test(e.title||"")&&!tagsOf(e).some(t=>t.k==="t4")).sort((a,b)=>endMs(a)-endMs(b));const sumNear=sumL.some(e=>endMs(e)-now<3*864e5);
   {const td=$("calTodo");const n=S.owner===true?CAL.ev.filter(autoLT).length:0;if(td){td.hidden=!n;td.textContent=`⚠️ 有 ${n} 項活動嘅「長期有效」係自動判斷，點擊查看待確認`;td.onclick=()=>autoOpen()}}
   const hdrRow=e=>`<span class="cdtxt">${esc(e.title)} : <b class="${urgent(e)?"urg":""}">${cdText(e)}</b></span>`;
-  $("calCd2").innerHTML=`<span class="cdlbl">${sumNear?"⚠️ 即將結束（抽卡） ⚠️":"⏳ 即將結束（抽卡）"}</span>`+(sumL.length?sumL.slice(0,5).map(hdrRow).join(""):`<span class="cdtxt">暫時沒有抽卡活動</span>`)+(verL.length?`<span class="cdlbl" style="margin-top:6px">🎉 版本活動</span>`+verL.slice(0,5).map(hdrRow).join(""):"");
+  const hsec=(body)=>`<div class="hsec">${body}</div>`;const secV=verL.length?hsec(`<span class="cdlbl">🎉 版本活動</span>`+verL.slice(0,5).map(hdrRow).join("")):"";const secS=hsec(`<span class="cdlbl">${sumNear?"⚠️ 即將結束（抽卡） ⚠️":"⏳ 即將結束（抽卡）"}</span>`+(sumL.length?sumL.slice(0,5).map(hdrRow).join(""):`<span class="cdtxt">暫時沒有抽卡活動</span>`));$("calCd2").innerHTML=secV+secS;
 }
 function renderCal(){
   if(!$("pane-cal"))return;renderCalLegend();
