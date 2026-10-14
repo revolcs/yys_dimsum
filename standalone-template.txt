@@ -2185,6 +2185,7 @@ const expTags=e=>Array.isArray(e&&e.tags)&&e.tags.length?e.tags.map(String):(e&&
 const tagsOf=e=>{if(!e||kindOf(e)!=="n")return [];const ex=expTags(e);if(ex.includes("__none"))return [];const got=ex.map(k=>CAL.tags.find(t=>t.k===k)).filter(Boolean);if(got.length)return got;const tt=kwNorm(e.title);return CAL.tags.filter(t=>(t.kw||[]).some(k=>k&&tt.includes(kwNorm(k))))};
 const tagOf=e=>tagsOf(e)[0]||null;
 const tagShown=()=>{try{const v=JSON.parse(pref("calTagShow")||"[]");return Array.isArray(v)?v:[]}catch(x){return []}};
+const tagPass=e=>{const sh=tagShown();if(!sh.length||kindOf(e)!=="n")return true;return tagsOf(e).some(t=>sh.includes(t.k))};
 const tagChips=e=>{if(kindOf(e)!=="n")return `<i>${esc(labelOf(e))}</i>`;const sh=tagShown();const ts=tagsOf(e).filter(t=>sh.includes(t.k));return ts.length?`<span class="tchips">${ts.map(t=>`<i class="tfill" style="--tc:${t.color}">${esc(t.name)}</i>`).join("")}</span>`:""};
 function tagPick(sel){const on=new Set(sel);$("calfTags").innerHTML=CAL.tags.map(t=>`<label class="tgck"><input type="checkbox" value="${esc(t.k)}"${on.has(t.k)?" checked":""}><span class="tdot" style="background:${t.color}"></span>${esc(t.name)}</label>`).join("")+`<label class="tgck"><input type="checkbox" value="__none"${on.has("__none")?" checked":""}>不分類</label>`;
   $("calfTags").querySelectorAll("input").forEach(c=>c.onchange=()=>{if(!c.checked)return;if(c.value==="__none")$("calfTags").querySelectorAll("input").forEach(o=>{if(o!==c)o.checked=false});else{const n=$("calfTags").querySelector('input[value="__none"]');if(n)n.checked=false}})}
@@ -2194,7 +2195,7 @@ const matchTag=v=>{const x=String(v||"").trim();return CAL.tags.find(t=>t.name==
 const tagClean=list=>{if(!Array.isArray(list))return null;return list.filter(t=>t&&t.k&&t.name).map(t=>({k:String(t.k),name:String(t.name).slice(0,20),color:/^#[0-9a-f]{6}$/i.test(t.color||"")?t.color:"#8c6d46",kw:Array.isArray(t.kw)?t.kw.map(x=>String(x).trim()).filter(Boolean).slice(0,20):[...((TAG0.find(x=>x.k===t.k)||{}).kw||[])]}))};
 const tagOptions=sel=>`<option value="">（自動分類）</option><option value="__none"${sel==="__none"?" selected":""}>（不分類，顯示為「活動」）</option>`+CAL.tags.map(t=>`<option value="${esc(t.k)}"${t.k===sel?" selected":""}>${esc(t.name)}</option>`).join("");
 function renderCalLegend(){const sh=tagShown();const el=$("calTagLg");if(el){const L=CAL.tags.filter(t=>sh.includes(t.k));el.hidden=!L.length;el.innerHTML=L.map(t=>`<span class="lg k-n" style="--kc:${t.color}">${esc(t.name)}</span>`).join("")}
-  const row=$("calTgRow");if(row){row.innerHTML=CAL.tags.map(t=>`<button type="button" class="tgbtn" data-tk="${esc(t.k)}" style="--tc:${t.color}" aria-pressed="${sh.includes(t.k)}">${esc(t.name)}</button>`).join("");row.querySelectorAll("[data-tk]").forEach(b=>b.onclick=()=>{const cur=tagShown(),k=b.dataset.tk;pref("calTagShow",JSON.stringify(cur.includes(k)?cur.filter(x=>x!==k):[...cur,k]));renderCal();if(!$("calDay").hidden)calRenderDay()})}}
+  const row=$("calTgRow");if(row){row.innerHTML=`<button type="button" class="tgbtn tgall" data-tk="__all" aria-pressed="${!sh.length}">全部</button>`+CAL.tags.map(t=>`<button type="button" class="tgbtn" data-tk="${esc(t.k)}" style="--tc:${t.color}" aria-pressed="${sh.includes(t.k)}">${esc(t.name)}</button>`).join("");row.querySelectorAll("[data-tk]").forEach(b=>b.onclick=()=>{const cur=tagShown(),k=b.dataset.tk;pref("calTagShow",JSON.stringify(k==="__all"?[]:cur.includes(k)?cur.filter(x=>x!==k):[...cur,k]));renderCal();if(!$("calDay").hidden)calRenderDay()})}}
 const PAL=["#8c6d46","#5f7d3a","#2f6f6a","#c96a2b","#4a5a78"];
 const evColor=e=>{const k=kindOf(e);if(k==="p")return "#8e3563";if(k==="m")return "#b5523b";if(k==="e")return "var(--gold)";const tg=tagOf(e);if(tg)return tg.color;let x=0;for(const ch of String(e.title||""))x=(x*31+ch.codePointAt(0))%100000;return PAL[x%PAL.length]};
 const endOf=e=>e.perm?e.date:(e.end||e.date);
@@ -2244,7 +2245,7 @@ const d1Key=e=>`calD1_${S.owner===true?"o":"g"}_${e.id}`;
 const d1Get=e=>{const v=pref(d1Key(e))||"",lo=e.date,hi=e.end||e.date;return /^\d{4}-\d{2}-\d{2}$/.test(v)&&v>=lo&&v<=hi?v:lo};
 const applyD1=e=>{const n=d1Days(e);if(!n||e.perm)return e;const d1=d1Get(e),pe=addDays(d1,n-1),en=e.end&&pe>e.end?e.end:pe;return {...e,date:d1,end:en,_d1:{n,d1,lo:e.date,hi:e.end||e.date,custom:d1!==e.date}}};
 const CALV=()=>CAL.ev.map(applyD1);
-const visEv=()=>CAL.showEnded?CALV():CALV().filter(e=>!isEnded(e));
+const visEv=()=>CAL.showEnded?CALV().filter(tagPass):CALV().filter(e=>!isEnded(e)&&tagPass(e));
 const evOn=k=>visEv().filter(e=>e.date<=k&&endOf(e)>=k).sort(calSort);
 const monthKey=()=>`${CAL.y}-${String(CAL.m+1).padStart(2,"0")}`;
 function calWatch(db){db.doc("meta/caltags").onSnapshot(d=>{const L=d&&d.exists&&d.data&&d.data().list;const tg=tagClean(L);if(tg){CAL.tags=tg;renderCal();renderCalTop();if(!$("calDay").hidden)calRenderDay()}},()=>{});db.collection("cal").onSnapshot(snap=>{CAL.ev=snap.docs.map(d=>({id:d.id,...d.data()}));renderCal();renderCalTop();if(!$("calDay").hidden)calRenderDay()},e=>notice("行事月曆讀取失敗："+(e.code||"")))}
@@ -2262,7 +2263,7 @@ function renderCalTop(){
     const tbdNm=TBD(nm.time);
     $("calCd1").innerHTML=tbdNm?`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span> <b class="urg">時間未定</b></span><span class="cdtxt cdn urg">⏰ 維護時間未定，請留意官方公告</span>`:`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span>${tt}${hrs?`（預計 ${hrs} 小時）`:""}</span><span class="cdtxt cdn">${cd}</span><span class="cdtxt cdnote">（請以官方公佈時間為準）</span>`;
   }else $("calCd1").innerHTML="🔧 暫時未有維護安排";
-  const ne=CALV().filter(e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now).sort((a,b)=>endMs(a)-endMs(b))[0];
+  const ne=CALV().filter(e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e)).sort((a,b)=>endMs(a)-endMs(b))[0];
   $("calCd2").innerHTML=ne?`<span class="cdlbl">⏳ 即將結束</span><span class="cdtxt">${esc(ne.title)} : <b class="${urgent(ne)?"urg":""}">${cdText(ne)}</b></span>`:"⏳ 暫時沒有進行中的限時活動";
 }
 function renderCal(){
@@ -2309,7 +2310,7 @@ function renderCal(){
   $("calGrid").innerHTML=h;
   $("calGrid").querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>calOpenDay(b.dataset.d));
   const ms=`${monthKey()}-01`,me=`${monthKey()}-${String(days).padStart(2,"0")}`;
-  const ALL=CALV(),L=ALL.filter(e=>e.date<=me&&endOf(e)>=ms).sort(calSort);
+  const ALL=CALV().filter(tagPass),L=ALL.filter(e=>e.date<=me&&endOf(e)>=ms).sort(calSort);
   const G={ing:[],soon:[],perm:[],end:[]};
   for(const e of L){const st=statusOf(e);if(st!=="end")G[st].push(e)}
   const endAll=ALL.filter(e=>statusOf(e)==="end").sort((a,b)=>endMs(b)-endMs(a)),cut=addDays(today,-30),endRecent=endAll.filter(e=>endOf(e)>=cut);
