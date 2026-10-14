@@ -2406,8 +2406,8 @@ async function calSave(){
   const date=dParse($("calfDate").value),endRaw=$("calfEnd").value.trim(),end=endRaw?dParse(endRaw):null;
   const title=$("calfTitle").value.trim(),trRaw=$("calfTime").value.trim(),erRaw=$("calfEndT").value.trim(),note=$("calfNote").value.trim();
   const isM=/維護/.test(title),tbd=!isM&&($("calfTBD").checked||/^(時間)?未定$/.test(trRaw)),endTbdM=isM&&$("calfTBD").checked;const time=tbd?"時間未定":(tParse(trRaw)||trRaw||null),endT=tbd?null:(tParse(erRaw)||erRaw||null);
-  if(!date){toast("日期看不明，試下 1012 或 10/12");return}
-  if(endRaw&&!end&&!$("calfPerm").checked){toast("結束日期看不明，試下 1020 或 10/20");return}
+  if(!date){toast(dfmt()==="md"?"日期看不明，試下 1014 或 10/14":"日期看不明，試下 1410 或 14/10");return}
+  if(endRaw&&!end&&!$("calfPerm").checked){toast(dfmt()==="md"?"結束日期看不明，試下 1025 或 10/25":"結束日期看不明，試下 2510 或 25/10");return}
   if(end&&end<date){toast("結束日期不可以早過開始日期");return}
   if(!title){toast("打個活動名先吧");return}
   const perm=$("calfPerm").checked;
