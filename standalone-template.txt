@@ -842,6 +842,14 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div class="row"><button class="btn ghost" id="sdCancel" type="button">取消</button><button class="btn danger" id="sdGo" type="button">確定刪除</button></div>
   </div>
 </div>
+<div id="autoScrim" class="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="autoTitle">
+    <h2 id="autoTitle">⚠️ 待確認嘅「長期有效」</h2>
+    <p class="sdwarn">以下活動冇結束日期，所以係自動判斷為長期有效。判斷啱嘅話撳「全部確定」，會寫入標籤，之後就唔會再提醒。</p>
+    <div class="sdlist" id="autoList"></div>
+    <div class="row"><button class="btn ghost" id="autoCancel" type="button">取消</button><button class="btn ghost" id="autoFilter" type="button">先篩出睇</button><button class="btn" id="autoGo" type="button">全部確定</button></div>
+  </div>
+</div>
 <div id="sbScrim" class="scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sbTitle">
     <h2 id="sbTitle">統一修改</h2>
@@ -2267,7 +2275,7 @@ function renderCalTop(){
     $("calCd1").innerHTML=tbdNm?`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span> <b class="urg">時間未定</b></span><span class="cdtxt cdn urg">⏰ 維護時間未定，請留意官方公告</span>`:`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span>${tt}${hrs?`（預計 ${hrs} 小時）`:""}</span><span class="cdtxt cdn">${cd}</span><span class="cdtxt cdnote">（請以官方公佈時間為準）</span>`;
   }else $("calCd1").innerHTML="🔧 暫時未有維護安排";
   const ne=CALV().filter(e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e)).sort((a,b)=>endMs(a)-endMs(b))[0];
-  {const td=$("calTodo");const n=S.owner===true?CAL.ev.filter(autoLT).length:0;if(td){td.hidden=!n;td.textContent=`⚠️ 有 ${n} 項活動嘅「長期有效」係自動判斷，點擊查看待確認`;td.onclick=()=>{pref("calTagShow",JSON.stringify(["t6"]));renderCal();if(!$("calDay").hidden)calRenderDay()}}}
+  {const td=$("calTodo");const n=S.owner===true?CAL.ev.filter(autoLT).length:0;if(td){td.hidden=!n;td.textContent=`⚠️ 有 ${n} 項活動嘅「長期有效」係自動判斷，點擊查看待確認`;td.onclick=()=>autoOpen()}}
   $("calCd2").innerHTML=ne?`<span class="cdlbl">⏳ 即將結束</span><span class="cdtxt">${esc(ne.title)} : <b class="${urgent(ne)?"urg":""}">${cdText(ne)}</b></span>`:"⏳ 暫時沒有進行中的限時活動";
 }
 function renderCal(){
@@ -2410,6 +2418,12 @@ async function calDel(){
   if(!S.db||S.owner!==true||!CAL.eid)return;
   try{await S.db.doc("cal/"+CAL.eid).delete();$("calScrim").hidden=true;toast("已刪除");calRenderDay()}catch(e){toast("沒刪到："+(e.code||"錯誤"))}
 }
+function autoItems(){return CAL.ev.filter(autoLT)}
+function autoOpen(){const L=autoItems();if(!L.length){renderCalTop();return}$("autoList").innerHTML=L.map(e=>`<div style="width:100%;font-size:.9rem">・${esc(e.title)}<small style="opacity:.7"> ｜ ${esc(e.date)}</small></div>`).join("");$("autoScrim").hidden=false}
+async function autoConfirm(){if(!S.db||S.owner!==true)return;const L=autoItems();let n=0;for(const e of L){try{await S.db.doc("cal/"+e.id).update({tags:["t6"]});n++}catch(x){}}$("autoScrim").hidden=true;toast(n?`已確定 ${n} 項 ✧`:"沒存到，試下再撳");renderCal();renderCalTop();if(!$("calDay").hidden)calRenderDay()}
+$("autoCancel").onclick=()=>{$("autoScrim").hidden=true};
+$("autoFilter").onclick=()=>{$("autoScrim").hidden=true;pref("calTagShow",JSON.stringify(["t6"]));renderCal();if(!$("calDay").hidden)calRenderDay()};
+$("autoGo").onclick=autoConfirm;
 $("calPrev").onclick=()=>calMove(-1);$("calNext").onclick=()=>calMove(1);
 $("calToday").onclick=()=>{const t=hkToday();CAL.y=+t.slice(0,4);CAL.m=+t.slice(5,7)-1;CAL.sel=t;renderCal()};
 $("calEndedBtn").onclick=()=>{CAL.showEnded=!CAL.showEnded;renderCal();if(!$("calDay").hidden)calRenderDay()};
