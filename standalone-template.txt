@@ -2283,9 +2283,9 @@ function renderCalTop(){
     $("calCd1").innerHTML=tbdNm?`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span> <b class="urg">時間未定</b></span><span class="cdtxt cdn urg">⏰ 維護時間未定，請留意官方公告</span>`:`<span class="cdlbl">🔧 下次維護</span><span class="cdtxt">${rangeOf(nm)}<span class="dfhint">${dfmt()==="md"?"月/日":"日/月"}</span>${tt}${hrs?`（預計 ${hrs} 小時）`:""}</span><span class="cdtxt cdn">${cd}</span><span class="cdtxt cdnote">（請以官方公佈時間為準）</span>`;
   }else $("calCd1").innerHTML="🔧 暫時未有維護安排";
   {const box=$("calMaintBtns");if(box){const tgt=ftd||nm||CAL.ev.filter(e=>kindOf(e)==="m"&&e.date<=hkToday()).sort((a,b)=>a.date<b.date?1:-1)[0];box.hidden=!(S.owner===true&&!S.previewing&&tgt);$("calMaintBack").dataset.mid=ftd?ftd.id:"";$("calMaintEdit").dataset.mid=tgt?tgt.id:""}}
-  const ne=CALV().filter(e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e)).sort((a,b)=>endMs(a)-endMs(b))[0];
+  const hdrOk=e=>/開啟/.test(e.title||"")||tagsOf(e).some(t=>t.k==="t4");const ne=CALV().filter(e=>kindOf(e)!=="m"&&!e.perm&&e.end&&endMs(e)>=now&&tagPass(e)&&hdrOk(e)).sort((a,b)=>endMs(a)-endMs(b))[0];const neNear=!!ne&&endMs(ne)-now<3*864e5;
   {const td=$("calTodo");const n=S.owner===true?CAL.ev.filter(autoLT).length:0;if(td){td.hidden=!n;td.textContent=`⚠️ 有 ${n} 項活動嘅「長期有效」係自動判斷，點擊查看待確認`;td.onclick=()=>autoOpen()}}
-  $("calCd2").innerHTML=ne?`<span class="cdlbl">⏳ 即將結束</span><span class="cdtxt">${esc(ne.title)} : <b class="${urgent(ne)?"urg":""}">${cdText(ne)}</b></span>`:"⏳ 暫時沒有進行中的限時活動";
+  $("calCd2").innerHTML=ne?`<span class="cdlbl">${neNear?"⚠️ 即將結束 ⚠️":"⏳ 即將結束"}</span><span class="cdtxt">${esc(ne.title)} : <b class="${urgent(ne)?"urg":""}">${cdText(ne)}</b></span>`:"⏳ 暫時沒有進行中的限時活動";
 }
 function renderCal(){
   if(!$("pane-cal"))return;renderCalLegend();
@@ -2337,7 +2337,7 @@ function renderCal(){
   {const soonEnd=Date.now()+3*864e5;G.ending=G.ing.filter(e=>e.end&&!e.perm&&endMs(e)<=soonEnd);G.ing=G.ing.filter(e=>!G.ending.includes(e))}
   const endAll=ALL.filter(e=>statusOf(e)==="end").sort((a,b)=>endMs(b)-endMs(a)),cut=addDays(today,-30),endRecent=endAll.filter(e=>endOf(e)>=cut);
   G.end=CAL.endAll?endAll:endRecent;const endOlder=endAll.length-endRecent.length;
-  const SEC=[["ending","⏳ 即將結束（3 日內）"],["ing","🟢 進行中"],["soon","🔜 準備上線"],["perm","✨ 永久上線"],["end","⚫ 已結束"]];
+  const SEC=[["ending","⚠️ 即將結束（3 日內）⚠️"],["ing","🟢 進行中"],["soon","🔜 準備上線"],["perm","✨ 永久上線"],["end","⚫ 已結束"]];
   $("calList").innerHTML=SEC.map(([k,t])=>`<details class="csec" data-k="${k}"${(CAL.open[k]??(k==="ending"))?" open":""}><summary>${t}<span class="cnt">${G[k].length}</span></summary>${k==="end"?`<p class="sub endnote">${CAL.endAll?"顯示全部已結束的活動":"預設只顯示最近 30 天內結束的活動"}</p>`:""}${G[k].length?G[k].map(bannerHTML).join(""):`<div class="empty" style="padding:10px 0">暫時沒有</div>`}${k==="end"&&(endOlder>0||CAL.endAll)?`<button type="button" class="btn ghost rfull" id="calEndMore">${CAL.endAll?"只顯示最近 30 天":`顯示更早的已結束（${endOlder}）`}</button>`:""}</details>`).join("");
   {const b=$("calEndMore");if(b)b.onclick=()=>{CAL.endAll=!CAL.endAll;renderCal()}}
   $("calList").querySelectorAll("[data-d1]").forEach(b=>b.onclick=e=>{e.stopPropagation();d1Open(b.dataset.d1)});
