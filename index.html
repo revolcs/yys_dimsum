@@ -388,6 +388,9 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .clegend .lg.k-m::before{background:#b5523b}
 .clegend .lg.k-e::before{background:var(--gold)}
 .calset{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+.calset .tgrow{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px}
+.tgbtn{font:inherit;font-size:.8rem;border:2px solid var(--tc);background:var(--sheet);color:var(--ink-soft);border-radius:99px;padding:4px 10px;cursor:pointer}
+.tgbtn[aria-pressed="true"]{background:var(--tc);color:#fff;font-weight:700}
 .calctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 12px}
 .calctl .calview{margin:0}
 .cbwrap{display:flex;gap:6px;align-items:stretch;margin-bottom:10px}
@@ -614,12 +617,12 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div class="calset">
       <div class="seg" role="group" aria-label="日期格式"><button type="button" data-df="md">月/日</button><button type="button" data-df="dm">日/月</button></div>
       <div class="seg" role="group" aria-label="時間格式"><button type="button" data-tf="12">12 小時</button><button type="button" data-tf="24">24 小時</button></div>
-      <div class="seg" role="group" aria-label="活動標籤"><button type="button" data-tg="0">隱藏標籤</button><button type="button" data-tg="1">顯示標籤</button></div>
+      <div class="tgrow" id="calTgRow" role="group" aria-label="活動標籤顯示"></div>
     </div>
     <div class="calctl">
       <div class="seg calview" role="group" aria-label="行事月曆檢視">
-        <button type="button" id="cvMonth" aria-pressed="true">📅 月曆</button>
         <button type="button" id="cvWeek" aria-pressed="false">🗓 日程</button>
+        <button type="button" id="cvMonth" aria-pressed="true">📅 月曆</button>
       </div>
       <button class="btn ghost" id="calNewTop" type="button" hidden>＋ 新增</button>
     </div>
@@ -2181,8 +2184,8 @@ CAL.tags=TAG0.map(t=>({...t,kw:[...t.kw]}));
 const expTags=e=>Array.isArray(e&&e.tags)&&e.tags.length?e.tags.map(String):(e&&e.tag?[String(e.tag)]:[]);
 const tagsOf=e=>{if(!e||kindOf(e)!=="n")return [];const ex=expTags(e);if(ex.includes("__none"))return [];const got=ex.map(k=>CAL.tags.find(t=>t.k===k)).filter(Boolean);if(got.length)return got;const tt=kwNorm(e.title);return CAL.tags.filter(t=>(t.kw||[]).some(k=>k&&tt.includes(kwNorm(k))))};
 const tagOf=e=>tagsOf(e)[0]||null;
-const tagsOn=()=>pref("calTag")==="1";
-const tagChips=e=>{if(kindOf(e)==="n"&&!tagsOn())return "";const ts=kindOf(e)==="n"?tagsOf(e):[];return ts.length?`<span class="tchips">${ts.map(t=>`<i class="tfill" style="--tc:${t.color}">${esc(t.name)}</i>`).join("")}</span>`:`<i>${esc(labelOf(e))}</i>`};
+const tagShown=()=>{try{const v=JSON.parse(pref("calTagShow")||"[]");return Array.isArray(v)?v:[]}catch(x){return []}};
+const tagChips=e=>{if(kindOf(e)!=="n")return `<i>${esc(labelOf(e))}</i>`;const sh=tagShown();const ts=tagsOf(e).filter(t=>sh.includes(t.k));return ts.length?`<span class="tchips">${ts.map(t=>`<i class="tfill" style="--tc:${t.color}">${esc(t.name)}</i>`).join("")}</span>`:""};
 function tagPick(sel){const on=new Set(sel);$("calfTags").innerHTML=CAL.tags.map(t=>`<label class="tgck"><input type="checkbox" value="${esc(t.k)}"${on.has(t.k)?" checked":""}><span class="tdot" style="background:${t.color}"></span>${esc(t.name)}</label>`).join("")+`<label class="tgck"><input type="checkbox" value="__none"${on.has("__none")?" checked":""}>不分類</label>`;
   $("calfTags").querySelectorAll("input").forEach(c=>c.onchange=()=>{if(!c.checked)return;if(c.value==="__none")$("calfTags").querySelectorAll("input").forEach(o=>{if(o!==c)o.checked=false});else{const n=$("calfTags").querySelector('input[value="__none"]');if(n)n.checked=false}})}
 const tagPicked=()=>[...$("calfTags").querySelectorAll("input:checked")].map(c=>c.value);
@@ -2190,7 +2193,8 @@ const labelOf=e=>{const k=kindOf(e);if(k==="n"){const ts=tagsOf(e);return ts.len
 const matchTag=v=>{const x=String(v||"").trim();return CAL.tags.find(t=>t.name===x||t.k===x)||null};
 const tagClean=list=>{if(!Array.isArray(list))return null;return list.filter(t=>t&&t.k&&t.name).map(t=>({k:String(t.k),name:String(t.name).slice(0,20),color:/^#[0-9a-f]{6}$/i.test(t.color||"")?t.color:"#8c6d46",kw:Array.isArray(t.kw)?t.kw.map(x=>String(x).trim()).filter(Boolean).slice(0,20):[...((TAG0.find(x=>x.k===t.k)||{}).kw||[])]}))};
 const tagOptions=sel=>`<option value="">（自動分類）</option><option value="__none"${sel==="__none"?" selected":""}>（不分類，顯示為「活動」）</option>`+CAL.tags.map(t=>`<option value="${esc(t.k)}"${t.k===sel?" selected":""}>${esc(t.name)}</option>`).join("");
-function renderCalLegend(){const el=$("calTagLg");if(el){el.hidden=!tagsOn();el.innerHTML=CAL.tags.map(t=>`<span class="lg k-n" style="--kc:${t.color}">${esc(t.name)}</span>`).join("")}}
+function renderCalLegend(){const sh=tagShown();const el=$("calTagLg");if(el){const L=CAL.tags.filter(t=>sh.includes(t.k));el.hidden=!L.length;el.innerHTML=L.map(t=>`<span class="lg k-n" style="--kc:${t.color}">${esc(t.name)}</span>`).join("")}
+  const row=$("calTgRow");if(row){row.innerHTML=CAL.tags.map(t=>`<button type="button" class="tgbtn" data-tk="${esc(t.k)}" style="--tc:${t.color}" aria-pressed="${sh.includes(t.k)}">${esc(t.name)}</button>`).join("");row.querySelectorAll("[data-tk]").forEach(b=>b.onclick=()=>{const cur=tagShown(),k=b.dataset.tk;pref("calTagShow",JSON.stringify(cur.includes(k)?cur.filter(x=>x!==k):[...cur,k]));renderCal();if(!$("calDay").hidden)calRenderDay()})}}
 const PAL=["#8c6d46","#5f7d3a","#2f6f6a","#c96a2b","#4a5a78"];
 const evColor=e=>{const k=kindOf(e);if(k==="p")return "#8e3563";if(k==="m")return "#b5523b";if(k==="e")return "var(--gold)";const tg=tagOf(e);if(tg)return tg.color;let x=0;for(const ch of String(e.title||""))x=(x*31+ch.codePointAt(0))%100000;return PAL[x%PAL.length]};
 const endOf=e=>e.perm?e.date:(e.end||e.date);
@@ -2410,8 +2414,7 @@ $("calDelBtn").onclick=()=>{$("calfConfirm").hidden=false};$("calfNo").onclick=(
 autoDate($("calfDate"));autoDate($("calfEnd"));$("calfPerm").onchange=permSync;$("calfTBD").onchange=tbdSync;
 document.querySelectorAll("[data-df]").forEach(b=>b.onclick=()=>{pref("calDF",b.dataset.df);syncSet();renderCal();renderCalTop();if(!$("calDay").hidden)calRenderDay()});
 document.querySelectorAll("[data-tf]").forEach(b=>b.onclick=()=>{pref("calTF",b.dataset.tf);syncSet();renderCal();if(!$("calDay").hidden)calRenderDay()});
-document.querySelectorAll("[data-tg]").forEach(b=>b.onclick=()=>{pref("calTag",b.dataset.tg);syncSet();renderCal();if(!$("calDay").hidden)calRenderDay()});
-function syncSet(){document.querySelectorAll("[data-df]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.df===dfmt())));document.querySelectorAll("[data-tf]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tf===tfmt())));document.querySelectorAll("[data-tg]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tg===(tagsOn()?"1":"0"))))}
+function syncSet(){document.querySelectorAll("[data-df]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.df===dfmt())));document.querySelectorAll("[data-tf]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tf===tfmt())))}
 syncSet();
 $("calNewTop").onclick=calNew;
 let D1ID=null;
