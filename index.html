@@ -2329,9 +2329,10 @@ function renderCal(){
   const G={ing:[],soon:[],ending:[],perm:[],end:[]};
   for(const e of L){const st=statusOf(e);if(st!=="end")G[st].push(e)}
   {const soonEnd=Date.now()+3*864e5;G.ending=G.ing.filter(e=>e.end&&!e.perm&&endMs(e)<=soonEnd);G.ing=G.ing.filter(e=>!G.ending.includes(e))}
+  G.both=[...G.soon,...G.ending].sort((a,b)=>startMs(a)-startMs(b));
   const endAll=ALL.filter(e=>statusOf(e)==="end").sort((a,b)=>endMs(b)-endMs(a)),cut=addDays(today,-30),endRecent=endAll.filter(e=>endOf(e)>=cut);
   G.end=CAL.endAll?endAll:endRecent;const endOlder=endAll.length-endRecent.length;
-  const SEC=[["ing","🟢 進行中"],["soon","🔜 準備上線"],["ending","⏳ 即將結束（3 日內）"],["perm","✨ 永久上線"],["end","⚫ 已結束"]];
+  const SEC=[["ing","🟢 進行中"],["soon","🔜 準備上線"],["ending","⏳ 即將結束（3 日內）"],["both","🔜⏳ 準備上線／即將結束"],["perm","✨ 永久上線"],["end","⚫ 已結束"]];
   $("calList").innerHTML=SEC.map(([k,t])=>`<details class="csec" data-k="${k}"${(CAL.open[k]??(k==="ending"))?" open":""}><summary>${t}<span class="cnt">${G[k].length}</span></summary>${k==="end"?`<p class="sub endnote">${CAL.endAll?"顯示全部已結束的活動":"預設只顯示最近 30 天內結束的活動"}</p>`:""}${G[k].length?G[k].map(bannerHTML).join(""):`<div class="empty" style="padding:10px 0">暫時沒有</div>`}${k==="end"&&(endOlder>0||CAL.endAll)?`<button type="button" class="btn ghost rfull" id="calEndMore">${CAL.endAll?"只顯示最近 30 天":`顯示更早的已結束（${endOlder}）`}</button>`:""}</details>`).join("");
   {const b=$("calEndMore");if(b)b.onclick=()=>{CAL.endAll=!CAL.endAll;renderCal()}}
   $("calList").querySelectorAll("[data-d1]").forEach(b=>b.onclick=e=>{e.stopPropagation();d1Open(b.dataset.d1)});
