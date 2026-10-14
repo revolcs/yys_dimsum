@@ -2427,11 +2427,12 @@ async function calDel(){
   try{await S.db.doc("cal/"+CAL.eid).delete();$("calScrim").hidden=true;toast("已刪除");calRenderDay()}catch(e){toast("沒刪到："+(e.code||"錯誤"))}
 }
 function autoItems(){return CAL.ev.filter(autoLT)}
-function autoOpen(){const L=autoItems();if(!L.length){renderCalTop();return}$("autoList").innerHTML=L.map(e=>`<div style="width:100%;font-size:.9rem">・${esc(e.title)}<small style="opacity:.7"> ｜ ${esc(e.date)}</small></div>`).join("");$("autoScrim").hidden=false}
+function autoOpen(){const L=autoItems();if(!L.length){renderCalTop();return}$("autoList").innerHTML=L.map(e=>`<div style="width:100%;display:flex;align-items:center;gap:8px;font-size:.9rem"><span style="flex:1;min-width:0">・${esc(e.title)}<small style="opacity:.7"> ｜ ${esc(e.date)}</small></span><button type="button" class="btn ghost" data-ae="${esc(e.id)}" style="width:auto;padding:4px 10px;font-size:.8rem">改</button><button type="button" class="btn ghost" data-ad="${esc(e.id)}" style="width:auto;padding:4px 10px;font-size:.8rem">刪</button></div>`).join("");$("autoScrim").hidden=false}
 async function autoConfirm(){if(!S.db||S.owner!==true)return;const L=autoItems();let n=0;for(const e of L){try{await S.db.doc("cal/"+e.id).update({tags:["t6"]});n++}catch(x){}}$("autoScrim").hidden=true;toast(n?`已確定 ${n} 項 ✧`:"沒存到，試下再撳");renderCal();renderCalTop();if(!$("calDay").hidden)calRenderDay()}
 $("autoCancel").onclick=()=>{$("autoScrim").hidden=true};
 $("autoFilter").onclick=()=>{$("autoScrim").hidden=true;pref("calTagShow",JSON.stringify(["t6"]));renderCal();if(!$("calDay").hidden)calRenderDay()};
 $("autoGo").onclick=autoConfirm;
+$("autoList").onclick=ev=>{const b=ev.target.closest("button");if(!b)return;const id=b.dataset.ae||b.dataset.ad;if(!id)return;$("autoScrim").hidden=true;calEdit(id);if(b.dataset.ad)$("calfConfirm").hidden=false};
 $("calMaintTbd").onclick=async()=>{if(!S.db||S.owner!==true)return;const b=$("calMaintTbd");const on=b.dataset.on==="1";const id=b.dataset.mid;if(!id)return;try{await S.db.doc("cal/"+id).update({endTbd:!on});toast(on?"已確定維護結束時間 ✧":"⚠️ 已標記維護結束時間未定");renderCal();renderCalTop()}catch(x){toast("沒存到："+(x.code||"錯誤"))}};
 $("calPrev").onclick=()=>calMove(-1);$("calNext").onclick=()=>calMove(1);
 $("calToday").onclick=()=>{const t=hkToday();CAL.y=+t.slice(0,4);CAL.m=+t.slice(5,7)-1;CAL.sel=t;renderCal()};
