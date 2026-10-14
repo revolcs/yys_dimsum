@@ -406,16 +406,6 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .twrow input[type=text]{width:100%;min-width:0;padding:6px 8px;font-size:14px}
 .twrow small{grid-column:2;color:var(--muted);font-size:12px;line-height:1.4}
 .twrow small b{color:var(--ink);font-weight:600}
-#calJp{margin-top:10px}
-.jpnote{font-size:12px;color:var(--muted);margin:4px 0 8px;line-height:1.5}
-.jpart{border-top:1px dashed var(--line);padding:8px 0}
-.jpart:first-of-type{border-top:0}
-.jpart>a{font-weight:600;color:var(--ink);text-decoration:underline;text-underline-offset:3px}
-.jpev{display:flex;gap:8px;align-items:flex-start;padding:5px 0;font-size:13px;line-height:1.45}
-.jpev>div{flex:1;min-width:0;overflow-wrap:anywhere}
-.jpev small{display:block;color:var(--muted);font-size:12px}
-.jpev .btn{flex:none;padding:4px 10px;font-size:12px;min-height:0}
-.jpev .have{flex:none;font-size:12px;color:var(--muted);padding-top:2px}
 .calselbar{position:sticky;bottom:calc(10px + env(safe-area-inset-bottom,0px));margin-top:12px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:var(--ink);color:var(--paper);border-radius:14px;padding:10px 12px;font-size:.85rem;z-index:4;box-shadow:3px 3px 0 var(--shadow)}
 .calselbar .btn{background:var(--paper);color:var(--ink);border-color:var(--paper)}
 .calselbar .btn.danger{background:var(--seal);color:var(--seal-ink);border-color:var(--seal)}
@@ -620,10 +610,11 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
         <li>上面可以切換<b>📅 月曆</b>同<b>🗓 日程</b>：日程是遊戲那種橫向七日表，今日在中間，一條條活動橫跨日子，按一條就開返那日。</li>
       </ul>
     </details>
-    <div class="clegend"><span class="lg k-m">維護（日期數字底色）</span><span class="lg k-e">活動結束（金）</span><span id="calTagLg"></span><span class="lg k-n" style="--kc:#8c6d46">活動（未分類）</span><span class="lg k-p">永久上線（酒紅，只在上線日）</span></div>
+    <div class="clegend"><span class="lg k-m">維護（日期數字底色）</span><span class="lg k-e">活動結束（金）</span><span id="calTagLg" hidden></span><span class="lg k-n" style="--kc:#8c6d46">活動（未分類）</span><span class="lg k-p">永久上線（酒紅，只在上線日）</span></div>
     <div class="calset">
       <div class="seg" role="group" aria-label="日期格式"><button type="button" data-df="md">月/日</button><button type="button" data-df="dm">日/月</button></div>
       <div class="seg" role="group" aria-label="時間格式"><button type="button" data-tf="12">12 小時</button><button type="button" data-tf="24">24 小時</button></div>
+      <div class="seg" role="group" aria-label="活動標籤"><button type="button" data-tg="0">隱藏標籤</button><button type="button" data-tg="1">顯示標籤</button></div>
     </div>
     <div class="calctl">
       <div class="seg calview" role="group" aria-label="行事月曆檢視">
@@ -655,7 +646,6 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <div class="wkbody" id="calWeek"></div>
     </div>
     <div id="calList" style="margin-top:14px"></div>
-    <div id="calJp" hidden></div>
     <div class="calselbar" id="calSelBar" hidden><span id="calSelN">已選 0 項</span><span class="spacer"></span><button class="btn ghost" id="calSelEnd" type="button">統一改結束</button><button class="btn danger" id="calSelDel" type="button">刪除所選</button><button class="btn ghost" id="calSelOff" type="button">完成</button></div>
     <div class="calbottom" id="calBottom" hidden><button class="btn ghost" id="calAdd" type="button">＋ 新增活動</button><button class="btn ghost" id="calTwBtn" type="button">📋 貼上台服公告</button><button class="btn ghost" id="calBatchAdd" type="button">📥 批量新增</button><button class="btn ghost" id="calTagBtn" type="button">🏷 管理標籤</button><button class="btn ghost" id="calSelOn" type="button">☑ 批量選取</button></div>
   </section>
@@ -2190,7 +2180,8 @@ CAL.tags=TAG0.map(t=>({...t,kw:[...t.kw]}));
 const expTags=e=>Array.isArray(e&&e.tags)&&e.tags.length?e.tags.map(String):(e&&e.tag?[String(e.tag)]:[]);
 const tagsOf=e=>{if(!e||kindOf(e)!=="n")return [];const ex=expTags(e);if(ex.includes("__none"))return [];const got=ex.map(k=>CAL.tags.find(t=>t.k===k)).filter(Boolean);if(got.length)return got;const tt=kwNorm(e.title);return CAL.tags.filter(t=>(t.kw||[]).some(k=>k&&tt.includes(kwNorm(k))))};
 const tagOf=e=>tagsOf(e)[0]||null;
-const tagChips=e=>{const ts=kindOf(e)==="n"?tagsOf(e):[];return ts.length?`<span class="tchips">${ts.map(t=>`<i class="tfill" style="--tc:${t.color}">${esc(t.name)}</i>`).join("")}</span>`:`<i>${esc(labelOf(e))}</i>`};
+const tagsOn=()=>pref("calTag")==="1";
+const tagChips=e=>{if(kindOf(e)==="n"&&!tagsOn())return "";const ts=kindOf(e)==="n"?tagsOf(e):[];return ts.length?`<span class="tchips">${ts.map(t=>`<i class="tfill" style="--tc:${t.color}">${esc(t.name)}</i>`).join("")}</span>`:`<i>${esc(labelOf(e))}</i>`};
 function tagPick(sel){const on=new Set(sel);$("calfTags").innerHTML=CAL.tags.map(t=>`<label class="tgck"><input type="checkbox" value="${esc(t.k)}"${on.has(t.k)?" checked":""}><span class="tdot" style="background:${t.color}"></span>${esc(t.name)}</label>`).join("")+`<label class="tgck"><input type="checkbox" value="__none"${on.has("__none")?" checked":""}>不分類</label>`;
   $("calfTags").querySelectorAll("input").forEach(c=>c.onchange=()=>{if(!c.checked)return;if(c.value==="__none")$("calfTags").querySelectorAll("input").forEach(o=>{if(o!==c)o.checked=false});else{const n=$("calfTags").querySelector('input[value="__none"]');if(n)n.checked=false}})}
 const tagPicked=()=>[...$("calfTags").querySelectorAll("input:checked")].map(c=>c.value);
@@ -2198,7 +2189,7 @@ const labelOf=e=>{const k=kindOf(e);if(k==="n"){const ts=tagsOf(e);return ts.len
 const matchTag=v=>{const x=String(v||"").trim();return CAL.tags.find(t=>t.name===x||t.k===x)||null};
 const tagClean=list=>{if(!Array.isArray(list))return null;return list.filter(t=>t&&t.k&&t.name).map(t=>({k:String(t.k),name:String(t.name).slice(0,20),color:/^#[0-9a-f]{6}$/i.test(t.color||"")?t.color:"#8c6d46",kw:Array.isArray(t.kw)?t.kw.map(x=>String(x).trim()).filter(Boolean).slice(0,20):[...((TAG0.find(x=>x.k===t.k)||{}).kw||[])]}))};
 const tagOptions=sel=>`<option value="">（自動分類）</option><option value="__none"${sel==="__none"?" selected":""}>（不分類，顯示為「活動」）</option>`+CAL.tags.map(t=>`<option value="${esc(t.k)}"${t.k===sel?" selected":""}>${esc(t.name)}</option>`).join("");
-function renderCalLegend(){const el=$("calTagLg");if(el)el.innerHTML=CAL.tags.map(t=>`<span class="lg k-n" style="--kc:${t.color}">${esc(t.name)}</span>`).join("")}
+function renderCalLegend(){const el=$("calTagLg");if(el){el.hidden=!tagsOn();el.innerHTML=CAL.tags.map(t=>`<span class="lg k-n" style="--kc:${t.color}">${esc(t.name)}</span>`).join("")}}
 const PAL=["#8c6d46","#5f7d3a","#2f6f6a","#c96a2b","#4a5a78"];
 const evColor=e=>{const k=kindOf(e);if(k==="p")return "#8e3563";if(k==="m")return "#b5523b";if(k==="e")return "var(--gold)";const tg=tagOf(e);if(tg)return tg.color;let x=0;for(const ch of String(e.title||""))x=(x*31+ch.codePointAt(0))%100000;return PAL[x%PAL.length]};
 const endOf=e=>e.perm?e.date:(e.end||e.date);
@@ -2326,7 +2317,7 @@ function renderCal(){
   $("calList").querySelectorAll("[data-ce]").forEach(b=>b.onclick=e=>{e.stopPropagation();calEdit(b.dataset.ce)});
   $("calList").querySelectorAll("[data-cdel]").forEach(b=>b.onclick=()=>twoTap(b,()=>calDelMany([b.dataset.cdel])));
   $("calList").querySelectorAll("[data-sel]").forEach(c=>c.onchange=()=>{c.checked?CAL.picked.add(c.dataset.sel):CAL.picked.delete(c.dataset.sel);renderCal()});
-  renderWeek();renderJp();
+  renderWeek();
 }
 function setView(v){
   CAL.view=v;pref("calView",v);
@@ -2414,7 +2405,8 @@ $("calDelBtn").onclick=()=>{$("calfConfirm").hidden=false};$("calfNo").onclick=(
 autoDate($("calfDate"));autoDate($("calfEnd"));$("calfPerm").onchange=permSync;
 document.querySelectorAll("[data-df]").forEach(b=>b.onclick=()=>{pref("calDF",b.dataset.df);syncSet();renderCal();renderCalTop();if(!$("calDay").hidden)calRenderDay()});
 document.querySelectorAll("[data-tf]").forEach(b=>b.onclick=()=>{pref("calTF",b.dataset.tf);syncSet();renderCal();if(!$("calDay").hidden)calRenderDay()});
-function syncSet(){document.querySelectorAll("[data-df]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.df===dfmt())));document.querySelectorAll("[data-tf]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tf===tfmt())))}
+document.querySelectorAll("[data-tg]").forEach(b=>b.onclick=()=>{pref("calTag",b.dataset.tg);syncSet();renderCal();if(!$("calDay").hidden)calRenderDay()});
+function syncSet(){document.querySelectorAll("[data-df]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.df===dfmt())));document.querySelectorAll("[data-tf]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tf===tfmt())));document.querySelectorAll("[data-tg]").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.tg===(tagsOn()?"1":"0"))))}
 syncSet();
 $("calNewTop").onclick=calNew;
 let D1ID=null;
@@ -2529,33 +2521,6 @@ $("twCancel").onclick=()=>{$("twScrim").hidden=true};
 $("twGo").onclick=async()=>{const L=TW.items.filter(e=>e.on&&e.date&&String(e.title||"").trim());if(!L.length)return;$("twGo").disabled=true;
   try{await calBatchApply(L.map(e=>({date:e.date,end:e.perm?"":(e.end||""),time:e.time||"",endTime:e.perm?"":(e.endTime||""),title:e.title.trim(),note:e.note||"",perm:!!e.perm,tags:null})))}finally{$("twScrim").hidden=true}};
 
-/* ===== 日服公告參考（由 GitHub Actions 每日更新 data/jp_news.json） ===== */
-var JP={data:null,open:false};
-async function jpLoad(){
-  const urls=window.GH_CFG?["data/jp_news.json"]:["https://revolcs.github.io/yys_dimsum/data/jp_news.json"];
-  for(const u of urls){try{const r=await fetch(u+"?t="+Date.now(),{cache:"no-store"});if(!r.ok)continue;const d=await r.json();if(d&&Array.isArray(d.items)){JP.data=d;renderJp();return}}catch(e){}}
-}
-function jpHave(ev,title){return CAL.ev.some(x=>x.date===ev.date&&(x.title===title||String(x.note||"").includes(title)))}
-function jpRange(e){const a=fmtMD(e.date)+(e.time?" "+tDisp(e.time):"");if(e.perm)return a+" 起";return `${a} → ${fmtMD(e.end)}${e.endTime?" "+tDisp(e.endTime):""}`}
-function renderJp(){
-  const box=$("calJp");if(!box)return;
-  if(!JP||!JP.data||!JP.data.items.length){box.hidden=true;return}
-  const today=hkToday(),own=S.owner===true;
-  const arts=JP.data.items.filter(a=>(a.maint&&a.maint.date>=addDays(today,-1))||a.events.some(e=>(e.perm?e.date:e.end)>=today)).slice(0,3);
-  const list=arts.length?arts:JP.data.items.slice(0,1);
-  let n=0;const rows=list.map(a=>{
-    const mt=a.maint?[{k:"m",name:"停服維護（日服）",date:a.maint.date,time:a.maint.start,endTime:a.maint.end,raw:a.maint.raw}]:[];
-    const evs=mt.concat(a.events.filter(e=>(e.perm?e.date:e.end)>=addDays(today,-1)));n+=evs.length;
-    return `<div class="jpart"><a href="${esc(a.url)}" target="_blank" rel="noopener">${esc(a.title)}</a>${a.posted?` <small class="sub">（${fmtMD(a.posted)}）</small>`:""}`+
-      evs.map(e=>{const title=e.k==="m"?"停服維護":e.name,have=jpHave(e,title);const rng=e.k==="m"?`${fmtMD(e.date)} ${tDisp(e.time)}～${tDisp(e.endTime)}`:jpRange(e);
-        const payload=encodeURIComponent(JSON.stringify(e.k==="m"?{date:e.date,time:e.time,endTime:e.endTime,title:"停服維護",note:"日服參考："+e.raw}:{date:e.date,end:e.perm?"":e.end,time:e.time||"",endTime:e.perm?"":(e.endTime||""),perm:!!e.perm,title:e.name,note:"日服參考："+e.raw}));
-        return `<div class="jpev"><div>${esc(e.name)}<small>${esc(rng)}（GMT+8）</small></div>${have?`<span class="have">月曆已有</span>`:own?`<button type="button" class="btn ghost" data-jpadd="${payload}">＋ 加入</button>`:""}</div>`}).join("")+`</div>`}).join("");
-  box.hidden=false;
-  box.innerHTML=`<details class="csec" id="jpSec"${JP.open?" open":""}><summary>🗾 日服參考<span class="cnt">${n}</span></summary><p class="jpnote">日服公告的時間已換算成 GMT+8（日本時間減 1 小時；23:59 這類「當日結束」不換算）。日服同台服不一定同時上線，台服未公佈時才當參考，請以台服官方公告為準。${JP.data.built?`資料更新於 ${fmtMD(JP.data.built.slice(0,10))}。`:""}</p>${rows}</details>`;
-  $("jpSec").ontoggle=()=>{JP.open=$("jpSec").open};
-  box.querySelectorAll("[data-jpadd]").forEach(b=>b.onclick=async()=>{if(!calNeedDb())return;b.disabled=true;const d=JSON.parse(decodeURIComponent(b.dataset.jpadd));try{await S.db.collection("cal").add(Object.assign({end:"",endTime:"",time:"",note:"",perm:false,tags:null},d));toast("已加入月曆 ✧")}catch(e){b.disabled=false;toast("加入失敗")}});
-}
-jpLoad();
 
 
 (async()=>{
