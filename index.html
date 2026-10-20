@@ -408,6 +408,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .tgall{--tc:#f7eef3;border-color:#f7eef3;color:#f7eef3;background:#1e1119}:root:not([data-theme="light"]) .tgall[aria-pressed="true"]{background:#f7eef3;color:#1e1119}}
 :root[data-theme="dark"] .tgall{--tc:#f7eef3;border-color:#f7eef3;color:#f7eef3;background:#1e1119}
 :root[data-theme="dark"] .tgall[aria-pressed="true"]{background:#f7eef3;color:#1e1119}
+.calsec{margin-top:12px}.calsec>.hshd{margin-bottom:2px}.calsec.fold>#calViewBody{display:none}
 .calctl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:10px 0 12px}
 .calctl .calview{margin:0}
 .cbwrap{display:flex;gap:6px;align-items:stretch;margin-bottom:10px}
@@ -637,6 +638,9 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <div class="seg" role="group" aria-label="時間格式"><button type="button" data-tf="12">12 小時</button><button type="button" data-tf="24">24 小時</button></div>
       <div class="tgrow" id="calTgRow" role="group" aria-label="活動標籤顯示"></div>
     </div>
+    <div class="hsec calsec" id="calViewSec">
+    <div class="hshd"><span class="cdlbl">📅 月曆／🗓 日程</span><button type="button" class="hstog" id="calViewTog" aria-label="展開或收起月曆同日程">▲</button></div>
+    <div id="calViewBody">
     <div class="calctl">
       <div class="seg calview" role="group" aria-label="行事月曆檢視">
         <button type="button" id="cvWeek" aria-pressed="false">🗓 日程</button>
@@ -665,6 +669,8 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       </div>
       <div class="wkhead" id="wkHead"></div>
       <div class="wkbody" id="calWeek"></div>
+    </div>
+    </div>
     </div>
     <div id="calList" style="margin-top:14px"></div>
     <div class="calselbar" id="calSelBar" hidden><span id="calSelN">已選 0 項</span><span class="spacer"></span><button class="btn ghost" id="calSelEnd" type="button">統一改結束</button><button class="btn danger" id="calSelDel" type="button">刪除所選</button><button class="btn ghost" id="calSelOff" type="button">完成</button></div>
@@ -2499,6 +2505,7 @@ $("autoCancel").onclick=()=>{$("autoScrim").hidden=true};
 $("autoFilter").onclick=()=>{$("autoScrim").hidden=true;pref("calTagShow",JSON.stringify(["t6"]));renderCal();if(!$("calDay").hidden)calRenderDay()};
 $("autoGo").onclick=autoConfirm;
 $("autoList").onclick=ev=>{const b=ev.target.closest("button");if(!b)return;const id=b.dataset.ae||b.dataset.ad;if(!id)return;$("autoScrim").hidden=true;calEdit(id);if(b.dataset.ad)$("calfConfirm").hidden=false};
+{const cvs=()=>{const op=pref("calViewOpen")!=="0";$("calViewSec").classList.toggle("fold",!op);const b=$("calViewTog");b.textContent=op?"▲":"▼";b.setAttribute("aria-expanded",op?"true":"false")};cvs();$("calViewTog").onclick=()=>{pref("calViewOpen",pref("calViewOpen")==="0"?"1":"0");cvs()}}
 $("calTopTog").onclick=()=>{pref("calTopOpen",pref("calTopOpen")==="1"?"0":"1");renderCalTop()};
 $("calCd2").onclick=e=>{const b=e.target.closest(".hstog");if(!b)return;let v={};try{v=JSON.parse(pref("calHsOpen")||"{}")}catch(x){}const k=b.dataset.hs;v[k]=!(v[k]!==false);pref("calHsOpen",JSON.stringify(v));renderCalTop()};
 $("calMaintEdit").onclick=()=>{const id=$("calMaintEdit").dataset.mid;if(id)calEdit(id)};
