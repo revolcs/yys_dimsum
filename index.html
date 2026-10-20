@@ -286,6 +286,8 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .tabs .tab{font-size:.9rem;padding:8px 2px!important;white-space:nowrap;min-width:0}
 .calbar{display:flex;flex-direction:column;gap:3px;background:var(--sheet);border:2px solid var(--ink);border-radius:12px;padding:6px 10px;font-size:.8rem;box-shadow:2px 2px 0 var(--shadow)}
 .calbar[hidden]{display:none}
+.calbar{position:relative}.ctog{position:absolute;top:6px;right:8px;width:28px;height:28px}.calbar>#calTodayTxt,.calbar>#calCd1{padding-right:34px}
+.calbar.fold>#calTodayTxt,.calbar.fold>#calMaintBtns,.calbar.fold>#calCd2,.calbar.fold>#calTodo{display:none!important}
 .calbar b{font-family:var(--f-num);color:var(--ink)}
 .ctoday{font-weight:900;color:var(--ink)}
 .clegend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0;font-size:.75rem}
@@ -430,6 +432,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .bxhint{font-size:.78rem;color:var(--ink-soft);line-height:1.5;background:var(--paper);border-radius:10px;padding:8px 10px;margin:0}
 .shselbar{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));max-width:720px;margin:0 auto;z-index:30}
 .sdwarn{margin:0;font-size:.88rem;line-height:1.55;color:var(--seal)}
+.ghclist{display:flex;flex-direction:column;gap:6px;max-height:42vh;overflow:auto;font-size:.85rem}.ghcf{font-weight:900;margin-top:4px}.ghci{border:2px solid var(--line);border-radius:10px;padding:6px 9px;line-height:1.45;overflow-wrap:anywhere}.ghci small{display:block;opacity:.85}
 .sdlist{display:flex;flex-wrap:wrap;gap:6px;max-height:30vh;overflow:auto}
 .shselbar .btn.danger{background:var(--paper);color:var(--seal);border-color:var(--seal)}
 .shselbar .btn:not(.ghost):not(.danger){background:var(--seal);color:var(--seal-ink);border-color:var(--seal)}
@@ -475,7 +478,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="tab" id="tab-res" role="tab" aria-selected="false">資源獲取</button>
       <button class="tab" id="tab-cal" role="tab" aria-selected="false">行事月曆</button>
     </nav>
-    <div class="calbar" id="calTop" hidden><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><div id="calMaintBtns" hidden style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn ghost" id="calMaintEdit" style="width:auto;font-size:.8rem;padding:5px 12px">✏️ 修改維護時間</button></div><div id="calCd2"></div><div id="calTodo" hidden></div></div>
+    <div class="calbar" id="calTop" hidden><button type="button" class="hstog ctog" id="calTopTog" aria-label="展開或收起頁首">▼</button><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><div id="calMaintBtns" hidden style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn ghost" id="calMaintEdit" style="width:auto;font-size:.8rem;padding:5px 12px">✏️ 修改維護時間</button></div><div id="calCd2"></div><div id="calTodo" hidden></div></div>
     <div class="acctwrap topacct" id="acctRow"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button></div>
     <div class="jump" id="jump" aria-label="跳到稀有度"></div>
   </div>
@@ -855,6 +858,15 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <p class="sdwarn">刪除之後<b>無法復原</b>，連同他們的圖片、點亮同黑蛋紀錄都會一起消失。</p>
     <div class="sdlist" id="sdList"></div>
     <div class="row"><button class="btn ghost" id="sdCancel" type="button">取消</button><button class="btn danger" id="sdGo" type="button">確定刪除</button></div>
+  </div>
+</div>
+<div id="ghcScrim" class="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ghcTitle">
+    <h2 id="ghcTitle">⚠️ GitHub 上面有新改動</h2>
+    <p class="sdwarn">你開住呢頁期間，GitHub 上嘅資料被改過（可能係另一部機，或者朔幫你更新過）。下面係兩邊唔同嘅地方，睇清楚再揀點處理：</p>
+    <div class="ghclist" id="ghcList"></div>
+    <p class="sub" style="margin:0">⬆️ 用我的：以呢部機嘅資料為準上傳，上面「只喺 GitHub 有」同 GitHub 嗰邊嘅數值會被蓋走。<br>⬇️ 用 GitHub：重新載入 GitHub 嘅資料，呢部機未上傳嘅改動會冇咗。</p>
+    <div class="row"><button class="btn ghost" id="ghcLater" type="button">先不處理</button><button class="btn ghost" id="ghcTake" type="button">⬇️ 用 GitHub</button><button class="btn" id="ghcMine" type="button">⬆️ 用我的</button></div>
   </div>
 </div>
 <div id="autoScrim" class="scrim" hidden>
@@ -2058,7 +2070,7 @@ const PUBK=["name","rarity","max","order","img","cn","work","shrine","shop"];
 function b64enc(str){const b=new TextEncoder().encode(str);let s="";for(let i=0;i<b.length;i+=0x8000)s+=String.fromCharCode.apply(null,b.subarray(i,i+0x8000));return btoa(s)}
 function b64dec(b64){const bin=atob(String(b64||"").replace(/\s/g,""));const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);return new TextDecoder().decode(u)}
 const ghAutoOn=()=>pref("ghAuto")!=="0";
-function ghSyncText(){if(GH.busy)return"☁️ 上傳中…";if(GH.fail)return"⚠️ 上傳失敗"+(ghAutoOn()?"，15 秒後自動重試":"，請再撳「⬆️ 上傳」");if(GH.timer)return"☁️ 有改動，停 15 秒後自動上傳…";if(GH.dirty)return"☁️ 有改動未上傳，記得撳「⬆️ 上傳」";const at=GH.lastAt||pref("ghLastAt");if(!GH.tok)return"未設定";return"已設定"+(at?"・上次上傳 "+at:"")}
+function ghSyncText(){if(GH.busy)return"☁️ 上傳中…";if(GH.conf)return"⚠️ GitHub 上有新改動，未上傳，撳「⬆️ 上傳」睇清楚再決定";if(GH.fail)return"⚠️ 上傳失敗"+(ghAutoOn()?"，15 秒後自動重試":"，請再撳「⬆️ 上傳」");if(GH.timer)return"☁️ 有改動，停 15 秒後自動上傳…";if(GH.dirty)return"☁️ 有改動未上傳，記得撳「⬆️ 上傳」";const at=GH.lastAt||pref("ghLastAt");if(!GH.tok)return"未設定";return"已設定"+(at?"・上次上傳 "+at:"")}
 function ghStatus(t){if(!S.isGH)return;$("staticTag").textContent=" ・GitHub 版"+(S.owner===true?"（擁有者）":"")+(t?"・"+t:"");if(S.owner===true)document.querySelectorAll(".ghsync").forEach(e=>{e.textContent=ghSyncText();e.hidden=false})}
 async function ghApi(method,path,body,allow404){
   const r=await fetch("https://api.github.com"+path,{method,cache:"no-store",headers:{"Authorization":"Bearer "+GH.tok,"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28",...(body?{"Content-Type":"application/json"}:{})},body:body?JSON.stringify(body):undefined});
@@ -2121,17 +2133,52 @@ function ghPack(){
     resFile:()=>`{"built":${JSON.stringify(stamp().txt)},"items":[\n${RES.map(o=>JSON.stringify(o)).join(",\n")}\n]}\n`,
     privFile:()=>`{"v":2,"a":${JSON.stringify(A)},"d":{\n${dStr}\n},"r":${JSON.stringify(rPrune(S.res,A))}}\n`};
 }
-function ghQueue(){if(!S.isGH||!GH.store)return;clearTimeout(GH.timer);GH.timer=null;GH.dirty=true;if(!ghAutoOn()){ghStatus("有改動未上傳");return}GH.timer=setTimeout(()=>{GH.timer=null;GH.q=GH.q.then(()=>ghFlush())},15000);ghStatus("未同步…")}
-async function ghFlush(manual){
-  const pk=ghPack();GH.busy++;ghStatus("上傳中…");let n=0;
+function ghQueue(){if(!S.isGH||!GH.store)return;clearTimeout(GH.timer);GH.timer=null;GH.dirty=true;if(GH.conf){ghStatus("");return}if(!ghAutoOn()){ghStatus("有改動未上傳");return}GH.timer=setTimeout(()=>{GH.timer=null;GH.q=GH.q.then(()=>ghFlush())},15000);ghStatus("未同步…")}
+const GHF=[{k:"pub",repo:"PUB",path:"data/shiki.json",str:"pubStr",file:"pubFile",last:"lastPub",msg:"更新式神名單",lbl:"式神名單"},
+  {k:"priv",repo:"PRIV",path:"records.json",str:"privStr",file:"privFile",last:"lastPriv",msg:"更新紀錄",lbl:"點亮／黑蛋紀錄"},
+  {k:"res",repo:"PUB",path:"data/resources.json",str:"resStr",file:"resFile",last:"lastRes",msg:"更新資源清單",lbl:"資源清單"},
+  {k:"cal",repo:"PUB",path:"data/calendar.json",str:"calStr",file:"calFile",last:"lastCal",msg:"更新行事月曆",lbl:"行事月曆"}];
+async function ghFlush(manual,force){
+  const pk=ghPack();const todo=GHF.filter(f=>pk[f.str]!==GH[f.last]);GH.busy++;ghStatus("上傳中…");let n=0;
   try{
-    if(pk.pubStr!==GH.lastPub){await ghPut(GH.PUB,"data/shiki.json",b64enc(pk.pubFile()),"更新式神名單");GH.lastPub=pk.pubStr;n++}
-    if(pk.privStr!==GH.lastPriv){await ghPut(GH.PRIV,"records.json",b64enc(pk.privFile()),"更新紀錄");GH.lastPriv=pk.privStr;n++}
-    if(pk.resStr!==GH.lastRes){await ghPut(GH.PUB,"data/resources.json",b64enc(pk.resFile()),"更新資源清單");GH.lastRes=pk.resStr;n++}
-    if(pk.calStr!==GH.lastCal){await ghPut(GH.PUB,"data/calendar.json",b64enc(pk.calFile()),"更新行事月曆");GH.lastCal=pk.calStr;n++}
+    if(force&&GH.conf){for(const c of GH.conf){const key=GH[c.f.repo]+"/"+c.f.path;if(c.sha)GH.sha[key]=c.sha;else delete GH.sha[key]}}
+    if(!force){GH.conf=null;const cf=[];
+      for(const f of todo){const key=GH[f.repo]+"/"+f.path;const r=await ghApi("GET",ghPath(GH[f.repo],f.path)+"?ref="+encodeURIComponent(GH_CFG.branch),null,true);const rs=r?r.sha:null;
+        if((GH.sha[key]||null)!==rs){const rt=r?b64dec(r.content):"",lt=pk[f.file]();const strip=t=>t.replace(/^\{"built":"[^"]*",/,"{");if(r&&strip(rt)===strip(lt)){GH.sha[key]=rs;GH[f.last]=pk[f.str];continue}cf.push({f,sha:rs,remote:rt,local:lt})}}
+      if(cf.length){GH.busy--;GH.conf=cf;clearTimeout(GH.timer);GH.timer=null;GH.dirty=true;ghStatus("GitHub 有新改動");ghConfOpen(cf);return}}
+    GH.conf=null;
+    for(const f of todo){if(GH[f.last]===pk[f.str])continue;await ghPut(GH[f.repo],f.path,b64enc(pk[f.file]()),f.msg);GH[f.last]=pk[f.str];n++}
     GH.busy--;GH.fail=false;if(!GH.timer)GH.dirty=false;if(n||!pref("ghLastAt")){const d=new Date();GH.lastAt=String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0");pref("ghLastAt",GH.lastAt)}ghStatus(GH.timer?"未同步…":"已同步 ✓");if(!GH.timer)toast(n?"☁️ 已上傳到 GitHub ✓":manual?"☁️ 沒有新改動，GitHub 已經是最新 ✓":"☁️ 已同步 ✓");
   }catch(e){GH.busy--;GH.fail=true;ghStatus("同步失敗，稍後自動重試");toast("同步失敗："+(e.code==="github_401"?"存取權杖過期或錯誤":e.code==="github_403"||e.code==="github_404"?"存取權杖沒有寫入權限":(e.code||e.message||"網路問題")));if(ghAutoOn())setTimeout(ghQueue,15000)}
 }
+const GHFLD={date:"開始日",end:"結束日",endTime:"結束時間",title:"標題",time:"時間",note:"備註",perm:"永久上線",tags:"標籤",tag:"標籤",endTbd:"結束時間未定",name:"名稱",rarity:"稀有度",max:"技能",order:"排序",img:"頭像",cn:"陸服限定",work:"作品",shrine:"神社",shop:"商店"};
+function ghItems(k,t){let o=null;try{o=JSON.parse(t)}catch(e){}const m=new Map();if(!o)return{m,o:{}};
+  if(k==="cal")(o.events||[]).forEach(e=>m.set(e.id,e));else if(k==="pub")(o.shiki||[]).forEach(e=>m.set(e.id,e));
+  else if(k==="res")(o.items||[]).forEach((e,i)=>m.set(e&&e.id!=null?String(e.id):"#"+i,e));
+  else if(k==="priv")Object.entries(o.d||{}).forEach(([id,v])=>m.set(id,{name:Array.isArray(v)?v[0]:id,...((Array.isArray(v)&&v[1])||{})}));
+  return{m,o}}
+function ghVal(k,f,v){if(v===undefined||v===null||v===""||v===false&&f!=="perm")return"（無）";
+  if(k==="priv"&&Array.isArray(v))return(v[0]?"已入手":"未入手")+(v[1]?"・"+v[1]:"");
+  if(f==="tags"||f==="tag"){const L=Array.isArray(v)?v:[v];return L.map(x=>(CAL.tags.find(t=>t.k===x)||{name:x}).name).join("、")}
+  if(f==="img")return"（圖片）";if(typeof v==="boolean")return v?"是":"否";if(typeof v==="object")return JSON.stringify(v);return String(v)}
+function ghLbl(k,e){return k==="cal"?`${e.date||""} ${e.title||""}`:(e.name||e.title||e.id||"")}
+function ghConfHTML(c){const k=c.f.k,R=ghItems(k,c.remote),L=ghItems(k,c.local),rows=[];
+  const fn=f=>k==="priv"?((S.accts.find(a=>a.k===f)||{}).name||f):(GHFLD[f]||f);
+  for(const[id,r]of R.m){const l=L.m.get(id);
+    if(!l){rows.push(`<div class="ghci">🟥 只喺 GitHub 有：<b>${esc(ghLbl(k,r))}</b><small>覆寫會刪走呢項</small></div>`);continue}
+    const ks=[...new Set([...Object.keys(r),...Object.keys(l)])].filter(x=>x!=="id"&&!(k==="priv"&&x==="name"));
+    const ch=ks.filter(x=>JSON.stringify(r[x]??null)!==JSON.stringify(l[x]??null)&&ghVal(k,x,r[x])!==ghVal(k,x,l[x]));
+    if(ch.length)rows.push(`<div class="ghci">🟨 <b>${esc(ghLbl(k,l))}</b>${ch.map(x=>`<small>${esc(fn(x))}：GitHub「${esc(ghVal(k,x,r[x]))}」→ 你的「${esc(ghVal(k,x,l[x]))}」</small>`).join("")}</div>`)}
+  for(const[id,l]of L.m)if(!R.m.has(id))rows.push(`<div class="ghci">🟩 只喺你呢邊有：<b>${esc(ghLbl(k,l))}</b><small>覆寫會加上去</small></div>`);
+  const ex=k==="cal"?["tags"]:k==="priv"?["a","r"]:[];const exL={tags:"月曆標籤設定",a:"帳號名單",r:"資源勾選進度"};
+  ex.forEach(x=>{if(JSON.stringify(R.o[x]??null)!==JSON.stringify(L.o[x]??null))rows.push(`<div class="ghci">🟨 ${exL[x]}有分別</div>`)});
+  if(!c.remote)rows.unshift(`<div class="ghci">GitHub 上冇咗呢個檔案</div>`);
+  const MX=60,more=rows.length>MX?`<div class="sub">…仲有 ${rows.length-MX} 項</div>`:"";
+  return`<div class="ghcf">📄 ${esc(c.f.lbl)}（${rows.length?rows.length+" 處唔同":"內容一樣，只係版本號唔同"}）</div>`+rows.slice(0,MX).join("")+more}
+function ghConfOpen(cf){$("ghcList").innerHTML=cf.map(ghConfHTML).join("");$("ghcScrim").hidden=false}
+$("ghcLater").onclick=()=>{$("ghcScrim").hidden=true;toast("未上傳，想處理就再撳「⬆️ 上傳」");ghStatus("")};
+$("ghcTake").onclick=()=>{$("ghcScrim").hidden=true;GH.dirty=false;GH.conf=null;clearTimeout(GH.timer);GH.timer=null;location.reload()};
+$("ghcMine").onclick=()=>{$("ghcScrim").hidden=true;GH.q=GH.q.then(()=>ghFlush(true,true))};
 function ghFill(){$("ghPubIn").value=GH.PUB||"";$("ghPrivIn").value=GH.PRIV||"";$("ghTokIn").value="";$("ghTokIn").placeholder=GH.tok?"已儲存（想換先再貼）":"github_pat_…";$("ghAuto").checked=ghAutoOn();$("ghUp").disabled=!GH.tok;$("ghLogout").hidden=!GH.tok;$("ghLogout").textContent="登出（清除這台裝置的權杖）";GH.outArm=false;GH.downArm=false;$("ghDown").textContent="⬇️ 還原";$("ghState").textContent=ghSyncText()}
 $("ghAuto").onchange=()=>{pref("ghAuto",$("ghAuto").checked?"1":"0");if($("ghAuto").checked){toast("已開啟自動上傳 ✓");if(GH.dirty&&!GH.busy)ghQueue()}else{if(GH.timer){clearTimeout(GH.timer);GH.timer=null}toast("已關閉自動上傳，改完記得撳「⬆️ 上傳」")}ghStatus("")};
 $("ghUp").onclick=()=>{if(!GH.tok||!GH.store){toast("先貼上存取權杖，再撳「💾 儲存設定」");return}if(GH.busy){toast("上傳中，等一下");return}clearTimeout(GH.timer);GH.timer=null;GH.q=GH.q.then(()=>ghFlush(true))};
@@ -2281,6 +2328,7 @@ const monthKey=()=>`${CAL.y}-${String(CAL.m+1).padStart(2,"0")}`;
 function calWatch(db){db.doc("meta/caltags").onSnapshot(d=>{const L=d&&d.exists&&d.data&&d.data().list;const tg=tagClean(L);if(tg){CAL.tags=tg;renderCal();renderCalTop();if(!$("calDay").hidden)calRenderDay()}},()=>{});db.collection("cal").onSnapshot(snap=>{CAL.ev=snap.docs.map(d=>({id:d.id,...d.data()}));renderCal();renderCalTop();if(!$("calDay").hidden)calRenderDay()},e=>notice("行事月曆讀取失敗："+(e.code||"")))}
 function calMove(n){let m=CAL.m+n,y=CAL.y;while(m<0){m+=12;y--}while(m>11){m-=12;y++}CAL.y=y;CAL.m=m;renderCal()}
 function renderCalTop(){
+  {const op=pref("calTopOpen")==="1";$("calTop").classList.toggle("fold",!op);const tb=$("calTopTog");tb.textContent=op?"▲":"▼";tb.setAttribute("aria-expanded",op?"true":"false")}
   const [y,m,d]=hkToday().split("-").map(Number);
   $("calTodayTxt").textContent=`📅 今日 ${y} 年 ${m} 月 ${d} 日（星期${WKS[new Date(Date.UTC(y,m-1,d)).getUTCDay()]}）`;
   const now=Date.now();
@@ -2451,6 +2499,7 @@ $("autoCancel").onclick=()=>{$("autoScrim").hidden=true};
 $("autoFilter").onclick=()=>{$("autoScrim").hidden=true;pref("calTagShow",JSON.stringify(["t6"]));renderCal();if(!$("calDay").hidden)calRenderDay()};
 $("autoGo").onclick=autoConfirm;
 $("autoList").onclick=ev=>{const b=ev.target.closest("button");if(!b)return;const id=b.dataset.ae||b.dataset.ad;if(!id)return;$("autoScrim").hidden=true;calEdit(id);if(b.dataset.ad)$("calfConfirm").hidden=false};
+$("calTopTog").onclick=()=>{pref("calTopOpen",pref("calTopOpen")==="1"?"0":"1");renderCalTop()};
 $("calCd2").onclick=e=>{const b=e.target.closest(".hstog");if(!b)return;let v={};try{v=JSON.parse(pref("calHsOpen")||"{}")}catch(x){}const k=b.dataset.hs;v[k]=!(v[k]!==false);pref("calHsOpen",JSON.stringify(v));renderCalTop()};
 $("calMaintEdit").onclick=()=>{const id=$("calMaintEdit").dataset.mid;if(id)calEdit(id)};
 $("calPrev").onclick=()=>calMove(-1);$("calNext").onclick=()=>calMove(1);
