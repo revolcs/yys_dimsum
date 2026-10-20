@@ -639,7 +639,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <div class="tgrow" id="calTgRow" role="group" aria-label="活動標籤顯示"></div>
     </div>
     <div class="hsec calsec" id="calViewSec">
-    <div class="hshd"><span class="cdlbl">📅 月曆／🗓 日程</span><button type="button" class="hstog" id="calViewTog" aria-label="展開或收起月曆同日程">▲</button></div>
+    <div class="hshd"><span class="cdlbl">🗓 日程 / 📅 月曆</span><button type="button" class="hstog" id="calViewTog" aria-label="展開或收起月曆同日程">▲</button></div>
     <div id="calViewBody">
     <div class="calctl">
       <div class="seg calview" role="group" aria-label="行事月曆檢視">
