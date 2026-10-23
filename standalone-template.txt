@@ -1071,7 +1071,7 @@ function drawGuide(){
     GW.tags.forEach(t=>{const b=document.createElement("button");b.type="button";b.className="gtg";b.textContent=t.name;const on=gFilterSel.has(t.k);b.setAttribute("aria-pressed",String(on));b.onclick=()=>{on?gFilterSel.delete(t.k):gFilterSel.add(t.k);drawGuide()};ft.append(b)});
   }else ft.hidden=true;
   box.replaceChildren();
-  if(!W.length){const p=document.createElement("p");p.className="sub";p.textContent="暫時未有攻略，等朔更新 ✧";box.append(p);return}
+  if(!W.length&&!(gOwn()&&GW.tags.length)){const p=document.createElement("p");p.className="sub";p.textContent="暫時未有攻略，等朔更新 ✧";box.append(p);return}
   const closed=gClosedSet();
   const known=new Set(GW.tags.map(t=>t.k));
   const all=W.map((wk,wi)=>({wk,wi}));
