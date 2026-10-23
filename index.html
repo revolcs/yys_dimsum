@@ -1064,7 +1064,6 @@ function gCard(wk,wi){
 function drawGuide(){
   const box=$("guideList"),ft=$("gFilter");if(!box)return;
   const W=GW.weeks;$("gOwn").hidden=!gOwn();
-  if(gOwn()&&$("gForm").hidden===false){}
   ft.replaceChildren();
   if(GW.tags.length){
     ft.hidden=false;
@@ -1093,26 +1092,54 @@ function drawGuide(){
     const body=document.createElement("div");body.className="gsecbody";body.hidden=isC;
     btn.onclick=()=>{const hide=!body.hidden;body.hidden=hide;hide?closed.add(s.key):closed.delete(s.key);btn.setAttribute("aria-expanded",String(!hide));arr.textContent=hide?"▾":"▴";gSaveClosed()};
     hd.append(btn);
-    if(s.tag&&gOwn()){const rn=document.createElement("button");rn.type="button";rn.className="btn ghost gren";rn.textContent="✏️";rn.setAttribute("aria-label","改分隔名稱");rn.onclick=()=>gRename(s.tag);hd.append(rn)}
+    if(s.tag&&gOwn()){const rn=document.createElement("button");rn.type="button";rn.className="btn ghost gren";rn.textContent="✏️";rn.setAttribute("aria-label","改分隔名稱");rn.onclick=()=>gRename(s.tag);const dl=document.createElement("button");dl.type="button";dl.className="btn ghost gren";dl.textContent="🗑";dl.setAttribute("aria-label","刪除分隔");dl.onclick=()=>gDelSec(s.tag);hd.append(rn,dl)}
     wrap.append(hd,body);
     if(!s.weeks.length){const p=document.createElement("p");p.className="sub";p.style.margin="4px 2px";p.textContent="未有攻略，撳下面嘅「改這週」貼標籤就會歸到呢度";body.append(p)}
     s.weeks.forEach(({wk,wi})=>body.append(gCard(wk,wi)));
     box.append(wrap);
   });
 }
+async function gFresh(){
+  const j=await ghGet(GH.PUB,"data/guides.json");
+  if(!j)return {weeks:[],tags:[]};
+  const d=JSON.parse(b64dec(j.content));
+  return {weeks:Array.isArray(d.weeks)?d.weeks:[],tags:gTagClean(d.tags)};
+}
+async function gMutate(fn,msg){
+  if(!gOwn()||!GWok){toast("攻略還未讀到，暫時唔可以改");return}
+  try{
+    const cur=await gFresh();
+    const r=fn(cur);if(!r)return;
+    await guideSave(r.weeks,r.tags,msg);
+  }catch(e){toast("儲存失敗（"+(e.code||e.message||"網絡")+"），稍後再試")}
+}
 function gRename(tk){
   const t=gTagOf(tk);if(!t)return;
   const nn=window.prompt("新嘅分隔名稱（最多 12 字）",t.name);if(nn==null)return;
   const name=nn.trim().slice(0,12);if(!name)return toast("名稱要填");
-  if(GW.tags.some(x=>x.k!==tk&&x.name===name))return toast("已經有同名分隔");
-  guideSave(GW.weeks,GW.tags.map(x=>x.k===tk?{...x,name}:x),"改攻略分隔名稱："+name);
+  gMutate(cur=>{
+    if(cur.tags.some(x=>x.k!==tk&&x.name===name)){toast("已經有同名分隔");return null}
+    if(!cur.tags.some(x=>x.k===tk)){toast("呢個分隔已經唔存在");return null}
+    return {weeks:cur.weeks,tags:cur.tags.map(x=>x.k===tk?{...x,name}:x)};
+  },"改攻略分隔名稱："+name);
 }
-async function gAddSec(){
+function gAddSec(){
   const nn=window.prompt("新分隔名稱（最多 12 字），例如：常駐");if(nn==null)return;
   const name=nn.trim().slice(0,12);if(!name)return toast("名稱要填");
-  if(GW.tags.some(x=>x.name===name))return toast("已經有同名分隔");
   const k="t"+Date.now().toString(36);
-  await guideSave(GW.weeks,[...GW.tags,{k,name}],"新增攻略分隔："+name);
+  gMutate(cur=>{
+    if(cur.tags.some(x=>x.name===name)){toast("已經有同名分隔");return null}
+    return {weeks:cur.weeks,tags:[...cur.tags,{k,name}]};
+  },"新增攻略分隔："+name);
+}
+function gDelSec(tk){
+  const t=gTagOf(tk);if(!t)return;
+  if(GW.weeks.some(w=>Array.isArray(w.tags)&&w.tags.includes(tk))){toast("分隔入面仲有攻略，先改去其他分隔先可以刪除");return}
+  if(!window.confirm("刪除空分隔「"+t.name+"」？"))return;
+  gMutate(cur=>{
+    if(cur.weeks.some(w=>Array.isArray(w.tags)&&w.tags.includes(tk))){toast("分隔入面仲有攻略，唔可以刪除");return null}
+    return {weeks:cur.weeks,tags:cur.tags.filter(x=>x.k!==tk)};
+  },"刪除攻略分隔："+t.name);
 }
 async function renderGuide(){
   let loaded=false;
@@ -1171,7 +1198,7 @@ async function guideSave(weeks,tags,msg){
     await ghGet(GH.PUB,"data/guides.json");
     await ghPut(GH.PUB,"data/guides.json",b64enc(json),msg);
     GW={built,weeks:fixed,tags};gClose();drawGuide();toast("攻略已儲存 ✧");return true;
-  }catch(e){$("gfMsg").textContent="儲存失敗（"+(e.code||e.message)+"），稍後再試";return false}
+  }catch(e){const m="儲存失敗（"+(e.code||e.message||"網絡")+"），稍後再試";if(!$("gForm").hidden)$("gfMsg").textContent=m;toast(m);return false}
   finally{sv.disabled=false}
 }
 async function gSave(){
