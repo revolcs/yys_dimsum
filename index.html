@@ -59,6 +59,8 @@ h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:
 .gren{flex:none;padding:6px 10px}
 .gsecbody{display:flex;flex-direction:column;gap:14px}
 .gsecbody[hidden]{display:none}
+.gtop{flex-wrap:nowrap}
+.gtop .btn{flex:1 1 0;min-width:0;padding:8px 6px}
 .tabs .tab.tabedit{flex:0 0 auto;padding:8px 12px!important}
 .tnlist{display:flex;flex-direction:column;gap:10px}
 .tnrow{display:flex;flex-direction:column;gap:4px;font-size:.8rem;font-weight:800;color:var(--ink-soft)}
@@ -523,6 +525,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="tab tabedit" id="tabEdit" type="button" hidden aria-label="改分頁名稱" title="改分頁名稱">✏️</button>
     </nav>
     <div class="calbar" id="calTop" hidden><button type="button" class="hstog ctog" id="calTopTog" aria-label="展開或收起頁首">▼</button><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><div id="calMaintBtns" hidden style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn ghost" id="calMaintEdit" style="width:auto;font-size:.8rem;padding:5px 12px">✏️ 修改維護時間</button></div><div id="calCd2"></div><div id="calTodo" hidden></div></div>
+    <div id="gOwn" class="gbar gtop" hidden><button class="btn ghost" id="gAddWk" type="button">＋ 新連結</button><button class="btn ghost" id="gAddSec" type="button">＋ 新增分隔</button></div>
     <div class="acctwrap topacct" id="acctRow"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button></div>
     <div class="jump" id="jump" aria-label="跳到稀有度"></div>
   </div>
@@ -722,7 +725,6 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
   <section id="pane-guide" hidden>
     <p class="sub" style="margin-top:12px">每星期更新嘅攻略，撳標題會喺新分頁開啟。</p>
     <div id="gFilter" class="gtags" hidden style="margin-top:12px"></div>
-    <div id="gOwn" class="gbar" hidden style="margin-top:12px"><button class="btn ghost" id="gAddWk" type="button">＋ 新連結</button><button class="btn ghost" id="gAddSec" type="button">＋ 新增分隔</button></div>
     <div id="gForm" class="rform" hidden>
       <b id="gfT">新增連結</b>
       <div class="gtagsec"><span class="sub" style="margin:0;font-weight:800">攻略標籤（只有你可以加，同月曆標籤分開）</span><div id="gfTags" class="gtags"></div><div class="grow2"><input id="gfNewTag" class="gin" placeholder="新標籤，例如：常駐"><button class="btn ghost" id="gfAddTag" type="button">＋ 標籤</button></div></div>
@@ -1285,7 +1287,7 @@ function showTab(k){
   $("acctBtn").textContent=k==="egg"?"±N號機記錄用":"±小號記錄";setTimeout(()=>{if(typeof syncSrv==="function")syncSrv()},0);
   for(const t of["shiki","egg","res","cal","guide"]){$("tab-"+t).setAttribute("aria-selected",k===t);$("pane-"+t).hidden=k!==t}
   setTimeout(()=>tabIntoView(k),0);
-  $("rEditBtn").hidden=true;$("jump").hidden=k==="res"||k==="cal"||k==="guide";$("acctRow").hidden=k==="cal"||k==="guide";$("calTop").hidden=k!=="cal";if(k==="res"||k==="cal")$("cnFab").hidden=true;pref("tab",k);if(k==="res")setTimeout(()=>renderRes(),0);if(k==="cal")setTimeout(()=>{renderCal();renderCalTop()},0);
+  $("rEditBtn").hidden=true;$("jump").hidden=k==="res"||k==="cal"||k==="guide";$("acctRow").hidden=k==="cal"||k==="guide";$("calTop").hidden=k!=="cal";$("gOwn").hidden=k!=="guide"||!gOwn();if(k==="res"||k==="cal")$("cnFab").hidden=true;pref("tab",k);if(k==="res")setTimeout(()=>renderRes(),0);if(k==="cal")setTimeout(()=>{renderCal();renderCalTop()},0);
 }
 $("tab-shiki").onclick=()=>{showTab("shiki");buildJump()};$("tab-egg").onclick=()=>{showTab("egg");buildJump()};$("tab-res").onclick=()=>{showTab("res");buildJump()};$("tab-cal").onclick=()=>{showTab("cal");buildJump()};$("tab-guide").onclick=()=>{showTab("guide");buildJump()};
 function tabIntoView(k){const el=document.querySelector(".tabs"),t=$("tab-"+k);if(!el||!t||el.scrollWidth<=el.clientWidth)return;el.scrollLeft+=t.getBoundingClientRect().left-el.getBoundingClientRect().left-(el.clientWidth-t.offsetWidth)/2}
