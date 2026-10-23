@@ -64,7 +64,7 @@ h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:
 .tnrow{display:flex;flex-direction:column;gap:4px;font-size:.8rem;font-weight:800;color:var(--ink-soft)}
 .gin{font:inherit;font-size:.9rem;padding:8px 10px;border:2px solid var(--ink);border-radius:10px;background:var(--paper);color:var(--ink);width:100%;min-width:0;box-sizing:border-box}
 .gitems{display:flex;flex-direction:column;gap:8px}
-.grow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) auto;gap:6px;align-items:center}
+.grow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center}
 .grow .btn{padding:6px 10px}
 .tab{padding:7px!important}
 .jump{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px;margin-inline:-2px}
@@ -722,15 +722,15 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
   <section id="pane-guide" hidden>
     <p class="sub" style="margin-top:12px">每星期更新嘅攻略，撳標題會喺新分頁開啟。</p>
     <div id="gFilter" class="gtags" hidden style="margin-top:12px"></div>
-    <div id="gOwn" class="gbar" hidden style="margin-top:12px"><button class="btn ghost" id="gAddWk" type="button">＋ 新增一週</button><button class="btn ghost" id="gAddSec" type="button">＋ 新增分隔</button></div>
+    <div id="gOwn" class="gbar" hidden style="margin-top:12px"><button class="btn ghost" id="gAddWk" type="button">＋ 新連結</button><button class="btn ghost" id="gAddSec" type="button">＋ 新增分隔</button></div>
     <div id="gForm" class="rform" hidden>
-      <b id="gfT">新增一週攻略</b>
+      <b id="gfT">新增連結</b>
       <div class="gtagsec"><span class="sub" style="margin:0;font-weight:800">攻略標籤（只有你可以加，同月曆標籤分開）</span><div id="gfTags" class="gtags"></div><div class="grow2"><input id="gfNewTag" class="gin" placeholder="新標籤，例如：常駐"><button class="btn ghost" id="gfAddTag" type="button">＋ 標籤</button></div></div>
-      <input id="gfTitle" class="gin" placeholder="週次標題，例如：第 44 週" maxlength="40">
+      <input id="gfTitle" class="gin" placeholder="連結標題／備註（可以唔填）">
       <div id="gfItems" class="gitems"></div>
       <button class="btn ghost" id="gfAddItem" type="button" style="align-self:flex-start">＋ 加一條連結</button>
       <p id="gfMsg" class="sub" style="margin:0;color:var(--seal);font-weight:700"></p>
-      <div class="gbar"><button class="btn danger" id="gfDel" type="button">🗑 刪除此週</button><button class="btn ghost" id="gfCancel" type="button">取消</button><button class="btn" id="gfSave" type="button">💾 儲存</button></div>
+      <div class="gbar"><button class="btn danger" id="gfDel" type="button">🗑 刪除</button><button class="btn ghost" id="gfCancel" type="button">取消</button><button class="btn" id="gfSave" type="button">💾 儲存</button></div>
     </div>
     <div id="guideList" style="display:flex;flex-direction:column;gap:14px;margin-top:12px"></div>
   </section>
@@ -1064,14 +1064,18 @@ const gClosedSet=()=>{if(!gClosed){try{const v=JSON.parse(pref("gSecClosed")||"[
 function gSaveClosed(){try{pref("gSecClosed",JSON.stringify([...gClosedSet()]))}catch(e){}}
 function gCard(wk,wi){
   const card=document.createElement("section");card.className="gwk";
-  const h=document.createElement("h3");h.textContent=String(wk.title||"攻略");card.append(h);
-  (Array.isArray(wk.items)?wk.items:[]).forEach(it=>{
-    if(!it||!/^https:\/\//.test(String(it.url||"")))return;
+  const L=(Array.isArray(wk.items)?wk.items:[]).filter(it=>it&&/^https:\/\//.test(String(it.url||"")));
+  const own=it=>{const t=String(it.title||"").trim();return t&&t!==String(it.url)?t:""};
+  const title=String(wk.title||"").trim();
+  const solo=L.length===1&&!own(L[0])&&title;
+  if(title&&!solo){const h=document.createElement("h3");h.textContent=title;card.append(h)}
+  L.forEach(it=>{
     const a=document.createElement("a");a.className="glk";a.href=String(it.url);a.target="_blank";a.rel="noopener noreferrer";
-    const t=document.createElement("span");t.className="gt";t.textContent=String(it.title||it.url);
+    const t=document.createElement("span");t.className="gt";t.textContent=solo?title:(own(it)||String(it.url));
     const g=document.createElement("span");g.className="gg";g.textContent="開新窗 ↗";
     a.append(t,g);card.append(a)});
-  if(gOwn()){const bar=document.createElement("div");bar.className="gbar";bar.style.marginTop="6px";const e=document.createElement("button");e.type="button";e.className="btn ghost";e.textContent="✏️ 改這週";e.onclick=()=>gOpen(wi);bar.append(e);card.append(bar)}
+  if(!L.length&&!title){const p=document.createElement("p");p.className="sub";p.style.margin="0";p.textContent="（未有連結）";card.append(p)}
+  if(gOwn()){const bar=document.createElement("div");bar.className="gbar";bar.style.marginTop="6px";const e=document.createElement("button");e.type="button";e.className="btn ghost";e.textContent="✏️ 修改";e.onclick=()=>gOpen(wi);bar.append(e);card.append(bar)}
   return card;
 }
 function drawGuide(){
@@ -1107,7 +1111,7 @@ function drawGuide(){
     hd.append(btn);
     if(s.tag&&gOwn()){const rn=document.createElement("button");rn.type="button";rn.className="btn ghost gren";rn.textContent="✏️";rn.setAttribute("aria-label","改分隔名稱");rn.onclick=()=>gRename(s.tag);const dl=document.createElement("button");dl.type="button";dl.className="btn ghost gren";dl.textContent="🗑";dl.setAttribute("aria-label","刪除分隔");dl.onclick=()=>gDelSec(s.tag);hd.append(rn,dl)}
     wrap.append(hd,body);
-    if(!s.weeks.length){const p=document.createElement("p");p.className="sub";p.style.margin="4px 2px";p.textContent="未有攻略，撳下面嘅「改這週」貼標籤就會歸到呢度";body.append(p)}
+    if(!s.weeks.length){const p=document.createElement("p");p.className="sub";p.style.margin="4px 2px";p.textContent="未有連結，喺「✏️ 修改」入面揀呢個標籤就會歸到呢度";body.append(p)}
     s.weeks.forEach(({wk,wi})=>body.append(gCard(wk,wi)));
     box.append(wrap);
   });
@@ -1162,11 +1166,10 @@ async function renderGuide(){
   drawGuide();
 }
 function gRow(t="",u=""){
-  const row=document.createElement("div");row.className="grow";
-  const a=document.createElement("input");a.type="text";a.placeholder="連結標題";a.value=t;a.className="gin";a.maxLength=80;a.setAttribute("aria-label","連結標題");
+  const row=document.createElement("div");row.className="grow";row.dataset.t=(t&&t!==u)?t:"";
   const b=document.createElement("input");b.type="url";b.placeholder="https://…";b.value=u;b.className="gin";b.setAttribute("aria-label","連結網址");
   const x=document.createElement("button");x.type="button";x.className="btn ghost";x.textContent="✕";x.setAttribute("aria-label","移除這條");x.onclick=()=>row.remove();
-  row.append(a,b,x);$("gfItems").append(row);
+  row.append(b,x);$("gfItems").append(row);
 }
 function gTagsDraw(){
   const box=$("gfTags");box.replaceChildren();
@@ -1190,7 +1193,7 @@ function gAddTag(){
 function gOpen(wi){
   if(!gOwn()||!GWok)return;
   gEdit=wi;const wk=wi>=0?GW.weeks[wi]:{title:"",date:"",items:[]};
-  $("gfT").textContent=wi>=0?"修改攻略":"新增一週攻略";
+  $("gfT").textContent=wi>=0?"修改連結":"新增連結";
   $("gfTitle").value=String(wk.title||"");
   $("gfItems").replaceChildren();
   (Array.isArray(wk.items)?wk.items:[]).forEach(it=>gRow(String(it.title||""),String(it.url||"")));
@@ -1216,25 +1219,25 @@ async function guideSave(weeks,tags,msg){
 }
 async function gSave(){
   const title=$("gfTitle").value.trim();
-  if(!title){$("gfMsg").textContent="週次標題要填";return}
   const items=[];
   for(const row of $("gfItems").children){
-    const [a,b]=row.querySelectorAll("input");const t=a.value.trim(),u=b.value.trim();
-    if(!t&&!u)continue;
-    if(!/^https:\/\/\S+$/.test(u)){$("gfMsg").textContent="連結要以 https:// 開頭：「"+(t||u)+"」";return}
-    items.push({title:t||u,url:u});
+    const b=row.querySelector("input");const u=b.value.trim(),t=String(row.dataset.t||"").trim();
+    if(!u)continue;
+    if(!/^https:\/\/\S+$/.test(u)){$("gfMsg").textContent="連結要以 https:// 開頭：「"+u+"」";return}
+    const o={url:u};if(t)o.title=t;items.push(o);
   }
-  const wk={title};wk.items=items;
+  if(!items.length){$("gfMsg").textContent="至少要貼一條連結";return}
+  const wk={};if(title)wk.title=title;wk.items=items;
   const tg=[...gSelTags].filter(k=>gTagWork.some(t=>t.k===k));if(tg.length)wk.tags=tg;
   const next=GW.weeks.slice();
   if(gEdit>=0)next[gEdit]=wk;else next.push(wk);
-  await guideSave(next,gTagWork,(gEdit>=0?"更新攻略：":"新增攻略：")+title);
+  await guideSave(next,gTagWork,(gEdit>=0?"更新連結：":"新增連結：")+(title||items[0].url));
 }
 async function gDelete(){
   if(gEdit==null||gEdit<0)return;
   const wk=GW.weeks[gEdit];
-  if(!window.confirm("刪除「"+(wk.title||"此週")+"」？"))return;
-  await guideSave(GW.weeks.filter((_,i)=>i!==gEdit),GW.tags,"刪除攻略："+(wk.title||""));
+  if(!window.confirm("刪除「"+(wk.title||((wk.items||[])[0]||{}).url||"呢條連結")+"」？"))return;
+  await guideSave(GW.weeks.filter((_,i)=>i!==gEdit),GW.tags,"刪除連結："+(wk.title||((wk.items||[])[0]||{}).url||""));
 }
 $("gAddWk").onclick=()=>gOpen(-1);
 $("gAddSec").onclick=gAddSec;
