@@ -83,6 +83,15 @@ h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:
 .themefab{flex:none;height:32px;padding:0 11px;border-radius:99px;font:inherit;font-size:.8rem;font-weight:900;color:var(--ink);white-space:nowrap;line-height:1;border:2px solid var(--ink);background:var(--sheet);box-shadow:3px 3px 0 var(--tshadow);cursor:pointer;display:grid;place-items:center}
 .cnfab{position:fixed;right:16px;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:25;font:inherit;font-size:.8rem;font-weight:900;border:2px solid #0b2e5c;color:#fff;background:#2fb8ff;border-radius:99px;padding:8px 14px;box-shadow:3px 3px 0 #0b2e5c;cursor:pointer}
 .cnfab[aria-pressed="true"]{background:var(--sheet);color:var(--cnink)}
+.gwk{background:var(--sheet);border:2px solid var(--ink);border-radius:16px;box-shadow:4px 4px 0 var(--shadow);padding:12px 14px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.gwk h3{margin:0;font-size:1rem;font-weight:900;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.gwk .gwd{font-size:.75rem;font-weight:700;color:var(--ink-soft)}
+.glk{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 2px;color:var(--ink);text-decoration:none;border-top:1px dashed var(--line);min-width:0}
+.glk:first-of-type{border-top:0}
+.glk span.gt{overflow-wrap:anywhere;min-width:0}
+.glk span.gg{flex:none;font-size:.78rem;font-weight:900;background:var(--acc);color:var(--acc-ink);border:2px solid var(--ink);border-radius:99px;padding:2px 10px;white-space:nowrap}
+.glk:hover span.gt,.glk:focus-visible span.gt{text-decoration:underline}
+.glk:focus-visible{outline:3px solid var(--seal);outline-offset:2px;border-radius:8px}
 .disc{margin-top:10px;background:var(--sheet);border:2px dashed var(--line);border-radius:12px;padding:8px 12px;font-size:.82rem;color:var(--ink-soft)}
 .disc summary{cursor:pointer;font-weight:900;color:var(--ink);list-style:none}
 .disc summary::-webkit-details-marker{display:none}
@@ -478,6 +487,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="tab" id="tab-egg" role="tab" aria-selected="false">黑蛋地獄</button>
       <button class="tab" id="tab-res" role="tab" aria-selected="false">資源獲取</button>
       <button class="tab" id="tab-cal" role="tab" aria-selected="false">行事月曆</button>
+      <button class="tab" id="tab-guide" role="tab" aria-selected="false" hidden>攻略</button>
     </nav>
     <div class="calbar" id="calTop" hidden><button type="button" class="hstog ctog" id="calTopTog" aria-label="展開或收起頁首">▼</button><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><div id="calMaintBtns" hidden style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn ghost" id="calMaintEdit" style="width:auto;font-size:.8rem;padding:5px 12px">✏️ 修改維護時間</button></div><div id="calCd2"></div><div id="calTodo" hidden></div></div>
     <div class="acctwrap topacct" id="acctRow"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button></div>
@@ -675,6 +685,10 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div id="calList" style="margin-top:14px"></div>
     <div class="calselbar" id="calSelBar" hidden><span id="calSelN">已選 0 項</span><span class="spacer"></span><button class="btn ghost" id="calSelEnd" type="button">統一改結束</button><button class="btn danger" id="calSelDel" type="button">刪除所選</button><button class="btn ghost" id="calSelOff" type="button">完成</button></div>
     <div class="calbottom" id="calBottom" hidden><button class="btn ghost" id="calAdd" type="button">＋ 新增活動</button><button class="btn ghost" id="calTwBtn" type="button">📋 貼上台服公告</button><button class="btn ghost" id="calBatchAdd" type="button">📥 批量新增</button><button class="btn ghost" id="calTagBtn" type="button">🏷 管理標籤</button><button class="btn ghost" id="calSelOn" type="button">☑ 批量選取</button></div>
+  </section>
+  <section id="pane-guide" hidden>
+    <p class="sub" style="margin-top:12px">每星期更新嘅攻略，撳標題會喺新分頁開啟。</p>
+    <div id="guideList" style="display:flex;flex-direction:column;gap:14px;margin-top:12px"></div>
   </section>
   <footer class="foot">
     <div id="copyLine">本頁為玩家自製的非官方工具，與網易及《陰陽師》官方沒有任何關係。<br>遊戲角色頭像、稀有度圖示等美術版權屬網易所有，此處僅作個人收藏紀錄用途，不作任何商業用途。<br>式神名單、技能數值為玩家手動整理，可能與遊戲實際內容有出入，一切以遊戲內為準。</div>
@@ -986,15 +1000,35 @@ function owe(max,cur){
   let n=0;m.forEach((d,i)=>{n+=Math.max(0,d-(c[i]??0))});return n;
 }
 
+/* 攻略：data/guides.json（只喺 GitHub 版）；{"weeks":[{"title":"第 43 週","date":"2026-10-23","items":[{"title":"標題","url":"https://…"}]}]} */
+async function renderGuide(){
+  const box=$("guideList");if(!box)return;
+  let W=[];try{const r=await fetch("data/guides.json?t="+Date.now(),{cache:"no-store"});if(r.ok){const j=await r.json();if(j&&Array.isArray(j.weeks))W=j.weeks}}catch(e){}
+  box.replaceChildren();
+  if(!W.length){const p=document.createElement("p");p.className="sub";p.textContent="暫時未有攻略，等朔更新 ✧";box.append(p);return}
+  for(const wk of W){
+    const card=document.createElement("section");card.className="gwk";
+    const h=document.createElement("h3");h.textContent=String(wk.title||"攻略");
+    if(wk.date){const d=document.createElement("span");d.className="gwd";d.textContent=String(wk.date);h.append(d)}
+    card.append(h);
+    (Array.isArray(wk.items)?wk.items:[]).forEach(it=>{
+      if(!it||!/^https:\/\//.test(String(it.url||"")))return;
+      const a=document.createElement("a");a.className="glk";a.href=String(it.url);a.target="_blank";a.rel="noopener noreferrer";
+      const t=document.createElement("span");t.className="gt";t.textContent=String(it.title||it.url);
+      const g=document.createElement("span");g.className="gg";g.textContent="開新窗 ↗";
+      a.append(t,g);card.append(a)});
+    box.append(card)}
+}
 /* tabs */
 function showTab(k){
-  if(!["shiki","egg","res","cal"].includes(k))k="shiki";
+  if(!["shiki","egg","res","cal","guide"].includes(k))k="shiki";
+  if(k==="guide"){if(!window.GH_CFG)k="shiki";else setTimeout(()=>renderGuide(),0)}
   $("acctBtn").textContent=k==="egg"?"±N號機記錄用":"±小號記錄";setTimeout(()=>{if(typeof syncSrv==="function")syncSrv()},0);
-  for(const t of["shiki","egg","res","cal"]){$("tab-"+t).setAttribute("aria-selected",k===t);$("pane-"+t).hidden=k!==t}
-  $("rEditBtn").hidden=true;$("jump").hidden=k==="res"||k==="cal";$("acctRow").hidden=k==="cal";$("calTop").hidden=k!=="cal";if(k==="res"||k==="cal")$("cnFab").hidden=true;pref("tab",k);if(k==="res")setTimeout(()=>renderRes(),0);if(k==="cal")setTimeout(()=>{renderCal();renderCalTop()},0);
+  for(const t of["shiki","egg","res","cal","guide"]){$("tab-"+t).setAttribute("aria-selected",k===t);$("pane-"+t).hidden=k!==t}
+  $("rEditBtn").hidden=true;$("jump").hidden=k==="res"||k==="cal"||k==="guide";$("acctRow").hidden=k==="cal"||k==="guide";$("calTop").hidden=k!=="cal";if(k==="res"||k==="cal")$("cnFab").hidden=true;pref("tab",k);if(k==="res")setTimeout(()=>renderRes(),0);if(k==="cal")setTimeout(()=>{renderCal();renderCalTop()},0);
 }
-$("tab-shiki").onclick=()=>{showTab("shiki");buildJump()};$("tab-egg").onclick=()=>{showTab("egg");buildJump()};$("tab-res").onclick=()=>{showTab("res");buildJump()};$("tab-cal").onclick=()=>{showTab("cal");buildJump()};
-function activePane(){return ["egg","res","cal"].map(k=>$("pane-"+k)).find(p=>!p.hidden)||$("pane-shiki")}
+$("tab-shiki").onclick=()=>{showTab("shiki");buildJump()};$("tab-egg").onclick=()=>{showTab("egg");buildJump()};$("tab-res").onclick=()=>{showTab("res");buildJump()};$("tab-cal").onclick=()=>{showTab("cal");buildJump()};$("tab-guide").onclick=()=>{showTab("guide");buildJump()};
+function activePane(){return ["egg","res","cal","guide"].map(k=>$("pane-"+k)).find(p=>!p.hidden)||$("pane-shiki")}
 function buildJump(){
   const hs=[...activePane().querySelectorAll(".group-h[data-r]")];
   $("jump").innerHTML=`<button class="jb" type="button" data-r="" aria-label="回到最上面，看全部">${RB("全部")}</button>`+hs.map(x=>`<button class="jb" type="button" data-r="${esc(x.dataset.r)}" aria-label="跳到 ${esc(x.dataset.r)}">${RB(x.dataset.r)}</button>`).join("");
@@ -1026,7 +1060,7 @@ function updateNow(force){
 addEventListener("scroll",()=>{if(nowLock){clearTimeout(nowLockT);nowLockT=setTimeout(()=>{nowLock=null;updateNow()},180)}if(nowRaf)return;nowRaf=requestAnimationFrame(()=>{nowRaf=0;updateNow()})},{passive:true});
 function setHdr(){document.documentElement.style.setProperty("--hdr",$("top").offsetHeight+"px")}
 try{new ResizeObserver(setHdr).observe($("top"))}catch(_){addEventListener("resize",setHdr)}
-{const h=location.hash.slice(1),t0=pref("tab");if(["egg","res","cal"].includes(h))showTab(h);else if(["egg","res","cal"].includes(t0))showTab(t0)}
+{const h=location.hash.slice(1),t0=pref("tab");if(["egg","res","cal","guide"].includes(h))showTab(h);else if(["egg","res","cal","guide"].includes(t0))showTab(t0)}
 function syncSrv(){
   const A=ACC();if(!A.some(a=>a.k===S.srv))S.srv=A[0].k;
   document.querySelectorAll(".acctseg").forEach(g=>{g.innerHTML=A.map(a=>`<button type="button" data-srv="${esc(a.k)}" aria-pressed="${a.k===S.srv}">${esc(DN(a))}</button>`).join("");
@@ -2058,6 +2092,7 @@ setInterval(()=>{if(!$("pane-res").hidden&&!document.hidden&&$("rScrim").hidden)
 document.addEventListener("visibilitychange",()=>{if(!document.hidden&&!$("pane-res").hidden&&$("rScrim").hidden)renderRes()});
 
 const HOST_THEME=document.documentElement.getAttribute("data-theme");
+if(window.GH_CFG)$("tab-guide").hidden=false;
 const THEMES=[["auto","🌓","跟隨系統","自動"],["light","☀️","日間模式","日間"],["dark","🌙","夜間模式","夜間"]];
 function applyTheme(m,announce){
   const R0=document.documentElement;
