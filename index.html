@@ -59,6 +59,9 @@ h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:
 .gren{flex:none;padding:6px 10px}
 .gsecbody{display:flex;flex-direction:column;gap:14px}
 .gsecbody[hidden]{display:none}
+.tabs .tab.tabedit{flex:0 0 auto;padding:8px 12px!important}
+.tnlist{display:flex;flex-direction:column;gap:10px}
+.tnrow{display:flex;flex-direction:column;gap:4px;font-size:.8rem;font-weight:800;color:var(--ink-soft)}
 .gin{font:inherit;font-size:.9rem;padding:8px 10px;border:2px solid var(--ink);border-radius:10px;background:var(--paper);color:var(--ink);width:100%;min-width:0;box-sizing:border-box}
 .gitems{display:flex;flex-direction:column;gap:8px}
 .grow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) auto;gap:6px;align-items:center}
@@ -517,6 +520,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="tab" id="tab-res" role="tab" aria-selected="false">資源獲取</button>
       <button class="tab" id="tab-cal" role="tab" aria-selected="false">行事月曆</button>
       <button class="tab" id="tab-guide" role="tab" aria-selected="false" hidden>攻略</button>
+      <button class="tab tabedit" id="tabEdit" type="button" hidden aria-label="改分頁名稱" title="改分頁名稱">✏️</button>
     </nav>
     <div class="calbar" id="calTop" hidden><button type="button" class="hstog ctog" id="calTopTog" aria-label="展開或收起頁首">▼</button><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><div id="calMaintBtns" hidden style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn ghost" id="calMaintEdit" style="width:auto;font-size:.8rem;padding:5px 12px">✏️ 修改維護時間</button></div><div id="calCd2"></div><div id="calTodo" hidden></div></div>
     <div class="acctwrap topacct" id="acctRow"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button></div>
@@ -980,6 +984,15 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div class="row"><button class="btn ghost" id="d1Cancel" type="button">取消</button><button class="btn ghost" id="d1Reset" type="button">改回開始日</button><button class="btn" id="d1Save" type="button">儲存</button></div>
   </div>
 </div>
+<div id="tnScrim" class="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="tnTitle">
+    <h2 id="tnTitle">✏️ 改分頁名稱</h2>
+    <p class="sub" style="margin:0">留空就用返原本嘅名。改咗之後訪客都會見到新名。</p>
+    <div id="tnList" class="tnlist"></div>
+    <div class="row"><button class="btn ghost" id="tnReset" type="button">全部還原預設</button></div>
+    <div class="row"><button class="btn ghost" id="tnCancel" type="button">取消</button><button class="btn" id="tnSave" type="button">儲存</button></div>
+  </div>
+</div>
 <div id="tgScrim" class="scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="tgTitle">
     <h2 id="tgTitle">🏷 管理標籤</h2>
@@ -1230,6 +1243,38 @@ $("gfAddTag").onclick=gAddTag;
 $("gfCancel").onclick=gClose;
 $("gfSave").onclick=gSave;
 $("gfDel").onclick=gDelete;
+/* 分頁名稱（擁有者可改；GitHub 版存 data/tabs.json，Claude 版存 meta/tabnames） */
+const TABK=["shiki","egg","res","cal","guide"];
+const TAB0={};TABK.forEach(k=>{TAB0[k]=$("tab-"+k).textContent});
+let TABN={};
+function tabClean(o){const r={};if(o&&typeof o==="object"&&!Array.isArray(o))TABK.forEach(k=>{const v=String(o[k]==null?"":o[k]).trim();if(v)r[k]=v});return r}
+function applyTabNames(){TABK.forEach(k=>{$("tab-"+k).textContent=TABN[k]||TAB0[k]})}
+function tabCanEdit(){return S.owner===true&&(S.isGH?!!GH.tok:!!S.db)}
+function tabOpen(){
+  if(!tabCanEdit())return;
+  const box=$("tnList");box.replaceChildren();
+  TABK.forEach(k=>{if(k==="guide"&&!window.GH_CFG)return;
+    const lab=document.createElement("label");lab.className="tnrow";
+    const sp=document.createElement("span");sp.textContent="原名："+TAB0[k];
+    const inp=document.createElement("input");inp.className="gin";inp.dataset.k=k;inp.placeholder=TAB0[k];inp.value=TABN[k]||"";
+    lab.append(sp,inp);box.append(lab)});
+  $("tnScrim").hidden=false;
+}
+async function tabSave(names){
+  if(!tabCanEdit()){toast("只有擁有者可以改");return}
+  const sv=$("tnSave");sv.disabled=true;
+  try{
+    if(S.isGH){const json=JSON.stringify({tabs:names},null,2)+"\n";await ghGet(GH.PUB,"data/tabs.json");await ghPut(GH.PUB,"data/tabs.json",b64enc(json),"更新分頁名稱")}
+    else await S.db.doc("meta/tabnames").set({names});
+    TABN=names;applyTabNames();$("tnScrim").hidden=true;toast("分頁名稱已儲存 ✧");
+  }catch(e){toast("儲存失敗（"+(e.code||e.message||"網絡")+"），稍後再試")}
+  finally{sv.disabled=false}
+}
+$("tabEdit").onclick=tabOpen;
+$("tnCancel").onclick=()=>{$("tnScrim").hidden=true};
+$("tnReset").onclick=()=>{document.querySelectorAll("#tnList input").forEach(i=>{i.value=""})};
+$("tnSave").onclick=()=>{const o={};document.querySelectorAll("#tnList input").forEach(i=>{o[i.dataset.k]=i.value});const n=tabClean(o);if(!window.GH_CFG&&TABN.guide)n.guide=TABN.guide;tabSave(n)};
+function tabWatch(db){db.doc("meta/tabnames").onSnapshot(d=>{const v=d&&d.exists&&d.data&&d.data().names;TABN=tabClean(v);applyTabNames()},()=>{})}
 /* tabs */
 function showTab(k){
   if(!["shiki","egg","res","cal","guide"].includes(k))k="shiki";
@@ -1810,7 +1855,7 @@ async function exportStatic(personal){
     const ids=[...new Set([...shiki.filter(s=>s.img).map(s=>s.img),...Object.values(RIMG),DARUMA_ID])];
     const IMG={};let n=0;
     for(const id of ids){const isIcon=!Object.values(RIMG).includes(id)&&id!==DARUMA_ID;const d=await shrinkData(BLOB(id),isIcon?160:256);if(d)IMG[id]=d;n++;if(n%20===0)toast(`打包頭像中… ${n}/${ids.length}`)}
-    const sdb={shiki,res:RES,cal:calClean(CAL.ev),calTags:CAL.tags,built:stamp().txt};if(personal){sdb.mine=packData();sdb.personal=true}
+    const sdb={shiki,res:RES,cal:calClean(CAL.ev),calTags:CAL.tags,tabNames:TABN,built:stamp().txt};if(personal){sdb.mine=packData();sdb.personal=true}
     const js=`window.STATIC_DB=${JSON.stringify(sdb)};window.STATIC_IMG=${JSON.stringify(IMG)};`.replace(/<\/script/gi,"<\\/script");
     const SLOT='<script id="static-data"><'+'/script>';const html=tpl.replace(SLOT,'<script id="static-data">'+js+'<'+'/script>');
     const fn=`點心紙-${personal?"我的":""}免登入版-${stamp().file}.html`;
@@ -1832,6 +1877,7 @@ function renderIO(){
   $("pvGuest").hidden=!(S.owner===true||S.previewing);$("pvGuest").textContent=S.previewing?"↩ 結束預覽":"👀 預覽訪客模式";
   $("io").classList.toggle("preview",!!S.previewing);
   $("copyLine").hidden=!!S.personal||S.owner===true;
+  $("tabEdit").hidden=!tabCanEdit();
   $("ioMsg").innerHTML=S.personal
     ?(S.dirty?'<span class="dirty">有未匯出的變更</span>':"")
     :g
@@ -2463,6 +2509,7 @@ async function ghBoot(){
   GH.PUB=pref("ghPub")||GH_CFG.owner+"/"+GH_CFG.pub;GH.PRIV=pref("ghPriv")||GH_CFG.owner+"/"+GH_CFG.priv;
   let pub=null;try{const r=await fetch("data/shiki.json?t="+Date.now(),{cache:"no-store"});if(r.ok)pub=await r.json()}catch(e){}
   const base=(pub&&Array.isArray(pub.shiki)&&pub.shiki)||(window.STATIC_DB&&STATIC_DB.shiki)||[];
+  try{const tr=await fetch("data/tabs.json?t="+Date.now(),{cache:"no-store"});if(tr.ok){TABN=tabClean((await tr.json()).tabs);applyTabNames()}}catch(e){}
   try{const rr=await fetch("data/resources.json?t="+Date.now(),{cache:"no-store"});if(rr.ok){const RL=cleanRes((await rr.json()).items);if(RL)setRes(RL)}}catch(e){}
   let calBase=(window.STATIC_DB&&calClean(STATIC_DB.cal))||[];
   if(window.STATIC_DB){const tg0=tagClean(STATIC_DB.calTags);if(tg0)CAL.tags=tg0}
@@ -2892,7 +2939,7 @@ $("twGo").onclick=async()=>{const L=TW.items.filter(e=>e.on&&e.date&&String(e.ti
 
 (async()=>{
   if(window.GH_CFG){await ghBoot();return}
-  if(window.STATIC_DB){if(Array.isArray(STATIC_DB.res)){const RL=cleanRes(STATIC_DB.res);if(RL)setRes(RL)}CAL.ev=calClean(STATIC_DB.cal);{const tg=tagClean(STATIC_DB.calTags);if(tg)CAL.tags=tg}renderCal();renderCalTop();$("staticTag").textContent=` ・免登入版（名單更新於 ${STATIC_DB.built||"?"}）`;S.isStatic=true;S.owner=false;S.shiki=STATIC_DB.shiki||[];if(STATIC_DB.personal&&STATIC_DB.mine){S.personal=true;applyPack(STATIC_DB.mine);$("staticTag").textContent=` ・我的免登入版（紀錄截至 ${STATIC_DB.built||"?"}）`}syncSrv();renderIO();renderShiki();renderEggs();renderRes();return}
+  if(window.STATIC_DB){if(Array.isArray(STATIC_DB.res)){const RL=cleanRes(STATIC_DB.res);if(RL)setRes(RL)}CAL.ev=calClean(STATIC_DB.cal);{const tg=tagClean(STATIC_DB.calTags);if(tg)CAL.tags=tg}TABN=tabClean(STATIC_DB.tabNames);applyTabNames();renderCal();renderCalTop();$("staticTag").textContent=` ・免登入版（名單更新於 ${STATIC_DB.built||"?"}）`;S.isStatic=true;S.owner=false;S.shiki=STATIC_DB.shiki||[];if(STATIC_DB.personal&&STATIC_DB.mine){S.personal=true;applyPack(STATIC_DB.mine);$("staticTag").textContent=` ・我的免登入版（紀錄截至 ${STATIC_DB.built||"?"}）`}syncSrv();renderIO();renderShiki();renderEggs();renderRes();return}
   try{const L=JSON.parse(pref("res_list_v1")||"null");if(Array.isArray(L)){const RL=cleanRes(L);if(RL)setRes(RL)}}catch(e){}
   if(!window.claude||!claude.use){notice("這個頁面要在 claude.ai 裡打開才能儲存紀錄。");return}
   const db=await claude.use("db");
@@ -2909,6 +2956,6 @@ $("twGo").onclick=async()=>{const L=TW.items.filter(e=>e.on&&e.date&&String(e.ti
     renderShiki();
     const a=document.activeElement;if(!(a&&a.classList.contains("cur")))renderEggs();
   },e=>notice("資料讀取失敗："+(e.code||"")));
-  calWatch(db);
+  calWatch(db);tabWatch(db);
 })();
 </script>
