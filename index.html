@@ -44,15 +44,20 @@ h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:
 .gtg[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink)}
 .gtgck:has(input:checked){background:var(--acc);color:var(--acc-ink)}
 .gtgck input{accent-color:var(--seal);margin:0}
-.gtgw{display:inline-flex;align-items:center;gap:0}
+.gtgw{display:inline-flex;align-items:center;gap:0;flex:none}
+.gtgw .gtg{max-width:none;flex:none}
+.gtgck span{white-space:nowrap;flex:none}
+.gtgck input{flex:none;width:auto}
 .gtx{border:0;background:none;color:var(--ink-soft);font:inherit;font-weight:900;cursor:pointer;padding:2px 6px}
 .gtag{font-size:.7rem;font-weight:900;border:1.5px solid var(--ink);border-radius:99px;padding:1px 8px;background:var(--acc);color:var(--acc-ink);align-self:center;white-space:nowrap}
 .grow2{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center}
 .gtagsec{display:flex;flex-direction:column;gap:6px}
 .gtagsec[hidden]{display:none}
 .gsecbox{display:flex;flex-direction:column;gap:10px}
-.gsechd{display:flex;align-items:center;gap:8px}
-.gsec{flex:1;min-width:0;display:flex;align-items:center;gap:10px;font:inherit;font-weight:900;font-size:1rem;padding:12px 14px;border:2px solid var(--ink);border-radius:16px;background:var(--sheet);color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--shadow);text-align:left}
+.gsechd{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.gstools{display:flex;gap:6px;margin-left:auto;flex:none}
+.gstools .btn:disabled{opacity:.35;cursor:default}
+.gsec{flex:1 1 200px;min-width:0;display:flex;align-items:center;gap:10px;font:inherit;font-weight:900;font-size:1rem;padding:12px 14px;border:2px solid var(--ink);border-radius:16px;background:var(--sheet);color:var(--ink);cursor:pointer;box-shadow:3px 3px 0 var(--shadow);text-align:left}
 .gsnm{flex:1;min-width:0;overflow-wrap:anywhere}
 .gcnt{flex:none;font-size:.8rem;font-weight:900;background:var(--paper);border:2px solid var(--ink);border-radius:99px;padding:1px 10px}
 .garr{flex:none;color:var(--ink-soft);font-size:.9rem}
@@ -723,17 +728,17 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div class="calbottom" id="calBottom" hidden><button class="btn ghost" id="calAdd" type="button">＋ 新增活動</button><button class="btn ghost" id="calTwBtn" type="button">📋 貼上台服公告</button><button class="btn ghost" id="calBatchAdd" type="button">📥 批量新增</button><button class="btn ghost" id="calTagBtn" type="button">🏷 管理標籤</button><button class="btn ghost" id="calSelOn" type="button">☑ 批量選取</button></div>
   </section>
   <section id="pane-guide" hidden>
-    <p class="sub" style="margin-top:12px">每星期更新嘅攻略，撳標題會喺新分頁開啟。</p>
+    <p class="sub" style="margin-top:12px">所有的連結內容將會不定期更新。</p>
     <div id="gFilter" class="gtags" hidden style="margin-top:12px"></div>
-    <div id="gForm" class="rform" hidden>
-      <b id="gfT">新增連結</b>
+    <div id="gForm" class="scrim" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="gfT">
+      <h2 id="gfT">新增連結</h2>
       <div class="gtagsec"><span class="sub" style="margin:0;font-weight:800">攻略標籤（只有你可以加，同月曆標籤分開）</span><div id="gfTags" class="gtags"></div><div class="grow2"><input id="gfNewTag" class="gin" placeholder="新標籤，例如：常駐"><button class="btn ghost" id="gfAddTag" type="button">＋ 標籤</button></div></div>
       <input id="gfTitle" class="gin" placeholder="連結標題／備註（可以唔填）">
       <div id="gfItems" class="gitems"></div>
       <button class="btn ghost" id="gfAddItem" type="button" style="align-self:flex-start">＋ 加一條連結</button>
       <p id="gfMsg" class="sub" style="margin:0;color:var(--seal);font-weight:700"></p>
       <div class="gbar"><button class="btn danger" id="gfDel" type="button">🗑 刪除</button><button class="btn ghost" id="gfCancel" type="button">取消</button><button class="btn" id="gfSave" type="button">💾 儲存</button></div>
-    </div>
+    </div></div>
     <div id="guideList" style="display:flex;flex-direction:column;gap:14px;margin-top:12px"></div>
   </section>
   <footer class="foot">
@@ -1111,7 +1116,11 @@ function drawGuide(){
     const body=document.createElement("div");body.className="gsecbody";body.hidden=isC;
     btn.onclick=()=>{const hide=!body.hidden;body.hidden=hide;hide?closed.add(s.key):closed.delete(s.key);btn.setAttribute("aria-expanded",String(!hide));arr.textContent=hide?"▾":"▴";gSaveClosed()};
     hd.append(btn);
-    if(s.tag&&gOwn()){const rn=document.createElement("button");rn.type="button";rn.className="btn ghost gren";rn.textContent="✏️";rn.setAttribute("aria-label","改分隔名稱");rn.onclick=()=>gRename(s.tag);const dl=document.createElement("button");dl.type="button";dl.className="btn ghost gren";dl.textContent="🗑";dl.setAttribute("aria-label","刪除分隔");dl.onclick=()=>gDelSec(s.tag);hd.append(rn,dl)}
+    if(s.tag&&gOwn()){
+      const ti=GW.tags.findIndex(t=>t.k===s.tag),tools=document.createElement("div");tools.className="gstools";
+      const mk=(txt,lbl,fn,dis)=>{const x=document.createElement("button");x.type="button";x.className="btn ghost gren";x.textContent=txt;x.setAttribute("aria-label",lbl);x.disabled=!!dis;x.onclick=fn;return x};
+      tools.append(mk("▲","分隔上移",()=>gMoveSec(s.tag,-1),ti<=0),mk("▼","分隔下移",()=>gMoveSec(s.tag,1),ti<0||ti>=GW.tags.length-1),mk("✏️","改分隔名稱",()=>gRename(s.tag)),mk("🗑","刪除分隔",()=>gDelSec(s.tag)));
+      hd.append(tools)}
     wrap.append(hd,body);
     if(!s.weeks.length){const p=document.createElement("p");p.className="sub";p.style.margin="4px 2px";p.textContent="未有連結，喺「✏️ 修改」入面揀呢個標籤就會歸到呢度";body.append(p)}
     s.weeks.forEach(({wk,wi})=>body.append(gCard(wk,wi)));
@@ -1150,6 +1159,14 @@ function gAddSec(){
     if(cur.tags.some(x=>x.name===name)){toast("已經有同名分隔");return null}
     return {weeks:cur.weeks,tags:[...cur.tags,{k,name}]};
   },"新增攻略分隔："+name);
+}
+function gMoveSec(tk,dir){
+  gMutate(cur=>{
+    const T=cur.tags.slice(),i=T.findIndex(t=>t.k===tk),j=i+dir;
+    if(i<0||j<0||j>=T.length)return null;
+    [T[i],T[j]]=[T[j],T[i]];
+    return {weeks:cur.weeks,tags:T};
+  },"調整攻略分隔次序："+((gTagOf(tk)||{}).name||""));
 }
 function gDelSec(tk){
   const t=gTagOf(tk);if(!t)return;
@@ -1203,7 +1220,6 @@ function gOpen(wi){
   if(!$("gfItems").children.length)gRow("","");
   gTagWork=GW.tags.map(t=>({...t}));gSelTags=new Set(Array.isArray(wk.tags)?wk.tags:[]);gTagsDraw();$("gfNewTag").value="";
   $("gfDel").hidden=wi<0;$("gfMsg").textContent="";$("gForm").hidden=false;
-  $("gForm").scrollIntoView({block:"nearest",behavior:"smooth"});
 }
 function gClose(){gEdit=null;$("gForm").hidden=true}
 async function guideSave(weeks,tags,msg){
