@@ -38,7 +38,17 @@ h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:
 .tabs.drag{cursor:grabbing}
 .gbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
 .gbar .btn{flex:none}
-.gbar[hidden],#gForm[hidden]{display:none}
+.gbar[hidden],#gForm[hidden],#gFilter[hidden],.gtagsec[hidden]{display:none}
+.gtags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.gtg{font:inherit;font-size:.82rem;font-weight:800;padding:5px 12px;border-radius:99px;border:2px solid var(--ink);background:var(--sheet);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.gtg[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink)}
+.gtgck:has(input:checked){background:var(--acc);color:var(--acc-ink)}
+.gtgck input{accent-color:var(--seal);margin:0}
+.gtgw{display:inline-flex;align-items:center;gap:0}
+.gtx{border:0;background:none;color:var(--ink-soft);font:inherit;font-weight:900;cursor:pointer;padding:2px 6px}
+.gtag{font-size:.7rem;font-weight:900;border:1.5px solid var(--ink);border-radius:99px;padding:1px 8px;background:var(--acc);color:var(--acc-ink);align-self:center;white-space:nowrap}
+.grow2{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px;align-items:center}
+.gtagsec{display:flex;flex-direction:column;gap:6px}
 .gin{font:inherit;font-size:.9rem;padding:8px 10px;border:2px solid var(--ink);border-radius:10px;background:var(--paper);color:var(--ink);width:100%;min-width:0;box-sizing:border-box}
 .gitems{display:flex;flex-direction:column;gap:8px}
 .grow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) auto;gap:6px;align-items:center}
@@ -697,9 +707,11 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
   </section>
   <section id="pane-guide" hidden>
     <p class="sub" style="margin-top:12px">每星期更新嘅攻略，撳標題會喺新分頁開啟。</p>
+    <div id="gFilter" class="gtags" hidden style="margin-top:12px"></div>
     <div id="gOwn" class="gbar" hidden style="margin-top:12px"><button class="btn ghost" id="gAddWk" type="button">＋ 新增一週</button></div>
     <div id="gForm" class="rform" hidden>
       <b id="gfT">新增一週攻略</b>
+      <div class="gtagsec"><span class="sub" style="margin:0;font-weight:800">攻略標籤（只有你可以加，同月曆標籤分開）</span><div id="gfTags" class="gtags"></div><div class="grow2"><input id="gfNewTag" class="gin" placeholder="新標籤，例如：常駐" maxlength="12"><button class="btn ghost" id="gfAddTag" type="button">＋ 標籤</button></div></div>
       <input id="gfTitle" class="gin" placeholder="週次標題，例如：第 44 週" maxlength="40">
       <input id="gfDate" class="gin" type="date" aria-label="日期">
       <div id="gfItems" class="gitems"></div>
@@ -1020,18 +1032,29 @@ function owe(max,cur){
 }
 
 /* 攻略：data/guides.json（只喺 GitHub 版）；{"weeks":[{"title":"第 43 週","date":"2026-10-23","items":[{"title":"標題","url":"https://…"}]}]} */
-let GW={built:"",weeks:[]},GWok=false,gEdit=null;
+let GW={built:"",weeks:[],tags:[]},GWok=false,gEdit=null,gFilterSel=new Set(),gTagWork=[],gSelTags=new Set();
 const gOwn=()=>S.owner===true&&!!GH.tok;
 const gNow=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"/"+p(d.getMonth()+1)+"/"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())};
+const gTagClean=list=>{if(!Array.isArray(list))return [];const seen=new Set();return list.filter(t=>t&&t.k&&t.name).map(t=>({k:String(t.k).slice(0,40),name:String(t.name).slice(0,12)})).filter(t=>{if(seen.has(t.k))return false;seen.add(t.k);return true})};
+const gTagOf=k=>GW.tags.find(t=>t.k===k);
 function drawGuide(){
-  const box=$("guideList");if(!box)return;
+  const box=$("guideList"),ft=$("gFilter");if(!box)return;
   const W=GW.weeks;$("gOwn").hidden=!gOwn();
+  ft.replaceChildren();
+  if(GW.tags.length){
+    ft.hidden=false;
+    const all=document.createElement("button");all.type="button";all.className="gtg";all.textContent="全部";all.setAttribute("aria-pressed",String(gFilterSel.size===0));all.onclick=()=>{gFilterSel.clear();drawGuide()};ft.append(all);
+    GW.tags.forEach(t=>{const b=document.createElement("button");b.type="button";b.className="gtg";b.textContent=t.name;const on=gFilterSel.has(t.k);b.setAttribute("aria-pressed",String(on));b.onclick=()=>{on?gFilterSel.delete(t.k):gFilterSel.add(t.k);drawGuide()};ft.append(b)});
+  }else ft.hidden=true;
   box.replaceChildren();
   if(!W.length){const p=document.createElement("p");p.className="sub";p.textContent="暫時未有攻略，等朔更新 ✧";box.append(p);return}
-  W.forEach((wk,wi)=>{
+  const shown=W.map((wk,wi)=>({wk,wi})).filter(({wk})=>!gFilterSel.size||(Array.isArray(wk.tags)&&wk.tags.some(k=>gFilterSel.has(k))));
+  if(!shown.length){const p=document.createElement("p");p.className="sub";p.textContent="呢個標籤暫時未有攻略 ✧";box.append(p);return}
+  shown.forEach(({wk,wi})=>{
     const card=document.createElement("section");card.className="gwk";
     const h=document.createElement("h3");h.textContent=String(wk.title||"攻略");
     if(wk.date){const d=document.createElement("span");d.className="gwd";d.textContent=String(wk.date);h.append(d)}
+    (Array.isArray(wk.tags)?wk.tags:[]).map(gTagOf).filter(Boolean).forEach(t=>{const g=document.createElement("span");g.className="gtag";g.textContent=t.name;h.append(g)});
     card.append(h);
     (Array.isArray(wk.items)?wk.items:[]).forEach(it=>{
       if(!it||!/^https:\/\//.test(String(it.url||"")))return;
@@ -1044,9 +1067,9 @@ function drawGuide(){
 }
 async function renderGuide(){
   let loaded=false;
-  try{const r=await fetch("data/guides.json?t="+Date.now(),{cache:"no-store"});if(r.ok){const j=await r.json();if(j&&Array.isArray(j.weeks)){GW={built:j.built||"",weeks:j.weeks};loaded=true}}}catch(e){}
+  try{const r=await fetch("data/guides.json?t="+Date.now(),{cache:"no-store"});if(r.ok){const j=await r.json();if(j&&Array.isArray(j.weeks)){GW={built:j.built||"",weeks:j.weeks,tags:gTagClean(j.tags)};loaded=true}}}catch(e){}
   GWok=loaded;
-  if(!loaded){GW={built:"",weeks:[]};if(gOwn()){$("gOwn").hidden=true;const box=$("guideList");box.replaceChildren();const p=document.createElement("p");p.className="sub";p.textContent="讀唔到現有攻略（可能網絡問題），暫時唔可以改，遲啲再試 ✧";box.append(p);return}}
+  if(!loaded){GW={built:"",weeks:[],tags:[]};if(gOwn()){$("gOwn").hidden=true;const box=$("guideList");box.replaceChildren();const p=document.createElement("p");p.className="sub";p.textContent="讀唔到現有攻略（可能網絡問題），暫時唔可以改，遲啲再試 ✧";box.append(p);return}}
   drawGuide();
 }
 function gRow(t="",u=""){
@@ -1056,6 +1079,25 @@ function gRow(t="",u=""){
   const x=document.createElement("button");x.type="button";x.className="btn ghost";x.textContent="✕";x.setAttribute("aria-label","移除這條");x.onclick=()=>row.remove();
   row.append(a,b,x);$("gfItems").append(row);
 }
+function gTagsDraw(){
+  const box=$("gfTags");box.replaceChildren();
+  if(!gTagWork.length){const p=document.createElement("span");p.className="sub";p.style.margin="0";p.textContent="未有標籤，喺下面新增一個";box.append(p)}
+  gTagWork.forEach(t=>{
+    const w=document.createElement("span");w.className="gtgw";
+    const lab=document.createElement("label");lab.className="gtg gtgck";
+    const cb=document.createElement("input");cb.type="checkbox";cb.checked=gSelTags.has(t.k);cb.onchange=()=>{cb.checked?gSelTags.add(t.k):gSelTags.delete(t.k)};
+    const sp=document.createElement("span");sp.textContent=t.name;
+    lab.append(cb,sp);
+    const x=document.createElement("button");x.type="button";x.className="gtx";x.textContent="✕";x.setAttribute("aria-label","刪除標籤 "+t.name);
+    x.onclick=()=>{if(!window.confirm("刪除標籤「"+t.name+"」？所有攻略上嘅呢個標籤都會移除"))return;gTagWork=gTagWork.filter(z=>z.k!==t.k);gSelTags.delete(t.k);gTagsDraw()};
+    w.append(lab,x);box.append(w)});
+}
+function gAddTag(){
+  const inp=$("gfNewTag");const name=inp.value.trim().slice(0,12);
+  if(!name){toast("標籤名要填");return}
+  if(gTagWork.some(t=>t.name===name)){toast("已經有呢個標籤");return}
+  const k="t"+Date.now().toString(36);gTagWork.push({k,name});gSelTags.add(k);inp.value="";gTagsDraw();
+}
 function gOpen(wi){
   if(!gOwn()||!GWok)return;
   gEdit=wi;const wk=wi>=0?GW.weeks[wi]:{title:"",date:"",items:[]};
@@ -1064,19 +1106,22 @@ function gOpen(wi){
   $("gfItems").replaceChildren();
   (Array.isArray(wk.items)?wk.items:[]).forEach(it=>gRow(String(it.title||""),String(it.url||"")));
   if(!$("gfItems").children.length)gRow("","");
+  gTagWork=GW.tags.map(t=>({...t}));gSelTags=new Set(Array.isArray(wk.tags)?wk.tags:[]);gTagsDraw();$("gfNewTag").value="";
   $("gfDel").hidden=wi<0;$("gfMsg").textContent="";$("gForm").hidden=false;
   $("gForm").scrollIntoView({block:"nearest",behavior:"smooth"});
 }
 function gClose(){gEdit=null;$("gForm").hidden=true}
-async function guideSave(weeks,msg){
+async function guideSave(weeks,tags,msg){
   if(!gOwn()||!GWok){toast("攻略還未讀到，暫時唔可以改");return false}
   const sv=$("gfSave");sv.disabled=true;
   try{
+    const keep=new Set(tags.map(t=>t.k));
+    const fixed=weeks.map(w=>{if(!Array.isArray(w.tags))return w;const t=w.tags.filter(k=>keep.has(k));const o={...w};if(t.length)o.tags=t;else delete o.tags;return o});
     const built=gNow();
-    const json=JSON.stringify({built,weeks},null,2)+"\n";
+    const json=JSON.stringify({built,tags,weeks:fixed},null,2)+"\n";
     await ghGet(GH.PUB,"data/guides.json");
     await ghPut(GH.PUB,"data/guides.json",b64enc(json),msg);
-    GW={built,weeks};gClose();drawGuide();toast("攻略已儲存 ✧");return true;
+    GW={built,weeks:fixed,tags};gClose();drawGuide();toast("攻略已儲存 ✧");return true;
   }catch(e){$("gfMsg").textContent="儲存失敗（"+(e.code||e.message)+"），稍後再試";return false}
   finally{sv.disabled=false}
 }
@@ -1091,18 +1136,20 @@ async function gSave(){
     items.push({title:t||u,url:u});
   }
   const wk={title};if(date)wk.date=date;wk.items=items;
+  const tg=[...gSelTags].filter(k=>gTagWork.some(t=>t.k===k));if(tg.length)wk.tags=tg;
   const next=GW.weeks.slice();
   if(gEdit>=0)next[gEdit]=wk;else next.push(wk);
-  await guideSave(next,(gEdit>=0?"更新攻略：":"新增攻略：")+title);
+  await guideSave(next,gTagWork,(gEdit>=0?"更新攻略：":"新增攻略：")+title);
 }
 async function gDelete(){
   if(gEdit==null||gEdit<0)return;
   const wk=GW.weeks[gEdit];
   if(!window.confirm("刪除「"+(wk.title||"此週")+"」？"))return;
-  await guideSave(GW.weeks.filter((_,i)=>i!==gEdit),"刪除攻略："+(wk.title||""));
+  await guideSave(GW.weeks.filter((_,i)=>i!==gEdit),GW.tags,"刪除攻略："+(wk.title||""));
 }
 $("gAddWk").onclick=()=>gOpen(-1);
 $("gfAddItem").onclick=()=>gRow("","");
+$("gfAddTag").onclick=gAddTag;
 $("gfCancel").onclick=gClose;
 $("gfSave").onclick=gSave;
 $("gfDel").onclick=gDelete;
