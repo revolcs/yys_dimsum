@@ -40,7 +40,7 @@ h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:
 .gbar .btn{flex:none}
 .gbar[hidden],#gForm[hidden],#gFilter[hidden],.gtagsec[hidden]{display:none}
 .gtags{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.gtg{font:inherit;font-size:.82rem;font-weight:800;padding:5px 12px;border-radius:99px;border:2px solid var(--ink);background:var(--sheet);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.gtg{max-width:100%;overflow-wrap:anywhere;text-align:left;font:inherit;font-size:.82rem;font-weight:800;padding:5px 12px;border-radius:99px;border:2px solid var(--ink);background:var(--sheet);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:4px}
 .gtg[aria-pressed="true"]{background:var(--acc);color:var(--acc-ink)}
 .gtgck:has(input:checked){background:var(--acc);color:var(--acc-ink)}
 .gtgck input{accent-color:var(--seal);margin:0}
@@ -721,7 +721,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     <div id="gOwn" class="gbar" hidden style="margin-top:12px"><button class="btn ghost" id="gAddWk" type="button">＋ 新增一週</button><button class="btn ghost" id="gAddSec" type="button">＋ 新增分隔</button></div>
     <div id="gForm" class="rform" hidden>
       <b id="gfT">新增一週攻略</b>
-      <div class="gtagsec"><span class="sub" style="margin:0;font-weight:800">攻略標籤（只有你可以加，同月曆標籤分開）</span><div id="gfTags" class="gtags"></div><div class="grow2"><input id="gfNewTag" class="gin" placeholder="新標籤，例如：常駐" maxlength="12"><button class="btn ghost" id="gfAddTag" type="button">＋ 標籤</button></div></div>
+      <div class="gtagsec"><span class="sub" style="margin:0;font-weight:800">攻略標籤（只有你可以加，同月曆標籤分開）</span><div id="gfTags" class="gtags"></div><div class="grow2"><input id="gfNewTag" class="gin" placeholder="新標籤，例如：常駐"><button class="btn ghost" id="gfAddTag" type="button">＋ 標籤</button></div></div>
       <input id="gfTitle" class="gin" placeholder="週次標題，例如：第 44 週" maxlength="40">
       <div id="gfItems" class="gitems"></div>
       <button class="btn ghost" id="gfAddItem" type="button" style="align-self:flex-start">＋ 加一條連結</button>
@@ -1044,7 +1044,7 @@ function owe(max,cur){
 let GW={built:"",weeks:[],tags:[]},GWok=false,gEdit=null,gFilterSel=new Set(),gTagWork=[],gSelTags=new Set();
 const gOwn=()=>S.owner===true&&!!GH.tok;
 const gNow=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"/"+p(d.getMonth()+1)+"/"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())};
-const gTagClean=list=>{if(!Array.isArray(list))return [];const seen=new Set();return list.filter(t=>t&&t.k&&t.name).map(t=>({k:String(t.k).slice(0,40),name:String(t.name).slice(0,12)})).filter(t=>{if(seen.has(t.k))return false;seen.add(t.k);return true})};
+const gTagClean=list=>{if(!Array.isArray(list))return [];const seen=new Set();return list.filter(t=>t&&t.k&&t.name).map(t=>({k:String(t.k).slice(0,40),name:String(t.name)})).filter(t=>{if(seen.has(t.k))return false;seen.add(t.k);return true})};
 const gTagOf=k=>GW.tags.find(t=>t.k===k);
 let gClosed=null;
 const gClosedSet=()=>{if(!gClosed){try{const v=JSON.parse(pref("gSecClosed")||"[]");gClosed=new Set(Array.isArray(v)?v:[])}catch(e){gClosed=new Set()}}return gClosed};
@@ -1115,8 +1115,8 @@ async function gMutate(fn,msg){
 }
 function gRename(tk){
   const t=gTagOf(tk);if(!t)return;
-  const nn=window.prompt("新嘅分隔名稱（最多 12 字）",t.name);if(nn==null)return;
-  const name=nn.trim().slice(0,12);if(!name)return toast("名稱要填");
+  const nn=window.prompt("新嘅分隔名稱",t.name);if(nn==null)return;
+  const name=nn.trim();if(!name)return toast("名稱要填");
   gMutate(cur=>{
     if(cur.tags.some(x=>x.k!==tk&&x.name===name)){toast("已經有同名分隔");return null}
     if(!cur.tags.some(x=>x.k===tk)){toast("呢個分隔已經唔存在");return null}
@@ -1124,8 +1124,8 @@ function gRename(tk){
   },"改攻略分隔名稱："+name);
 }
 function gAddSec(){
-  const nn=window.prompt("新分隔名稱（最多 12 字），例如：常駐");if(nn==null)return;
-  const name=nn.trim().slice(0,12);if(!name)return toast("名稱要填");
+  const nn=window.prompt("新分隔名稱，例如：常駐");if(nn==null)return;
+  const name=nn.trim();if(!name)return toast("名稱要填");
   const k="t"+Date.now().toString(36);
   gMutate(cur=>{
     if(cur.tags.some(x=>x.name===name)){toast("已經有同名分隔");return null}
@@ -1169,7 +1169,7 @@ function gTagsDraw(){
     w.append(lab,x);box.append(w)});
 }
 function gAddTag(){
-  const inp=$("gfNewTag");const name=inp.value.trim().slice(0,12);
+  const inp=$("gfNewTag");const name=inp.value.trim();
   if(!name){toast("標籤名要填");return}
   if(gTagWork.some(t=>t.name===name)){toast("已經有呢個標籤");return}
   const k="t"+Date.now().toString(36);gTagWork.push({k,name});gSelTags.add(k);inp.value="";gTagsDraw();
