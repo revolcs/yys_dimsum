@@ -2368,6 +2368,7 @@ async function ghBoot(){
       syncSrv();renderIO();renderRes();ghStatus(pj&&rj?"":"首次使用，改動後會自動建立檔案");
       st.collection("shiki").onSnapshot(snap=>{S.shiki=snap.docs.map(d=>({id:d.id,...d.data()}));renderShiki();const a=document.activeElement;if(!(a&&a.classList.contains("cur")))renderEggs()});
       calWatch(st);
+      if(!$("pane-guide").hidden)renderGuide();
       toast("擁有者模式 ✧ 改動會自動存去 GitHub");
       return;
     }catch(e){
