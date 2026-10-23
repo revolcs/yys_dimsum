@@ -1162,7 +1162,8 @@ function gDelSec(tk){
 }
 async function renderGuide(){
   let loaded=false;
-  try{const r=await fetch("data/guides.json?t="+Date.now(),{cache:"no-store"});if(r.ok){const j=await r.json();if(j&&Array.isArray(j.weeks)){GW={built:j.built||"",weeks:j.weeks,tags:gTagClean(j.tags)};loaded=true}}}catch(e){}
+  if(gOwn()){try{const c=await gFresh();GW={built:"",weeks:c.weeks,tags:c.tags};loaded=true}catch(e){}}
+  if(!loaded)try{const r=await fetch("data/guides.json?t="+Date.now(),{cache:"no-store"});if(r.ok){const j=await r.json();if(j&&Array.isArray(j.weeks)){GW={built:j.built||"",weeks:j.weeks,tags:gTagClean(j.tags)};loaded=true}}}catch(e){}
   GWok=loaded;
   if(!loaded){GW={built:"",weeks:[],tags:[]};if(gOwn()){$("gOwn").hidden=true;const box=$("guideList");box.replaceChildren();const p=document.createElement("p");p.className="sub";p.textContent="讀唔到現有攻略（可能網絡問題），暫時唔可以改，遲啲再試 ✧";box.append(p);return}}
   drawGuide();
@@ -2544,6 +2545,7 @@ async function ghBoot(){
       syncSrv();renderIO();renderRes();ghStatus(pj&&rj?"":"首次使用，改動後會自動建立檔案");
       st.collection("shiki").onSnapshot(snap=>{S.shiki=snap.docs.map(d=>({id:d.id,...d.data()}));renderShiki();const a=document.activeElement;if(!(a&&a.classList.contains("cur")))renderEggs()});
       calWatch(st);
+      try{const tj=await ghGet(GH.PUB,"data/tabs.json");if(tj){TABN=tabClean((JSON.parse(b64dec(tj.content))||{}).tabs);applyTabNames()}}catch(e){}
       if(!$("pane-guide").hidden)renderGuide();
       toast("擁有者模式 ✧ 改動會自動存去 GitHub");
       return;
