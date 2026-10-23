@@ -33,7 +33,16 @@ h1 mark{background:var(--acc);color:var(--acc-ink);padding:0 .2em;border-radius:
 .toprow h1{font-size:1.45rem;flex:none}
 .now{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--ink-soft);white-space:nowrap}
 .now .rimg{filter:var(--rimgf);height:1.9rem}.now .rar{font-size:1.15rem}
-.tabs{display:flex;gap:6px}
+.tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:4px 4px 7px;margin:-4px -4px -7px;user-select:none;cursor:grab;overscroll-behavior-x:contain}
+.tabs::-webkit-scrollbar{display:none}
+.tabs.drag{cursor:grabbing}
+.gbar{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.gbar .btn{flex:none}
+.gbar[hidden],#gForm[hidden]{display:none}
+.gin{font:inherit;font-size:.9rem;padding:8px 10px;border:2px solid var(--ink);border-radius:10px;background:var(--paper);color:var(--ink);width:100%;min-width:0;box-sizing:border-box}
+.gitems{display:flex;flex-direction:column;gap:8px}
+.grow{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.5fr) auto;gap:6px;align-items:center}
+.grow .btn{padding:6px 10px}
 .tab{padding:7px!important}
 .jump{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px 2px 4px;margin-inline:-2px}
 .jump::-webkit-scrollbar{display:none}
@@ -292,7 +301,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 .rform>b{font-family:var(--f-display);font-size:1rem}
 
 /* 行事月曆 */
-.tabs .tab{font-size:.9rem;padding:8px 2px!important;white-space:nowrap;min-width:0}
+.tabs .tab{font-size:.9rem;padding:8px 12px!important;white-space:nowrap;min-width:0;flex:1 0 auto}
 .calbar{display:flex;flex-direction:column;gap:3px;background:var(--sheet);border:2px solid var(--ink);border-radius:12px;padding:6px 10px;font-size:.8rem;box-shadow:2px 2px 0 var(--shadow)}
 .calbar[hidden]{display:none}
 .calbar{position:relative}.ctog{position:absolute;top:6px;right:8px;width:28px;height:28px}.calbar>#calTodayTxt,.calbar>#calCd1{padding-right:34px}
@@ -688,6 +697,16 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
   </section>
   <section id="pane-guide" hidden>
     <p class="sub" style="margin-top:12px">每星期更新嘅攻略，撳標題會喺新分頁開啟。</p>
+    <div id="gOwn" class="gbar" hidden style="margin-top:12px"><button class="btn ghost" id="gAddWk" type="button">＋ 新增一週</button></div>
+    <div id="gForm" class="rform" hidden>
+      <b id="gfT">新增一週攻略</b>
+      <input id="gfTitle" class="gin" placeholder="週次標題，例如：第 44 週" maxlength="40">
+      <input id="gfDate" class="gin" type="date" aria-label="日期">
+      <div id="gfItems" class="gitems"></div>
+      <button class="btn ghost" id="gfAddItem" type="button" style="align-self:flex-start">＋ 加一條連結</button>
+      <p id="gfMsg" class="sub" style="margin:0;color:var(--seal);font-weight:700"></p>
+      <div class="gbar"><button class="btn danger" id="gfDel" type="button">🗑 刪除此週</button><button class="btn ghost" id="gfCancel" type="button">取消</button><button class="btn" id="gfSave" type="button">💾 儲存</button></div>
+    </div>
     <div id="guideList" style="display:flex;flex-direction:column;gap:14px;margin-top:12px"></div>
   </section>
   <footer class="foot">
@@ -1001,12 +1020,15 @@ function owe(max,cur){
 }
 
 /* 攻略：data/guides.json（只喺 GitHub 版）；{"weeks":[{"title":"第 43 週","date":"2026-10-23","items":[{"title":"標題","url":"https://…"}]}]} */
-async function renderGuide(){
+let GW={built:"",weeks:[]},GWok=false,gEdit=null;
+const gOwn=()=>S.owner===true&&!!GH.tok;
+const gNow=()=>{const d=new Date(),p=n=>String(n).padStart(2,"0");return d.getFullYear()+"/"+p(d.getMonth()+1)+"/"+p(d.getDate())+" "+p(d.getHours())+":"+p(d.getMinutes())};
+function drawGuide(){
   const box=$("guideList");if(!box)return;
-  let W=[];try{const r=await fetch("data/guides.json?t="+Date.now(),{cache:"no-store"});if(r.ok){const j=await r.json();if(j&&Array.isArray(j.weeks))W=j.weeks}}catch(e){}
+  const W=GW.weeks;$("gOwn").hidden=!gOwn();
   box.replaceChildren();
   if(!W.length){const p=document.createElement("p");p.className="sub";p.textContent="暫時未有攻略，等朔更新 ✧";box.append(p);return}
-  for(const wk of W){
+  W.forEach((wk,wi)=>{
     const card=document.createElement("section");card.className="gwk";
     const h=document.createElement("h3");h.textContent=String(wk.title||"攻略");
     if(wk.date){const d=document.createElement("span");d.className="gwd";d.textContent=String(wk.date);h.append(d)}
@@ -1017,17 +1039,90 @@ async function renderGuide(){
       const t=document.createElement("span");t.className="gt";t.textContent=String(it.title||it.url);
       const g=document.createElement("span");g.className="gg";g.textContent="開新窗 ↗";
       a.append(t,g);card.append(a)});
-    box.append(card)}
+    if(gOwn()){const bar=document.createElement("div");bar.className="gbar";bar.style.marginTop="6px";const e=document.createElement("button");e.type="button";e.className="btn ghost";e.textContent="✏️ 改這週";e.onclick=()=>gOpen(wi);bar.append(e);card.append(bar)}
+    box.append(card)});
 }
+async function renderGuide(){
+  let loaded=false;
+  try{const r=await fetch("data/guides.json?t="+Date.now(),{cache:"no-store"});if(r.ok){const j=await r.json();if(j&&Array.isArray(j.weeks)){GW={built:j.built||"",weeks:j.weeks};loaded=true}}}catch(e){}
+  GWok=loaded;
+  if(!loaded){GW={built:"",weeks:[]};if(gOwn()){$("gOwn").hidden=true;const box=$("guideList");box.replaceChildren();const p=document.createElement("p");p.className="sub";p.textContent="讀唔到現有攻略（可能網絡問題），暫時唔可以改，遲啲再試 ✧";box.append(p);return}}
+  drawGuide();
+}
+function gRow(t="",u=""){
+  const row=document.createElement("div");row.className="grow";
+  const a=document.createElement("input");a.type="text";a.placeholder="連結標題";a.value=t;a.className="gin";a.maxLength=80;a.setAttribute("aria-label","連結標題");
+  const b=document.createElement("input");b.type="url";b.placeholder="https://…";b.value=u;b.className="gin";b.setAttribute("aria-label","連結網址");
+  const x=document.createElement("button");x.type="button";x.className="btn ghost";x.textContent="✕";x.setAttribute("aria-label","移除這條");x.onclick=()=>row.remove();
+  row.append(a,b,x);$("gfItems").append(row);
+}
+function gOpen(wi){
+  if(!gOwn()||!GWok)return;
+  gEdit=wi;const wk=wi>=0?GW.weeks[wi]:{title:"",date:"",items:[]};
+  $("gfT").textContent=wi>=0?"修改攻略":"新增一週攻略";
+  $("gfTitle").value=String(wk.title||"");$("gfDate").value=String(wk.date||"");
+  $("gfItems").replaceChildren();
+  (Array.isArray(wk.items)?wk.items:[]).forEach(it=>gRow(String(it.title||""),String(it.url||"")));
+  if(!$("gfItems").children.length)gRow("","");
+  $("gfDel").hidden=wi<0;$("gfMsg").textContent="";$("gForm").hidden=false;
+  $("gForm").scrollIntoView({block:"nearest",behavior:"smooth"});
+}
+function gClose(){gEdit=null;$("gForm").hidden=true}
+async function guideSave(weeks,msg){
+  if(!gOwn()||!GWok){toast("攻略還未讀到，暫時唔可以改");return false}
+  const sv=$("gfSave");sv.disabled=true;
+  try{
+    const built=gNow();
+    const json=JSON.stringify({built,weeks},null,2)+"\n";
+    await ghGet(GH.PUB,"data/guides.json");
+    await ghPut(GH.PUB,"data/guides.json",b64enc(json),msg);
+    GW={built,weeks};gClose();drawGuide();toast("攻略已儲存 ✧");return true;
+  }catch(e){$("gfMsg").textContent="儲存失敗（"+(e.code||e.message)+"），稍後再試";return false}
+  finally{sv.disabled=false}
+}
+async function gSave(){
+  const title=$("gfTitle").value.trim(),date=$("gfDate").value.trim();
+  if(!title){$("gfMsg").textContent="週次標題要填";return}
+  const items=[];
+  for(const row of $("gfItems").children){
+    const [a,b]=row.querySelectorAll("input");const t=a.value.trim(),u=b.value.trim();
+    if(!t&&!u)continue;
+    if(!/^https:\/\/\S+$/.test(u)){$("gfMsg").textContent="連結要以 https:// 開頭：「"+(t||u)+"」";return}
+    items.push({title:t||u,url:u});
+  }
+  const wk={title};if(date)wk.date=date;wk.items=items;
+  const next=GW.weeks.slice();
+  if(gEdit>=0)next[gEdit]=wk;else next.push(wk);
+  await guideSave(next,(gEdit>=0?"更新攻略：":"新增攻略：")+title);
+}
+async function gDelete(){
+  if(gEdit==null||gEdit<0)return;
+  const wk=GW.weeks[gEdit];
+  if(!window.confirm("刪除「"+(wk.title||"此週")+"」？"))return;
+  await guideSave(GW.weeks.filter((_,i)=>i!==gEdit),"刪除攻略："+(wk.title||""));
+}
+$("gAddWk").onclick=()=>gOpen(-1);
+$("gfAddItem").onclick=()=>gRow("","");
+$("gfCancel").onclick=gClose;
+$("gfSave").onclick=gSave;
+$("gfDel").onclick=gDelete;
 /* tabs */
 function showTab(k){
   if(!["shiki","egg","res","cal","guide"].includes(k))k="shiki";
   if(k==="guide"){if(!window.GH_CFG)k="shiki";else setTimeout(()=>renderGuide(),0)}
   $("acctBtn").textContent=k==="egg"?"±N號機記錄用":"±小號記錄";setTimeout(()=>{if(typeof syncSrv==="function")syncSrv()},0);
   for(const t of["shiki","egg","res","cal","guide"]){$("tab-"+t).setAttribute("aria-selected",k===t);$("pane-"+t).hidden=k!==t}
+  setTimeout(()=>tabIntoView(k),0);
   $("rEditBtn").hidden=true;$("jump").hidden=k==="res"||k==="cal"||k==="guide";$("acctRow").hidden=k==="cal"||k==="guide";$("calTop").hidden=k!=="cal";if(k==="res"||k==="cal")$("cnFab").hidden=true;pref("tab",k);if(k==="res")setTimeout(()=>renderRes(),0);if(k==="cal")setTimeout(()=>{renderCal();renderCalTop()},0);
 }
 $("tab-shiki").onclick=()=>{showTab("shiki");buildJump()};$("tab-egg").onclick=()=>{showTab("egg");buildJump()};$("tab-res").onclick=()=>{showTab("res");buildJump()};$("tab-cal").onclick=()=>{showTab("cal");buildJump()};$("tab-guide").onclick=()=>{showTab("guide");buildJump()};
+function tabIntoView(k){const el=document.querySelector(".tabs"),t=$("tab-"+k);if(!el||!t||el.scrollWidth<=el.clientWidth)return;el.scrollLeft+=t.getBoundingClientRect().left-el.getBoundingClientRect().left-(el.clientWidth-t.offsetWidth)/2}
+(()=>{const el=document.querySelector(".tabs");if(!el)return;let down=false,moved=false,sx=0,sl=0;
+  el.addEventListener("pointerdown",e=>{if(e.pointerType!=="mouse"||e.button!==0)return;down=true;moved=false;sx=e.clientX;sl=el.scrollLeft});
+  addEventListener("pointermove",e=>{if(!down)return;const dx=e.clientX-sx;if(!moved&&Math.abs(dx)<5)return;if(!moved){moved=true;el.classList.add("drag")}el.scrollLeft=sl-dx});
+  const end=()=>{if(!down)return;down=false;el.classList.remove("drag")};addEventListener("pointerup",end);addEventListener("pointercancel",end);
+  el.addEventListener("click",e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false}},true);
+})();
 function activePane(){return ["egg","res","cal","guide"].map(k=>$("pane-"+k)).find(p=>!p.hidden)||$("pane-shiki")}
 function buildJump(){
   const hs=[...activePane().querySelectorAll(".group-h[data-r]")];
