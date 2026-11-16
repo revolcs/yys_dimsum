@@ -153,6 +153,14 @@ button:focus-visible,input:focus-visible,select:focus-visible,label:focus-visibl
 .chip{font:inherit;font-size:.85rem;font-weight:700;padding:5px 12px;border-radius:99px;border:2px solid var(--line);background:var(--sheet);color:var(--ink);cursor:pointer}
 .chip[aria-pressed="true"]{border-color:var(--ink);background:var(--ink);color:var(--paper);font-weight:700}
 .spacer{flex:1}
+.qbox{display:flex;align-items:center;gap:8px;margin-top:10px;padding:6px 8px 6px 12px;border:2px solid var(--ink);border-radius:99px;background:var(--sheet)}
+.qbox input{flex:1;min-width:0;font:inherit;font-size:1rem;border:0;background:transparent;color:var(--ink);outline:none;padding:4px 0;-webkit-appearance:none;appearance:none}
+.qbox input::-webkit-search-cancel-button{display:none}
+.qbox:focus-within{box-shadow:0 0 0 3px var(--neon)}
+.qx{flex:none;border:0;background:var(--paper);color:var(--ink);font:inherit;font-weight:900;border-radius:99px;width:30px;height:30px;cursor:pointer}
+.qx[hidden]{display:none}
+.qinfo{margin:6px 6px 0;font-size:.85rem;color:var(--ink-soft);font-weight:700}
+.qinfo:empty{display:none}
 .btn{font:inherit;font-weight:700;font-size:.9rem;padding:7px 14px;border-radius:99px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;text-align:center}
 .btn.ghost{background:var(--sheet);color:var(--ink);border-color:var(--ink)}
 .btn.danger{background:var(--seal);border-color:var(--seal);color:var(--seal-ink)}
@@ -570,6 +578,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
         <li>想藏起陸服限定避免誤按，有三個地方可以按，<b>按哪個都一樣、兩頁同步</b>：上面工具列的<b>隱藏陸服限定</b>、合作標題旁的<b>🙈／🙉</b>小按鈕，以及捲到合作區時右下角浮出的<b>±陸限</b>（🙈＝已隱藏，🙉＝顯示中）。</li>
         <li>最大的數字和進度條只算<b>本家</b>（不含合作）。進度條下面：<b>本家</b>、<b>合作</b>各自的數量；<b>合計</b>固定不含陸服限定，<b>含陸服限定</b>是全部式神。</li>
         <li>最上面的稀有度按鈕可以快速跳轉，右上角會顯示「正在看」哪一組。</li>
+        <li><b>🔍 搜尋</b>：輸入式神名稱或合作作品名稱（字數不限），點心紙和黑蛋頁共用同一個搜尋；擁有者找到後可以直接編輯。</li>
         <li>訪客記得在離開前按<b>匯出 MD／匯出圖片</b>，下次用<b>匯入紀錄</b>接續。</li>
         <li>右下角的 <b>🌓／☀️／🌙</b> 浮動按鈕可以切換<b>跟隨系統／日間／夜間</b>模式，只記在你自己的裝置上。</li>
       </ul>
@@ -591,6 +600,8 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="btn ghost" id="editBtn" aria-pressed="false" hidden>編輯</button>
       <button class="btn ghost" id="shSelBtn" type="button" hidden>☑ 批量修改</button>
     </div>
+    <div class="qbox" role="search"><span aria-hidden="true">🔍</span><input type="search" class="qin" id="qShiki" placeholder="搜尋式神名稱或合作作品" aria-label="搜尋式神名稱" autocomplete="off" enterkeyhint="search"><button class="qx" type="button" hidden aria-label="清除搜尋">✕</button></div>
+    <p class="qinfo" id="qInfoShiki"></p>
     <div class="bar2" id="pendBar" hidden style="margin-top:12px"><span id="pendMsg" style="flex:1;min-width:0"></span><button class="btn" id="pendGo" type="button">開始配對</button></div>
     <p class="sub" id="ownerHint" style="margin:10px 0 0" hidden>長按後放開＝編輯（編輯視窗最下面可以刪除這隻式神）；長按後拖曳＝換位置（在「全部」底下才能拖）。「＋新增式神」只有你看得到。</p>
     <div id="groups"></div>
@@ -606,6 +617,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
         <li><b>未</b>：設成還沒擁有（不計算）；再按一次變回擁有，技能從 1 開始。</li>
         <li><b>一鍵全滿</b>、各組的<b>這組全滿</b>：只會補滿已經填過的式神。</li>
         <li>篩選<b>全部／未滿／已滿／未擁有</b>；<b>隱藏陸服限定</b>跟點心紙連動。</li>
+        <li><b>🔍 搜尋</b>：和點心紙共用，輸入名字就只顯示符合的式神。</li>
         <li>總數預設<b>不含合作</b>，勾「總數包含合作」才會算進去。</li>
         <li><b>±N號機記錄用</b>：多號機各自記錄。下方表格列出每個帳號的<b>尚欠</b>和<b>已餵</b>（技能從 1 升到現在吃掉的黑蛋），最後一行是所有帳號合計。</li>
       </ul>
@@ -617,6 +629,8 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       </div>
       <button class="btn ghost" id="allFull">一鍵全滿</button>
     </div>
+    <div class="qbox" role="search"><span aria-hidden="true">🔍</span><input type="search" class="qin" id="qEgg" placeholder="搜尋式神名稱或合作作品" aria-label="搜尋式神名稱" autocomplete="off" enterkeyhint="search"><button class="qx" type="button" hidden aria-label="清除搜尋">✕</button></div>
+    <p class="qinfo" id="qInfoEgg"></p>
     <div class="bar2" id="fullConfirm" hidden>
       <span id="fullMsg" style="flex:1;min-width:0"></span>
       <button class="btn ghost" id="fullNo" type="button">取消</button>
@@ -1416,6 +1430,20 @@ const wkKey=s=>s.work?(s.cn?"1":"0")+"|"+s.work:"";
 const sortFn=(a,b)=>(a.order??999)-(b.order??999)||String(a.name).localeCompare(b.name,"zh-Hant");
 function ranks(){return [...RAR,...new Set(S.shiki.map(rarOf).filter(r=>!RAR.includes(r)))]}
 
+/* 🔍 搜尋式神：點心紙同黑蛋頁共用同一個關鍵字，字數不限 */
+let SQ="";
+const qNorm=t=>String(t||"").normalize("NFKC").toLowerCase().replace(/\s+/g,"");
+const qOn=()=>!!qNorm(SQ);
+const qOK=s=>{const q=qNorm(SQ);if(!q)return true;return qNorm(s.name).includes(q)||qNorm(s.work).includes(q)};
+function qSync(){document.querySelectorAll(".qin").forEach(i=>{if(i.value!==SQ)i.value=SQ;i.parentElement.querySelector(".qx").hidden=!SQ})}
+function qInfo(id,n){const el=$(id);if(!el)return;el.textContent=qOn()?(n?`找到 ${n} 隻符合「${SQ.trim()}」的式神`:`找不到符合「${SQ.trim()}」的式神`):""}
+function qRun(v){SQ=v;qSync();renderShiki();renderEggs()}
+document.querySelectorAll(".qin").forEach(i=>{
+  i.addEventListener("input",e=>{if(e.isComposing)return;qRun(i.value)});
+  i.addEventListener("compositionend",()=>qRun(i.value));
+  i.addEventListener("keydown",e=>{if(e.key==="Enter")i.blur()});
+});
+document.querySelectorAll(".qx").forEach(b=>b.onclick=()=>{qRun("");b.parentElement.querySelector(".qin").focus()});
 function renderShiki(){
   if(typeof D!=="undefined"&&D.t){D.pending=true;return}
   const all=VIS(),base=all.filter(s=>rarOf(s)!=="合作"),on=base.filter(s=>OW(s)).length;
@@ -1423,19 +1451,21 @@ function renderShiki(){
   $("barfill").style.width=base.length?(on/base.length*100)+"%":"0";
   {const hon=all.filter(s=>rarOf(s)!=="合作"),col=all.filter(s=>rarOf(s)==="合作"),c=L=>`<b>${L.filter(s=>OW(s)).length}</b> / ${L.length}`;
    $("cntSplit").innerHTML=`<span class="pill">本家 ${c(hon)}</span><span class="pill">合作 ${c(col)}</span><span class="pill">${ANAME(S.srv,false)}合計 ${c(S.shiki.filter(s=>!s.cn&&rarOf(s)!=="合作"))}</span><span class="pill">含陸服限定 ${c(S.shiki)}</span>`}
-  let html="";
+  let html="",qN=0;
   for(const r of ranks()){
     const inR=all.filter(s=>rarOf(s)===r);if(!inR.length)continue;
-    const shown=sortGroup(inR.filter(s=>S.filter==="all"||(S.filter==="yes"?OW(s):!OW(s))));
+    const shown=sortGroup(inR.filter(s=>(S.filter==="all"||(S.filter==="yes"?OW(s):!OW(s)))&&qOK(s)));
+    if(qOn()&&!shown.length)continue;qN+=shown.length;
     html+=`<h3 class="group-h" data-r="${esc(r)}">${RB(r,"lg")}${r==="合作"?CNMINI():""}<span>${inR.filter(s=>OW(s)).length} / ${inR.length}</span></h3><div class="grid${S.edit?" editing":""}">`;
     let lw=null;for(const s of shown){const w=wkKey(s);if(w&&w!==lw)html+=`<div class="wk">${esc(s.work)}${s.cn?" ・陸服限定":""}</div>`;lw=w;html+=`<button class="tile${OW(s)?" on":""}${s.cn?" cn":""}${S.shSel&&S.shPicked.has(s.id)?" picked":""}" data-id="${esc(s.id)}" aria-pressed="${OW(s)}"><div class="face">${faceHTML(s)}${s.cn?'<span class="cnb">陸服限定</span>':""}<span class="pen">改</span></div><span class="nm">${esc(s.name)}</span></button>`;}
     html+=`</div>`;
     if(!shown.length)html+=`<div class="allfull" style="color:var(--ink-soft)">${S.filter==="yes"?"這組還沒有入手的 (；´Д｀)":"這組全部入手了 ✧"}</div>`;
   }
   if(!all.length)html=`<div class="empty">還沒有式神～按「編輯」再點 ＋ 新增第一隻 (´,,•ω•,,)</div>`;
+  else if(!html&&qOn())html=`<div class="empty">找不到符合「${esc(SQ.trim())}」的式神 (´･ω･｀)</div>`;
   else if(!html)html=`<div class="empty">${S.filter==="yes"?"還沒有入手的…抽卡加油 (；´Д｀)":"全部入手了！？歐皇請收下我的膝蓋 m(_ _)m"}</div>`;
   if(S.edit)html+=`<div class="grid editing" style="margin-top:14px"><button class="tile addtile" data-add="1"><div class="face"><span class="ini">＋</span></div><span class="nm">新增式神</span></button></div>`;
-  $("groups").innerHTML=html;
+  $("groups").innerHTML=html;qInfo("qInfoShiki",qN);
   $("groups").classList.toggle("shsel",!!S.shSel);$("shSelBar").hidden=!S.shSel;$("shSelN").textContent=`已選 ${S.shPicked.size} 隻`;$("shSelBtn").textContent=S.shSel?"完成選取":"☑ 批量修改";
   if(typeof buildJump==="function"&&!$("pane-shiki").hidden)buildJump();
   document.querySelectorAll("#groups .tile").forEach(t=>{
@@ -1479,7 +1509,7 @@ function tick(){
   const x=D.x,y=D.y;
   if(D.ghost)D.ghost.style.transform=`translate3d(${x-D.dx}px,${y-D.dy}px,0) scale(1.08)`;
   const edge=80,topE=$("top").getBoundingClientRect().bottom+60;if(y<topE)window.scrollBy(0,-Math.ceil((topE-y)/5));else if(y>innerHeight-edge)window.scrollBy(0,Math.ceil((y-(innerHeight-edge))/5));
-  if(D.moved&&S.filter==="all"){
+  if(D.moved&&S.filter==="all"&&!qOn()){
     let best=null,bd=1e9;
     for(const el of D.grid.querySelectorAll(".tile[data-id]")){
       if(el===D.t)continue;const r=el.getBoundingClientRect();const cx=r.left+r.width/2,cy=r.top+r.height/2;
@@ -1504,7 +1534,7 @@ function pressEnd(){
   if(!wasLifted)return;
   D.suppress=true;setTimeout(()=>{D.suppress=false},450);
   const ids=[...D.grid.querySelectorAll(".tile[data-id]")].map(e=>e.dataset.id);
-  if(moved&&S.filter!=="all"){toast("切到「全部」才能拖曳換位置喔");return}
+  if(moved&&(S.filter!=="all"||qOn())){toast(qOn()?"搜尋中不能拖曳換位置，清除搜尋後再拖喔":"切到「全部」才能拖曳換位置喔");return}
   if(moved&&ids.join(",")!==D.before)saveOrder(ids);
   else if(!moved){const s=S.shiki.find(y=>y.id===t.dataset.id);if(s)openSheet(s)}
 }
@@ -1553,7 +1583,7 @@ function stdHTML(s,cur){
 const TAGS=s=>(s.cn?'<span class="cntag">陸服限定</span>':"")+(s.shrine?'<span class="tag">神龕</span>':"")+(s.shop?`<span class="tag">${esc(s.shop)}</span>`:"");
 function renderEggs(){
   const k=S.srv;$("eggLbl").textContent=ANAME(k,true)+"尚欠黑蛋";
-  let total=0,html="",pills="";
+  let total=0,html="",pills="",qE=0;
   for(const r of ranks()){
     const inR=sortGroup(VIS().filter(s=>rarOf(s)===r));if(!inR.length)continue;
     let sum=0,sumS=0,filled=0,lacking=0;
@@ -1561,7 +1591,8 @@ function renderEggs(){
     const counted=r!=="合作"||S.eggCol;
     if(counted)total+=sum+sumS;
     if(counted&&sum+sumS>0)pills+=`<span class="pill">${RB(r)} <b>${sum+sumS}</b>${sumS?`（神龕 ${sumS}）`:""}</span>`;
-    const F=S.eggF,shown=rows.filter(x=>F==="all"||(F==="owe"&&x.o>0)||(F==="full"&&x.o===0)||(F==="none"&&x.o===null));
+    const F=S.eggF,shown=rows.filter(x=>F==="all"||(F==="owe"&&x.o>0)||(F==="full"&&x.o===0)||(F==="none"&&x.o===null)).filter(x=>qOK(x.s));
+    if(qOn()&&!shown.length)continue;qE+=shown.length;
     html+=`<h3 class="group-h" data-r="${esc(r)}">${RB(r,"lg")}${r==="合作"?CNMINI():""}<span><span class="dm">${DARUMA}</span>欠 ${sum}${sumS?` ・神龕 ${sumS}`:""} ・已填 ${filled}/${inR.length}${r==="合作"&&!S.eggCol?" ・不計入總數":""}</span><button class="gfull" type="button" data-gfull="${esc(r)}" ${lacking?"":"disabled"} title="只補滿這個稀有度已擁有的式神">${lacking?"一鍵全滿":"全滿了 ✧"}</button></h3><ul class="rows">`;
     html+=shown.map(({s,o},i)=>`${wkKey(s)&&(i===0||wkKey(shown[i-1].s)!==wkKey(s))?`<li class="wkli">${esc(s.work)}${s.cn?" ・陸服限定":""}</li>`:""}<li class="srow${s.cn?" cn":""}"><div class="mini">${s.img?`<img src="${imgSrc(s)}" alt="">`:esc((s.name||"?").slice(0,1))}</div>
       <div class="who" data-id="${esc(s.id)}" role="button" tabindex="0" ${S.owner===true?'title="點一下編輯"':""}><b>${esc(s.name)}${TAGS(s)}</b>${stdHTML(s,SK(s,k))}</div>
@@ -1576,6 +1607,8 @@ function renderEggs(){
    $("eggFed").innerHTML=`這個帳號已餵 <b>${me.f}</b> 顆`;
    const T=st.reduce((t,x)=>({o:t.o+x.o,f:t.f+x.f}),{o:0,f:0});
    $("acctSum").innerHTML=`<table><thead><tr><th>帳號</th><th>尚欠</th><th>已餵</th></tr></thead><tbody>${st.map(x=>`<tr class="${x.a.k===k?"cur":""}"><td>${esc(DN(x.a,true))}</td><td>${x.o}</td><td>${x.f}</td></tr>`).join("")}<tr class="tot"><td>所有帳號合計</td><td>${T.o}</td><td>${T.f}</td></tr></tbody></table>`;}
+  if(!html&&qOn())html=`<div class="empty">找不到符合「${esc(SQ.trim())}」的式神 (´･ω･｀)</div>`;
+  qInfo("qInfoEgg",qE);
   $("eggGroups").innerHTML=html||`<div class="empty">${S.shiki.length?"全部技能都滿了！黑蛋自由吧 (๑˃ᴗ˂)ﻭ":"還沒有式神資料"}</div>`;
   document.querySelectorAll(".cur").forEach(inp=>{
     inp.onchange=()=>saveCur(inp);
