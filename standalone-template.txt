@@ -161,6 +161,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,label:focus-visibl
 .qx[hidden]{display:none}
 .qinfo{margin:6px 6px 0;font-size:.85rem;color:var(--ink-soft);font-weight:700}
 .qinfo:empty{display:none}
+.qbox[hidden]{display:none}
+.qtop{margin-top:0;padding:3px 6px 3px 12px}
+.qtog{margin-left:auto;flex:none;padding:6px 12px;white-space:nowrap;max-width:45%;overflow:hidden;text-overflow:ellipsis}
+.qtog[hidden]{display:none}
+.qtog.act{background:var(--neon);color:var(--neon-ink)}
 .btn{font:inherit;font-weight:700;font-size:.9rem;padding:7px 14px;border-radius:99px;border:2px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;text-align:center}
 .btn.ghost{background:var(--sheet);color:var(--ink);border-color:var(--ink)}
 .btn.danger{background:var(--seal);border-color:var(--seal);color:var(--seal-ink)}
@@ -539,7 +544,8 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     </nav>
     <div class="calbar" id="calTop" hidden><button type="button" class="hstog ctog" id="calTopTog" aria-label="展開或收起頁首">▼</button><div class="ctoday" id="calTodayTxt"></div><div id="calCd1"></div><div id="calMaintBtns" hidden style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" class="btn ghost" id="calMaintEdit" style="width:auto;font-size:.8rem;padding:5px 12px">✏️ 修改維護時間</button></div><div id="calCd2"></div><div id="calTodo" hidden></div></div>
     <div id="gOwn" class="gbar gtop" hidden><button class="btn ghost" id="gAddWk" type="button">＋ 新連結</button><button class="btn ghost" id="gAddSec" type="button">＋ 新增分隔</button></div>
-    <div class="acctwrap topacct" id="acctRow"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button></div>
+    <div class="acctwrap topacct" id="acctRow"><span class="acctlbl">帳號</span><div class="seg acctseg" role="group" aria-label="帳號"></div><button class="btn ghost acctbtn" id="acctBtn" type="button" aria-label="新增、改名或刪除帳號">±小號記錄</button><button class="btn ghost qtog" id="qTog" type="button" hidden aria-label="收起或展開搜尋" aria-expanded="true">🔍 ▴</button></div>
+    <div class="qbox qtop" id="qTop" role="search" hidden><span aria-hidden="true">🔍</span><input type="search" class="qin" id="qIn" placeholder="搜尋式神名稱或合作作品" aria-label="搜尋式神名稱" autocomplete="off" enterkeyhint="search"><button class="qx" type="button" hidden aria-label="清除搜尋">✕</button></div>
     <div class="jump" id="jump" aria-label="跳到稀有度"></div>
   </div>
   <details class="disc" id="disc">
@@ -600,7 +606,6 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       <button class="btn ghost" id="editBtn" aria-pressed="false" hidden>編輯</button>
       <button class="btn ghost" id="shSelBtn" type="button" hidden>☑ 批量修改</button>
     </div>
-    <div class="qbox" role="search"><span aria-hidden="true">🔍</span><input type="search" class="qin" id="qShiki" placeholder="搜尋式神名稱或合作作品" aria-label="搜尋式神名稱" autocomplete="off" enterkeyhint="search"><button class="qx" type="button" hidden aria-label="清除搜尋">✕</button></div>
     <p class="qinfo" id="qInfoShiki"></p>
     <div class="bar2" id="pendBar" hidden style="margin-top:12px"><span id="pendMsg" style="flex:1;min-width:0"></span><button class="btn" id="pendGo" type="button">開始配對</button></div>
     <p class="sub" id="ownerHint" style="margin:10px 0 0" hidden>長按後放開＝編輯（編輯視窗最下面可以刪除這隻式神）；長按後拖曳＝換位置（在「全部」底下才能拖）。「＋新增式神」只有你看得到。</p>
@@ -629,7 +634,6 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
       </div>
       <button class="btn ghost" id="allFull">一鍵全滿</button>
     </div>
-    <div class="qbox" role="search"><span aria-hidden="true">🔍</span><input type="search" class="qin" id="qEgg" placeholder="搜尋式神名稱或合作作品" aria-label="搜尋式神名稱" autocomplete="off" enterkeyhint="search"><button class="qx" type="button" hidden aria-label="清除搜尋">✕</button></div>
     <p class="qinfo" id="qInfoEgg"></p>
     <div class="bar2" id="fullConfirm" hidden>
       <span id="fullMsg" style="flex:1;min-width:0"></span>
@@ -1318,7 +1322,7 @@ function showTab(k){
   $("acctBtn").textContent=k==="egg"?"±N號機記錄用":"±小號記錄";setTimeout(()=>{if(typeof syncSrv==="function")syncSrv()},0);
   for(const t of["shiki","egg","res","cal","guide"]){$("tab-"+t).setAttribute("aria-selected",k===t);$("pane-"+t).hidden=k!==t}
   setTimeout(()=>tabIntoView(k),0);
-  $("rEditBtn").hidden=true;$("jump").hidden=k==="res"||k==="cal"||k==="guide";$("acctRow").hidden=k==="cal"||k==="guide";$("calTop").hidden=k!=="cal";$("gOwn").hidden=k!=="guide"||!gOwn();if(k==="res"||k==="cal")$("cnFab").hidden=true;pref("tab",k);if(k==="res")setTimeout(()=>renderRes(),0);if(k==="cal")setTimeout(()=>{renderCal();renderCalTop()},0);
+  $("rEditBtn").hidden=true;$("jump").hidden=k==="res"||k==="cal"||k==="guide";$("acctRow").hidden=k==="cal"||k==="guide";$("calTop").hidden=k!=="cal";$("gOwn").hidden=k!=="guide"||!gOwn();qVis(k);if(k==="res"||k==="cal")$("cnFab").hidden=true;pref("tab",k);if(k==="res")setTimeout(()=>renderRes(),0);if(k==="cal")setTimeout(()=>{renderCal();renderCalTop()},0);
 }
 $("tab-shiki").onclick=()=>{showTab("shiki");buildJump()};$("tab-egg").onclick=()=>{showTab("egg");buildJump()};$("tab-res").onclick=()=>{showTab("res");buildJump()};$("tab-cal").onclick=()=>{showTab("cal");buildJump()};$("tab-guide").onclick=()=>{showTab("guide");buildJump()};
 function tabIntoView(k){const el=document.querySelector(".tabs"),t=$("tab-"+k);if(!el||!t||el.scrollWidth<=el.clientWidth)return;el.scrollLeft+=t.getBoundingClientRect().left-el.getBoundingClientRect().left-(el.clientWidth-t.offsetWidth)/2}
@@ -1435,9 +1439,15 @@ let SQ="";
 const qNorm=t=>String(t||"").normalize("NFKC").toLowerCase().replace(/\s+/g,"");
 const qOn=()=>!!qNorm(SQ);
 const qOK=s=>{const q=qNorm(SQ);if(!q)return true;return qNorm(s.name).includes(q)||qNorm(s.work).includes(q)};
-function qSync(){document.querySelectorAll(".qin").forEach(i=>{if(i.value!==SQ)i.value=SQ;i.parentElement.querySelector(".qx").hidden=!SQ})}
+function qSync(){document.querySelectorAll(".qin").forEach(i=>{if(i.value!==SQ)i.value=SQ;i.parentElement.querySelector(".qx").hidden=!SQ});qVis()}
+function qVis(k){try{k=k||pref("tab")||"shiki";const on=k==="shiki"||k==="egg",open=pref("qOpen")!=="0",t=$("qTog");t.hidden=!on;$("qTop").hidden=!(on&&open);t.setAttribute("aria-expanded",String(open));t.classList.toggle("act",qOn());const q=SQ.trim();t.textContent=!open&&q?"🔍 "+(q.length>6?q.slice(0,6)+"…":q):(open?"🔍 ▴":"🔍 ▾")}catch(e){}}
 function qInfo(id,n){const el=$(id);if(!el)return;el.textContent=qOn()?(n?`找到 ${n} 隻符合「${SQ.trim()}」的式神`:`找不到符合「${SQ.trim()}」的式神`):""}
-function qRun(v){SQ=v;qSync();renderShiki();renderEggs()}
+function qRun(v){SQ=v;qSync();renderShiki();renderEggs();
+  if(!qOn())return;const L=$(pref("tab")==="egg"?"eggGroups":"groups");if(!L)return;
+  const tb=$("top").getBoundingClientRect().bottom,lt=L.getBoundingClientRect().top;
+  if(lt<tb)window.scrollTo({top:window.scrollY+lt-tb-60})}
+$("qTog").onclick=()=>{const open=pref("qOpen")!=="0";pref("qOpen",open?"0":"1");qVis();if(!open)$("qIn").focus()};
+qVis();
 document.querySelectorAll(".qin").forEach(i=>{
   i.addEventListener("input",e=>{if(e.isComposing)return;qRun(i.value)});
   i.addEventListener("compositionend",()=>qRun(i.value));
