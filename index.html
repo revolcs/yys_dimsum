@@ -685,6 +685,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
   </section>
   <section id="pane-cal" hidden>
     <p class="sub" style="margin-top:12px">式神活動的日期一律用<b>GMT+8</b>，格仔同橫幅都是跟著日期走～</p>
+    <div class="calbottom" id="calBottom" hidden><button class="btn ghost" id="calAdd" type="button">＋ 新增活動</button><button class="btn ghost" id="calTwBtn" type="button">📋 貼上台服公告</button><button class="btn ghost" id="calBatchAdd" type="button">📥 批量新增</button><button class="btn ghost" id="calTagBtn" type="button">🏷 管理標籤</button><button class="btn ghost" id="calSelOn" type="button">☑ 批量選取</button></div>
     <details class="disc help">
       <summary>📖 行事月曆使用說明</summary>
       <ul>
@@ -695,7 +696,7 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
         <li>一般活動可以選一個或多個標籤（預設有<b>活動-期間限定</b>、<b>活動-特別加成</b>、<b>活動-課金相關</b>、<b>活動-召喚(抽卡)相關</b>）；擁有者按<b>🏷 管理標籤</b>可以自己增減、改名、換顏色。</li>
         <li>沒有手動選標籤的活動會按<b>關鍵字自動分類</b>：標題有「額外加成」「機率 UP」→ 活動-特別加成；有「禮」→ 活動-課金相關；有「召喚」「抽卡」→ 活動-召喚(抽卡)相關。同時符合幾個時，會全部標上。關鍵字可以在<b>🏷 管理標籤</b>修改。</li>
         <li>寫著「以首次登入起算／起計 N 天」的活動，可以按<b>🗓 改我的 Day 1</b>填自己第一天登入的日期，月曆和倒數會跟著你的日期走（只在活動期間內有效；每台裝置、擁有者和訪客各自記錄）。</li>
-        <li><b>⚫ 已結束</b>預設只顯示最近 30 天內結束的活動，最下面可以按「顯示更早的已結束」。</li>
+        <li><b>⚫ 已結束</b>預設只顯示最近一個星期內結束的活動，最下面可以按「顯示更早的已結束」。</li>
         <li>擁有者可以用<b>📥 批量新增</b>一次貼入多個活動；<b>☑ 批量選取</b>之後可以一次刪除或統一改結束時間。</li>
         <li>日期可以寫 2026-10-12、1012 或 10/12（跟上面選的日期格式），時間可以用 12 小時或 24 小時，兩個格式都可以在上面選。</li>
         <li>上面可以切換<b>📅 月曆</b>同<b>🗓 日程</b>：日程是遊戲那種橫向七日表，今日在中間，一條條活動橫跨日子，按一條就開返那日。</li>
@@ -743,14 +744,13 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
     </div>
     <div id="calList" style="margin-top:14px"></div>
     <div class="calselbar" id="calSelBar" hidden><span id="calSelN">已選 0 項</span><span class="spacer"></span><button class="btn ghost" id="calSelEnd" type="button">統一改結束</button><button class="btn danger" id="calSelDel" type="button">刪除所選</button><button class="btn ghost" id="calSelOff" type="button">完成</button></div>
-    <div class="calbottom" id="calBottom" hidden><button class="btn ghost" id="calAdd" type="button">＋ 新增活動</button><button class="btn ghost" id="calTwBtn" type="button">📋 貼上台服公告</button><button class="btn ghost" id="calBatchAdd" type="button">📥 批量新增</button><button class="btn ghost" id="calTagBtn" type="button">🏷 管理標籤</button><button class="btn ghost" id="calSelOn" type="button">☑ 批量選取</button></div>
   </section>
   <section id="pane-guide" hidden>
     <p class="sub" style="margin-top:12px">所有的連結內容將會不定期更新。</p>
     <div id="gFilter" class="gtags" hidden style="margin-top:12px"></div>
     <div id="gForm" class="scrim" hidden><div class="sheet" role="dialog" aria-modal="true" aria-labelledby="gfT">
       <h2 id="gfT">新增連結</h2>
-      <div class="gtagsec"><span class="sub" style="margin:0;font-weight:800">攻略標籤（只有你可以加，同月曆標籤分開）</span><div id="gfTags" class="gtags"></div><div class="grow2"><input id="gfNewTag" class="gin" placeholder="新標籤，例如：常駐"><button class="btn ghost" id="gfAddTag" type="button">＋ 標籤</button></div></div>
+      <div class="gtagsec"><span class="sub" style="margin:0;font-weight:800">攻略標籤（只有你可以加，同月曆標籤分開；只新增標籤、不貼連結也可以儲存）</span><div id="gfTags" class="gtags"></div><div class="grow2"><input id="gfNewTag" class="gin" placeholder="新標籤，例如：常駐"><button class="btn ghost" id="gfAddTag" type="button">＋ 標籤</button></div></div>
       <input id="gfTitle" class="gin" placeholder="連結標題／備註（可以唔填）">
       <div id="gfItems" class="gitems"></div>
       <button class="btn ghost" id="gfAddItem" type="button" style="align-self:flex-start">＋ 加一條連結</button>
@@ -994,11 +994,20 @@ input,select{font:inherit;font-size:1rem;color:var(--ink);background:var(--paper
 <div id="twScrim" class="scrim" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="twTitle">
     <h2 id="twTitle">📋 貼上台服公告</h2>
-    <p class="bxhint">把台服更新公告整篇文字貼進來，會自動抓出維護時間同各個活動的期間。認到之後可以剔走不要的、改名，再一次加入月曆。</p>
+    <p class="bxhint">把台服更新公告整篇文字貼進來，會自動抓出維護時間同各個活動的期間。認到之後可以剔走不要的、改名，再一次加入月曆。找不到日期的項目也可以勾選加入，加入前會先問你。</p>
     <textarea id="twText" class="bxtext" spellcheck="false" placeholder="親愛的陰陽師大人：&#10;為了給大家帶來更好的遊戲體驗，伺服器將於9月30日（週三）07:30~09:30進行停服維護……"></textarea>
     <p class="sub" id="twInfo" style="margin:0">未有內容</p>
     <div id="twList" class="twlist"></div>
     <div class="row"><button class="btn ghost" id="twCancel" type="button">取消</button><button class="btn" id="twGo" type="button" disabled>加入所選</button></div>
+  </div>
+</div>
+<div id="twAsk" class="scrim" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="twAskT">
+    <h2 id="twAskT">加入沒有日期的項目？</h2>
+    <p class="sub" style="margin:0">有 <b id="twAskN">0</b> 項公告裡找不到日期：</p>
+    <div id="twAskList" class="sub" style="margin:0;white-space:pre-line;font-weight:700;color:var(--ink)"></div>
+    <p class="sub" style="margin:0">要加入嗎？會用今天當開始日、設成「永久上線」，之後可以在月曆裡按編輯改日期。</p>
+    <div class="row"><button class="btn ghost" id="twAskNo" type="button">先不要</button><button class="btn" id="twAskYes" type="button">加入</button></div>
   </div>
 </div>
 <div id="d1Scrim" class="scrim" hidden>
@@ -1263,9 +1272,14 @@ async function gSave(){
     if(!/^https:\/\/\S+$/.test(u)){$("gfMsg").textContent="連結要以 https:// 開頭：「"+u+"」";return}
     const o={url:u};if(t)o.title=t;items.push(o);
   }
-  if(!items.length){$("gfMsg").textContent="至少要貼一條連結";return}
-  const wk={};if(title)wk.title=title;wk.items=items;
-  const tg=[...gSelTags].filter(k=>gTagWork.some(t=>t.k===k));if(tg.length)wk.tags=tg;
+  const tg=[...gSelTags].filter(k=>gTagWork.some(t=>t.k===k));
+  if(!items.length&&!title){
+    const tagsSame=JSON.stringify(gTagWork)===JSON.stringify(GW.tags);
+    if(tagsSame){$("gfMsg").textContent="請填連結或標題；只想建立分隔的話，就新增一個標籤再儲存";return}
+    const ok=await guideSave(GW.weeks.slice(),gTagWork,"更新攻略分隔");
+    if(ok&&gEdit!=null&&gEdit>=0)toast("分隔已儲存；這條沒有連結也沒有標題，內容沒有改動（想移除請按刪除）");
+    return}
+  const wk={};if(title)wk.title=title;wk.items=items;if(tg.length)wk.tags=tg;
   const next=GW.weeks.slice();
   if(gEdit>=0)next[gEdit]=wk;else next.push(wk);
   await guideSave(next,gTagWork,(gEdit>=0?"更新連結：":"新增連結：")+(title||items[0].url));
@@ -2771,10 +2785,10 @@ function renderCal(){
   const G={ing:[],soon:[],ending:[],perm:[],end:[]};
   for(const e of L){const st=statusOf(e);if(st!=="end")G[st].push(e)}
   {const soonEnd=Date.now()+3*864e5;G.ending=G.ing.filter(e=>e.end&&!e.perm&&endMs(e)<=soonEnd);G.ing=G.ing.filter(e=>!G.ending.includes(e))}
-  const endAll=ALL.filter(e=>statusOf(e)==="end").sort((a,b)=>endMs(b)-endMs(a)),cut=addDays(today,-30),endRecent=endAll.filter(e=>endOf(e)>=cut);
+  const endAll=ALL.filter(e=>statusOf(e)==="end").sort((a,b)=>endMs(b)-endMs(a)),cut=addDays(today,-7),endRecent=endAll.filter(e=>endOf(e)>=cut);
   G.end=CAL.endAll?endAll:endRecent;const endOlder=endAll.length-endRecent.length;
   const SEC=[["ending","⚠️ 即將結束（3 日內）⚠️"],["ing","🟢 進行中"],["soon","🔜 準備上線"],["perm","✨ 永久上線"],["end","⚫ 已結束"]];
-  $("calList").innerHTML=SEC.map(([k,t])=>`<details class="csec" data-k="${k}"${(CAL.open[k]??(k==="ending"))?" open":""}><summary>${t}<span class="cnt">${G[k].length}</span></summary>${k==="end"?`<p class="sub endnote">${CAL.endAll?"顯示全部已結束的活動":"預設只顯示最近 30 天內結束的活動"}</p>`:""}${G[k].length?G[k].map(bannerHTML).join(""):`<div class="empty" style="padding:10px 0">暫時沒有</div>`}${k==="end"&&(endOlder>0||CAL.endAll)?`<button type="button" class="btn ghost rfull" id="calEndMore">${CAL.endAll?"只顯示最近 30 天":`顯示更早的已結束（${endOlder}）`}</button>`:""}</details>`).join("");
+  $("calList").innerHTML=SEC.map(([k,t])=>`<details class="csec" data-k="${k}"${(CAL.open[k]??(k==="ending"))?" open":""}><summary>${t}<span class="cnt">${G[k].length}</span></summary>${k==="end"?`<p class="sub endnote">${CAL.endAll?"顯示全部已結束的活動":"預設只顯示最近一個星期內結束的活動"}</p>`:""}${G[k].length?G[k].map(bannerHTML).join(""):`<div class="empty" style="padding:10px 0">暫時沒有</div>`}${k==="end"&&(endOlder>0||CAL.endAll)?`<button type="button" class="btn ghost rfull" id="calEndMore">${CAL.endAll?"只顯示最近一個星期":`顯示更早的已結束（${endOlder}）`}</button>`:""}</details>`).join("");
   {const b=$("calEndMore");if(b)b.onclick=()=>{CAL.endAll=!CAL.endAll;renderCal()}}
   $("calList").querySelectorAll("[data-d1]").forEach(b=>b.onclick=e=>{e.stopPropagation();d1Open(b.dataset.d1)});
   $("calList").querySelectorAll(".csec").forEach(d=>d.ontoggle=()=>{CAL.open[d.dataset.k]=d.open});
@@ -2979,27 +2993,34 @@ function twParse(raw){
       e.src="活動時間";out.push(e);continue}}
     const any=txt.match(ONE)||sc.title.match(ONE);
     if(any){const e=mk(title,any[0],{});if(e){e.on=false;e.note=e.perm?"內文提到的日期，當作永久上線":"";e.src="內文日期";out.push(e);continue}}
-    out.push({title,on:false,src:"找不到日期"});
+    out.push({title,on:false,nodate:true,src:"找不到日期"});
   }
-  for(const e of out){if(!e.date)continue;const dup=CAL.ev.find(x=>x.date===e.date&&(x.title===e.title||(kindOf(e)==="m"&&kindOf(x)==="m")));if(dup){e.on=false;e.dup=true}}
+  for(const e of out){if(!e.date){if(CAL.ev.some(x=>x.title===e.title)){e.dup=true}continue}const dup=CAL.ev.find(x=>x.date===e.date&&(x.title===e.title||(kindOf(e)==="m"&&kindOf(x)==="m")));if(dup){e.on=false;e.dup=true}}
   return out;
 }
-function twRangeText(e){if(!e.date)return "找不到日期，不會加入";const a=fmtMD(e.date)+(e.time?" "+tDisp(e.time):"");if(e.perm)return `${a} 起（永久上線）`;if(e.end)return `${a} → ${fmtMD(e.end)}${e.endTime?" "+tDisp(e.endTime):""}`;return a+(e.endTime?" ~ "+tDisp(e.endTime):"")}
+function twRangeText(e){if(!e.date)return "找不到日期（可勾選，加入前會先問你）";const a=fmtMD(e.date)+(e.time?" "+tDisp(e.time):"");if(e.perm)return `${a} 起（永久上線）`;if(e.end)return `${a} → ${fmtMD(e.end)}${e.endTime?" "+tDisp(e.endTime):""}`;return a+(e.endTime?" ~ "+tDisp(e.endTime):"")}
 function twRender(){
-  const L=TW.items,ok=L.filter(e=>e.date),on=ok.filter(e=>e.on).length;
-  $("twInfo").textContent=L.length?`認到 ${ok.length} 項有日期，已選 ${on} 項`+(L.length>ok.length?`；${L.length-ok.length} 項找不到日期`:""):"未有內容";
+  const L=TW.items,ok=L.filter(e=>e.date),on=L.filter(e=>e.on&&(e.date||e.nodate)).length;
+  $("twInfo").textContent=L.length?`認到 ${ok.length} 項有日期，已選 ${on} 項`+(L.length>ok.length?`；${L.length-ok.length} 項找不到日期，想加入的可以自己勾選`:""):"未有內容";
   $("twGo").disabled=!on;$("twGo").textContent=on?`加入所選（${on}）`:"加入所選";
-  $("twList").innerHTML=L.map((e,i)=>`<label class="twrow${e.on?"":" off"}"><input type="checkbox" data-i="${i}"${e.on?" checked":""}${e.date?"":" disabled"}><input type="text" data-t="${i}" value="${esc(e.title)}" aria-label="活動名稱"><small><b>${esc(twRangeText(e))}</b>${e.dup?"・月曆已有":""}${e.note?"・"+esc(e.note):""}${e.src&&e.src!=="活動時間"?"・"+esc(e.src):""}</small></label>`).join("");
+  $("twList").innerHTML=L.map((e,i)=>`<label class="twrow${e.on?"":" off"}"><input type="checkbox" data-i="${i}"${e.on?" checked":""}><input type="text" data-t="${i}" value="${esc(e.title)}" aria-label="活動名稱"><small><b>${esc(twRangeText(e))}</b>${e.dup?"・月曆已有":""}${e.note?"・"+esc(e.note):""}${e.src&&e.src!=="活動時間"?"・"+esc(e.src):""}</small></label>`).join("");
   $("twList").querySelectorAll("[data-i]").forEach(c=>c.onchange=()=>{TW.items[+c.dataset.i].on=c.checked;twRender()});
   $("twList").querySelectorAll("[data-t]").forEach(c=>c.oninput=()=>{TW.items[+c.dataset.t].title=c.value});
 }
-function twOpen(){if(!calNeedDb())return;$("twText").value="";TW.items=[];twRender();$("twScrim").hidden=false}
+function twOpen(){if(!calNeedDb())return;$("twAsk").hidden=true;$("twText").value="";TW.items=[];twRender();$("twScrim").hidden=false}
 let twTimer=0;
 $("twText").oninput=()=>{clearTimeout(twTimer);twTimer=setTimeout(()=>{TW.items=twParse($("twText").value);twRender()},250)};
 $("calTwBtn").onclick=twOpen;
 $("twCancel").onclick=()=>{$("twScrim").hidden=true};
-$("twGo").onclick=async()=>{const L=TW.items.filter(e=>e.on&&e.date&&String(e.title||"").trim());if(!L.length)return;$("twGo").disabled=true;
-  try{await calBatchApply(L.map(e=>({date:e.date,end:e.perm?"":(e.end||""),time:e.time||"",endTime:e.perm?"":(e.endTime||""),title:e.title.trim(),note:e.note||"",perm:!!e.perm,tags:null})))}finally{$("twScrim").hidden=true}};
+const twPick=()=>TW.items.filter(e=>e.on&&(e.date||e.nodate)&&String(e.title||"").trim());
+async function twDo(L){$("twGo").disabled=true;
+  try{await calBatchApply(L.map(e=>{const nd=!e.date,pm=!!e.perm||nd;return {date:e.date||hkToday(),end:pm?"":(e.end||""),time:e.time||"",endTime:pm?"":(e.endTime||""),title:e.title.trim(),note:nd?(e.note||"公告沒寫日期，暫當永久上線"):(e.note||""),perm:pm,tags:null}}))}finally{$("twScrim").hidden=true;$("twAsk").hidden=true}}
+$("twGo").onclick=async()=>{const L=twPick();if(!L.length)return;
+  const nd=L.filter(e=>!e.date);
+  if(nd.length){$("twAskN").textContent=String(nd.length);$("twAskList").textContent=nd.map(e=>"・"+e.title.trim()).join("\n");$("twAsk").hidden=false;return}
+  await twDo(L)};
+$("twAskNo").onclick=()=>{$("twAsk").hidden=true};
+$("twAskYes").onclick=()=>{const L=twPick();$("twAsk").hidden=true;if(L.length)twDo(L)};
 
 
 
